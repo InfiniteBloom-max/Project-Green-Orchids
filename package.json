@@ -1,0 +1,22 @@
+{
+  "name": "project-green",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:api": "cd apps/api && npm run dev",
+    "dev:web": "cd apps/web && npm run dev",
+    "build:api": "cd apps/api && npm run build",
+    "build:web": "cd apps/web && npm run build",
+    "seed": "cd apps/api && npm run seed",
+    "migrate": "cd apps/api && npm run migrate"
+  },
+  "dependencies": {
+    "date-fns": "^2.30.0",
+    "pdf-lib": "^1.17.1",
+    "puppeteer-core": "^25.1.0"
+  }
+}
