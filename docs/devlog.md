@@ -4,3 +4,4 @@
 - 2026-05-05 · @rashandi · docs(db): first-draft ERD — users, buyers, products, orders
 - 2026-05-05 · @rashandi · docs(db): add suppliers, inventory, price_tiers to ERD
 - 2026-05-05 · @ronith · docs: /docs folder, CONTRIBUTING.md (branch + commit rules)
+- 2026-05-05 · @nadeera · docs(api): API surface plan v0 (41 endpoints)
