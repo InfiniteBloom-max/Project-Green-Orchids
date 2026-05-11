@@ -8,3 +8,4 @@
 - 2026-05-07 · @rashandi · docs(db): ERD v0 frozen — 19 tables
 - 2026-05-11 · @rashandi · docs(ux): low-fi wireframes — login, catalogue, buyer dashboard
 - 2026-05-11 · @rashandi · docs(ux): admin + finance + delivery wireframes
+- 2026-05-11 · @ronith · docs: RBAC role × permission matrix (5 roles, 44 permissions)
