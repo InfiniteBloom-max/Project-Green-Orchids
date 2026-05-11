@@ -6,3 +6,4 @@
 - 2026-05-05 · @ronith · docs: /docs folder, CONTRIBUTING.md (branch + commit rules)
 - 2026-05-05 · @nadeera · docs(api): API surface plan v0 (41 endpoints)
 - 2026-05-07 · @rashandi · docs(db): ERD v0 frozen — 19 tables
+- 2026-05-11 · @rashandi · docs(ux): low-fi wireframes — login, catalogue, buyer dashboard
