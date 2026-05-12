@@ -10,3 +10,4 @@
 - 2026-05-11 · @rashandi · docs(ux): admin + finance + delivery wireframes
 - 2026-05-11 · @ronith · docs: RBAC role × permission matrix (5 roles, 44 permissions)
 - 2026-05-12 · @nadeera · docs(api): endpoint contract doc served at /docs
+- 2026-05-12 · @sithum · test(api): healthz + error-envelope tests (3 green)
