@@ -1,0 +1,259 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;1,400;1,500;1,600;1,700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-display: 'Sora', system-ui, sans-serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
+}
+
+/* Elegant italic serif wordmark (hero) */
+.font-serif-display {
+  font-family: var(--font-serif);
+  font-style: italic;
+  letter-spacing: -0.01em;
+}
+
+/* Frosted-glass pill navbar on a dark hero */
+.glass-nav {
+  background: rgba(20, 20, 22, 0.45);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.glass-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+}
+.glass-btn:hover {
+  background: rgba(255, 255, 255, 0.92);
+  color: #0b0b0c;
+  border-color: rgba(255, 255, 255, 0.92);
+}
+
+@keyframes hero-rise {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.hero-rise { animation: hero-rise 1.1s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.15; transform: scale(0.8); }
+  50% { opacity: 0.9; transform: scale(1.15); }
+}
+
+/* ============ Dark portal theme ============
+   Applied via .portal-dark on the WorkspaceShell content column. Remaps the
+   residual light-theme utilities used across all portal pages (admin / buyer /
+   finance / inventory / delivery) so the whole app reads on the dark orchid
+   theme without editing every page. Colored accents and status pills are left
+   intact so they pop as tags against the dark surfaces. */
+.portal-dark { color: rgba(241, 245, 249, 0.82); }
+
+.portal-dark .text-slate-950,
+.portal-dark .text-slate-900,
+.portal-dark .text-slate-800,
+.portal-dark .text-gray-900,
+.portal-dark .text-gray-800 { color: #f1f5f9 !important; }
+
+.portal-dark .text-slate-700,
+.portal-dark .text-slate-600,
+.portal-dark .text-slate-500,
+.portal-dark .text-gray-700,
+.portal-dark .text-gray-600,
+.portal-dark .text-gray-500 { color: #9aa6ba !important; }
+
+.portal-dark .text-slate-400,
+.portal-dark .text-slate-300,
+.portal-dark .text-gray-400 { color: #6b7689 !important; }
+
+.portal-dark .bg-white,
+.portal-dark [class*="bg-white/"] { background-color: rgba(255, 255, 255, 0.045) !important; }
+
+.portal-dark .bg-slate-50,
+.portal-dark .bg-slate-100,
+.portal-dark .bg-gray-50,
+.portal-dark .bg-gray-100 { background-color: rgba(255, 255, 255, 0.06) !important; }
+
+.portal-dark .border-white,
+.portal-dark [class*="border-white/"],
+.portal-dark .border-slate-200,
+.portal-dark .border-slate-100,
+.portal-dark .border-gray-200,
+.portal-dark .border-gray-100 { border-color: rgba(255, 255, 255, 0.1) !important; }
+
+.portal-dark [class*="ring-slate-"] { --tw-ring-color: rgba(255, 255, 255, 0.08) !important; }
+
+.portal-dark [class*="divide-slate-"] > :not([hidden]) ~ :not([hidden]),
+.portal-dark [class*="divide-gray-"] > :not([hidden]) ~ :not([hidden]) { border-color: rgba(255, 255, 255, 0.08) !important; }
+
+.portal-dark input,
+.portal-dark select,
+.portal-dark textarea { color: #f1f5f9; }
+.portal-dark input::placeholder,
+.portal-dark textarea::placeholder { color: rgba(255, 255, 255, 0.4) !important; }
+.portal-dark select option { background-color: #15161a; color: #f1f5f9; }
+
+/* Light tint backgrounds used on a few cards → faint dark tints */
+.portal-dark .bg-green-50,
+.portal-dark .bg-sky-50,
+.portal-dark .bg-amber-50,
+.portal-dark .bg-rose-50,
+.portal-dark .bg-orange-50 { background-color: rgba(255, 255, 255, 0.05) !important; }
+
+/* Light gradient table headers (e.g. from-slate-50 to-green-50/70) → dark */
+.portal-dark [class*="from-slate-50"],
+.portal-dark [class*="from-gray-50"],
+.portal-dark [class*="from-green-50"] { --tw-gradient-from: rgba(255, 255, 255, 0.06) !important; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important; }
+.portal-dark [class*="to-green-50"],
+.portal-dark [class*="to-slate-50"],
+.portal-dark [class*="to-gray-50"] { --tw-gradient-to: rgba(255, 255, 255, 0.02) !important; }
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply text-slate-900 antialiased font-sans;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  background:
+    radial-gradient(circle at 12% 0%, rgba(236, 37, 136, 0.14), transparent 30rem),
+    radial-gradient(circle at 88% 6%, rgba(18, 185, 129, 0.20), transparent 32rem),
+    linear-gradient(135deg, #f6fbf8 0%, #eef8f1 50%, #fff6fb 100%);
+}
+
+h1, h2, h3, h4, .font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+::selection {
+  background: #ec2588;
+  color: #fff;
+}
+
+/* ---------- Surfaces ---------- */
+.app-shell-surface {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(18px);
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+}
+
+.glass-dark {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* ---------- Text & accents ---------- */
+.text-gradient {
+  background: linear-gradient(110deg, #047857 0%, #12b981 42%, #ec2588 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-pink {
+  background: linear-gradient(110deg, #ec2588, #fb4fa3);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.bg-brand {
+  background-image: linear-gradient(120deg, #047857 0%, #12b981 40%, #ec2588 100%);
+}
+
+.bg-brand-animated {
+  background-image: linear-gradient(120deg, #047857, #12b981, #ec2588, #12b981, #047857);
+  background-size: 300% 300%;
+  animation: gradient-x 8s ease infinite;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-weight: 700;
+  font-size: 0.7rem;
+}
+
+/* ---------- Decorative blobs ---------- */
+.blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(60px);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ---------- Status pill base ---------- */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.01em;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  line-height: 1.1;
+}
+
+/* ---------- Scrollbar ---------- */
+.orchid-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #94e6c2 transparent;
+}
+.orchid-scrollbar::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.orchid-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(#5fd6a2, #12b981);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+.orchid-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(#12b981, #ec2588);
+  background-clip: padding-box;
+}
+
+/* ---------- Card hover lift ---------- */
+.lift {
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease;
+}
+.lift:hover {
+  transform: translateY(-4px);
+}
+
+/* ---------- Shimmer skeleton ---------- */
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+  animation: shimmer 1.6s infinite;
+}
