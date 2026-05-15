@@ -13,3 +13,4 @@
 - 2026-05-12 · @sithum · test(api): healthz + error-envelope tests (3 green)
 - 2026-05-13 · @ronith · ci(deploy): Render (api) + Vercel (web) hello-world
 - 2026-05-13 · @ronith · ci: cache npm store, run tests on PR, block merge on red
+- 2026-05-15 · @rashandi · docs(db): regenerate ERD from migrations, commit /docs/diagrams
