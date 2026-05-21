@@ -15,3 +15,4 @@
 - 2026-05-13 · @ronith · ci: cache npm store, run tests on PR, block merge on red
 - 2026-05-15 · @rashandi · docs(db): regenerate ERD from migrations, commit /docs/diagrams
 - 2026-05-20 · @rashandi · docs(db): ERD v1 final + data-dictionary.md
+- 2026-05-21 · @ronith · docs: scope locked 22 May — must-have list, sacrifice order
