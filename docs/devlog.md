@@ -18,3 +18,4 @@
 - 2026-05-21 · @ronith · docs: scope locked 22 May — must-have list, sacrifice order
 - 2026-05-22 · @rashandi · docs(ux): wireframes v2 signed off
 - 2026-05-23 · @ronith · docs: user stories US-01..US-58 grouped by role
+- 2026-05-24 · @rashandi · docs(ux): role-based navigation maps (5 dashboards)
