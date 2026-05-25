@@ -20,3 +20,4 @@
 - 2026-05-23 · @ronith · docs: user stories US-01..US-58 grouped by role
 - 2026-05-24 · @rashandi · docs(ux): role-based navigation maps (5 dashboards)
 - 2026-05-25 · @nadeera · docs(arch): state machines — RFQ, order, invoice, payment, RMA, delivery
+- 2026-05-25 · @sithum · docs(arch): money handling — decimal.js, round-half-up, no floats
