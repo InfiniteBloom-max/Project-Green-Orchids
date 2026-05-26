@@ -22,3 +22,4 @@
 - 2026-05-25 · @nadeera · docs(arch): state machines — RFQ, order, invoice, payment, RMA, delivery
 - 2026-05-25 · @sithum · docs(arch): money handling — decimal.js, round-half-up, no floats
 - 2026-05-25 · @sithum · test(api): money.js 14 cases (rounding, negative) green
+- 2026-05-26 · @sithum · docs(security): threat model — IDOR, SQLi, brute-force, price tamper
