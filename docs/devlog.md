@@ -25,3 +25,4 @@
 - 2026-05-26 · @sithum · docs(security): threat model — IDOR, SQLi, brute-force, price tamper
 - 2026-05-26 · @sithum · chore(seed): roles + permissions matrix (seed 44 perms)
 - 2026-05-26 · @nadeera · chore(seed): roles + permissions + 5 demo users
+- 2026-05-27 · @nadeera · chore(seed): products, suppliers, categories, buyer tiers (faker 42)
