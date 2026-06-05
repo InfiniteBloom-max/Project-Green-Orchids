@@ -30,3 +30,4 @@
 - 2026-05-28 · @sithum · docs(arch): price-change governance — 2/24h, 3rd needs approval
 - 2026-05-29 · @ronith · chore: freeze develop for branch-out (lock pinned, CI green)
 - 2026-05-29 · @nadeera · chore: branch from develop
+- 2026-06-05 · @nadeera · db: low_stock_alerts — collides with auth 031 (I-02), renumber after rebase
