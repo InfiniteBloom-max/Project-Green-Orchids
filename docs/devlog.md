@@ -33,3 +33,4 @@
 - 2026-06-02 · @sithum · chore(api): add .env.example (placeholders) + ensure .env ignored
 - 2026-06-03 · @sithum · test(rbac): 11 permission-matrix cases (allow/deny per role) green
 - 2026-06-06 · @sithum · chore: rebase onto develop, resolve package-lock conflict (I-01)
+- 2026-06-06 · @sithum · test(auth): e2e login→refresh→revoke (6 green), coverage 71%
