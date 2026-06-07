@@ -29,4 +29,6 @@
 - 2026-05-28 · @nadeera · chore(seed): 12 trade buyers w/ tiers + credit limits
 - 2026-05-28 · @sithum · docs(arch): price-change governance — 2/24h, 3rd needs approval
 - 2026-05-29 · @ronith · chore: freeze develop for branch-out (lock pinned, CI green)
-- 2026-05-29 · @yasali · chore: branch from develop
+- 2026-05-29 · @ronith · chore: branch from develop
+- 2026-06-01 · @ronith · ci: per-branch preview deploys + healthz smoke test
+- 2026-06-05 · @ronith · ci: add jest coverage gate (>60% on changed modules)
