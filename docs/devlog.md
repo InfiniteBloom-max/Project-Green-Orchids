@@ -34,3 +34,4 @@
 - 2026-06-06 · @nadeera · chore: merge develop → branch, resolve middleware registration conflict (I-06)
 - 2026-06-06 · @nadeera · chore: recover from upstream rebase — reset --hard + cherry-pick (I-05)
 - 2026-06-08 · @nadeera · chore: add sample product images to repo (+22 MB) (I-09)
+- 2026-06-08 · @ronith · chore: migrate images to Git LFS, purge blobs from pack (I-09)
