@@ -1,0 +1,13 @@
+const { Router } = require('express');
+const c = require('./pricing.controller');
+const { requireAuth } = require('../../middleware/auth');
+const { requirePermission } = require('../../middleware/rbac');
+const { validate } = require('../../middleware/validate');
+const { approveSchema, rejectSchema } = require('./pricing.schema');
+const r = Router();
+r.use(requireAuth, requirePermission('ADMIN', 'SALES_MANAGER'));
+r.get('/requests', c.listRequests);
+r.patch('/requests/:id/approve', validate({ body: approveSchema }), c.approve);
+r.patch('/requests/:id/reject', validate({ body: rejectSchema }), c.reject);
+r.get('/history', c.listHistory);
+module.exports = r;
