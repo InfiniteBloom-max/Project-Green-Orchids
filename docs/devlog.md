@@ -35,3 +35,4 @@
 - 2026-06-06 · @sithum · chore: rebase onto develop, resolve package-lock conflict (I-01)
 - 2026-06-06 · @sithum · test(auth): e2e login→refresh→revoke (6 green), coverage 71%
 - 2026-06-06 · @sithum · chore: force-push after rebase — broke @nadeera-p local (I-05)
+- 2026-06-09 · @sithum · feat(buyers): tier discount applied at price-resolution (FOR UPDATE)
