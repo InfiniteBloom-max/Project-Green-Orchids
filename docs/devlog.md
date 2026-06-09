@@ -36,3 +36,4 @@
 - 2026-06-06 · @sithum · test(auth): e2e login→refresh→revoke (6 green), coverage 71%
 - 2026-06-06 · @sithum · chore: force-push after rebase — broke @nadeera-p local (I-05)
 - 2026-06-09 · @sithum · feat(buyers): tier discount applied at price-resolution (FOR UPDATE)
+- 2026-06-09 · @sithum · test(pricing): governance — 2 ok, 3rd queued, same-price no-op (9 green)
