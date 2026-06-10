@@ -1,0 +1,18 @@
+const { Router } = require('express');
+const c = require('./rfq.controller');
+const { requireAuth, requireApprovedBuyer } = require('../../middleware/auth');
+const { requirePermission } = require('../../middleware/rbac');
+const { validate } = require('../../middleware/validate');
+const { createSchema, reviewSchema, quoteSchema, declineSchema } = require('./rfq.schema');
+const r = Router();
+r.use(requireAuth);
+r.post('/', requireApprovedBuyer, validate({ body: createSchema }), c.create);
+r.get('/', c.list);
+r.get('/:id', c.get);
+r.patch('/:id/review', requirePermission('ADMIN', 'SALES_MANAGER'), validate({ body: reviewSchema }), c.review);
+r.patch('/:id/quote', requirePermission('ADMIN', 'SALES_MANAGER'), validate({ body: quoteSchema }), c.quote);
+r.patch('/:id/decline', requirePermission('ADMIN', 'SALES_MANAGER'), validate({ body: declineSchema }), c.decline);
+r.patch('/:id/accept', requireApprovedBuyer, c.accept);
+r.patch('/:id/reject', requireApprovedBuyer, c.reject);
+r.post('/:id/convert', requireApprovedBuyer, c.convert);
+module.exports = r;
