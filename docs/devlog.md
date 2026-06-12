@@ -32,3 +32,4 @@
 - 2026-05-29 · @ronith · chore: branch from develop
 - 2026-06-01 · @ronith · ci: per-branch preview deploys + healthz smoke test
 - 2026-06-05 · @ronith · ci: add jest coverage gate (>60% on changed modules)
+- 2026-06-12 · @ronith · feat(reports): sales + inventory + credit cards wired to real queries
