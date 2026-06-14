@@ -37,3 +37,4 @@
 - 2026-06-12 · @sithum · feat(payments): payment.record txn (FOR UPDATE invoice, audit row)
 - 2026-06-14 · @rashandi · chore: rebase onto develop (post-RFQ), regenerate lock
 - 2026-06-14 · @yasali · test(e2e): golden path RFQ→quote→convert on staging seed
+- 2026-06-14 · @ronith · ci: staging smoke covers RFQ golden path + invoice generate
