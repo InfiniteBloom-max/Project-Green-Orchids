@@ -29,3 +29,10 @@ available_credit computed as credit_limit − unpaid invoice balances inside the
 **Files:** orders.repository.js · orders.service.js
 
 Cart items joined through carts (cart_items.cart_id → carts.buyer_id); availability uses status=ACTIVE; clearCart deletes by cart_id.
+
+### 4. Column drift: orders / order_items / invoices / stock_movements
+
+**Severity:** P0 · **Status:** FIXED
+**Files:** orders.repository.js
+
+Every INSERT/SELECT mapped to the real migration columns (order_no/total/source, qty/unit_price_at_order/price_source, invoice_no, stock_movements qty/ref_table/ref_id/performed_by).
