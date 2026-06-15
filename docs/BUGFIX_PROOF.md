@@ -106,3 +106,10 @@ Notify resolves OUR invoice from the PayHere order ref; method ONLINE; bad signa
 **Files:** products.service.js · pricing.service.js
 
 changePrice runs in a txn with SELECT … FOR UPDATE, re-counts the rolling 24h window from price_history, rejects same-price no-ops, writes history atomically; approval re-locks and verifies current price.
+
+### 15. Buyer self-cancel compared user-id to trade-account-id
+
+**Severity:** P1 · **Status:** FIXED
+**Files:** orders.service.js
+
+Caller trade_account id resolved and compared to order.buyer_id to decide BUYER vs ADMIN.
