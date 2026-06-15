@@ -71,3 +71,10 @@ Machine states renamed to exact DB enums (PENDING_APPROVAL…); confirm-receipt 
 **Files:** payments.service.js
 
 Balance computed under the invoice lock; a payment exceeding it throws 422 with the maximum acceptable amount.
+
+### 10. Invoice balance ignored invoice_adjustments (hard-coded 0)
+
+**Severity:** P1 · **Status:** FIXED
+**Files:** payments.service.js · payments.repository.js
+
+balance_due = total_amount + adjustments − paid_amount, recomputed under the lock; balance reaching 0 via credit adjustment yields ADJUSTED, not PAID.
