@@ -92,3 +92,10 @@ A reversal over 50,000 requires a confirmed_by that is present and different fro
 **Files:** orders.service.js · utils/time.js (new)
 
 Due date computed from the buyer trade_account payment_term mapped to days in Asia/Colombo via toColomboDate/dueDateForTerm.
+
+### 13. PayHere notify mapped order_id→invoice_id; weak idempotency
+
+**Severity:** P1 · **Status:** FIXED
+**Files:** payments.service.js · payments.repository.js
+
+Notify resolves OUR invoice from the PayHere order ref; method ONLINE; bad signatures audited+ignored; duplicates caught by UNIQUE(invoice_id,method,reference).
