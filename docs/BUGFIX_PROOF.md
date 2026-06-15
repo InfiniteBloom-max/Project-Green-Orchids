@@ -78,3 +78,10 @@ Balance computed under the invoice lock; a payment exceeding it throws 422 with 
 **Files:** payments.service.js · payments.repository.js
 
 balance_due = total_amount + adjustments − paid_amount, recomputed under the lock; balance reaching 0 via credit adjustment yields ADJUSTED, not PAID.
+
+### 11. Two-person reversal control was bypassable
+
+**Severity:** P1 · **Status:** FIXED
+**Files:** payments.service.js · payments.controller.js
+
+A reversal over 50,000 requires a confirmed_by that is present and different from the actor; controller passes the approver from the request body.
