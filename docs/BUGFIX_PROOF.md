@@ -8,3 +8,10 @@ Scope: 30 findings across orders, payments, pricing, auth.
 Areas: A. Schema vs code (8) · B. Money & invoice (5) · C. Price governance (2) · D. Auth/RBAC/security (6) · E. Transactions (4) · F. Indexing (5).
 
 ## Findings
+
+### 1. Pricing wrote to a non-existent price_changes table
+
+**Severity:** P0 · **Status:** FIXED
+**Files:** products.service.js · pricing.service.js · pricing.repository.js
+
+Removed the phantom price_changes table. Direct changes write immutable price_history; governed changes create a price_change_requests row; approval writes price_history(source=PRICE_REQUEST).
