@@ -34,3 +34,4 @@
 - 2026-06-05 · @ronith · ci: add jest coverage gate (>60% on changed modules)
 - 2026-06-12 · @ronith · feat(reports): sales + inventory + credit cards wired to real queries
 - 2026-06-15 · @yasali · feat(web): delivery coordinator board — assign, status, POD
+- 2026-06-15 · @ronith · feat(delivery): deliveries state machine + POD signed URL
