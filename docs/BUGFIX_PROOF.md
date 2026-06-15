@@ -22,3 +22,10 @@ Removed the phantom price_changes table. Direct changes write immutable price_hi
 **Files:** orders.repository.js
 
 available_credit computed as credit_limit − unpaid invoice balances inside the locked txn; tier discount read from buyer_tiers.discount_rate via tier_id. Hard-coded TIER_* map deleted.
+
+### 3. Cart used products.is_active & cart_items.buyer_id (absent)
+
+**Severity:** P0 · **Status:** FIXED
+**Files:** orders.repository.js · orders.service.js
+
+Cart items joined through carts (cart_items.cart_id → carts.buyer_id); availability uses status=ACTIVE; clearCart deletes by cart_id.
