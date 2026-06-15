@@ -50,3 +50,10 @@ Invoice status uses PENDING; online payments use ONLINE; reservations use ORDER_
 **Files:** payments.repository.js · payments.service.js
 
 Reversal detected via reversed_at; a second reversal throws ALREADY_REVERSED.
+
+### 7. Reservation decremented physical stock; availability ignored reserved_qty
+
+**Severity:** P0 · **Status:** FIXED
+**Files:** orders.repository.js · orders.service.js
+
+Reservation bumps reserved_qty (stock_qty intact); availability = stock_qty − reserved_qty on FOR UPDATE rows; dispatch converts the reservation.
