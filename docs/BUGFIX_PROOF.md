@@ -43,3 +43,10 @@ Every INSERT/SELECT mapped to the real migration columns (order_no/total/source,
 **Files:** orders.repository.js · payments.service.js · migration 0009
 
 Invoice status uses PENDING; online payments use ONLINE; reservations use ORDER_RESERVE/ORDER_RELEASE. 0009 adds CLOSED/ADJUSTED/ACCEPTED/CONFIRMED.
+
+### 6. Double payment reversal (guard read a missing status column)
+
+**Severity:** P0 · **Status:** FIXED
+**Files:** payments.repository.js · payments.service.js
+
+Reversal detected via reversed_at; a second reversal throws ALREADY_REVERSED.
