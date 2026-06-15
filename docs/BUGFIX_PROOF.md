@@ -85,3 +85,10 @@ balance_due = total_amount + adjustments − paid_amount, recomputed under the l
 **Files:** payments.service.js · payments.controller.js
 
 A reversal over 50,000 requires a confirmed_by that is present and different from the actor; controller passes the approver from the request body.
+
+### 12. Invoice due_date always NET30 (term read from a missing column)
+
+**Severity:** P1 · **Status:** FIXED
+**Files:** orders.service.js · utils/time.js (new)
+
+Due date computed from the buyer trade_account payment_term mapped to days in Asia/Colombo via toColomboDate/dueDateForTerm.
