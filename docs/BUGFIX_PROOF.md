@@ -64,3 +64,10 @@ Reservation bumps reserved_qty (stock_qty intact); availability = stock_qty − 
 **Files:** utils/stateMachine.js · orders.service.js · migration 0009
 
 Machine states renamed to exact DB enums (PENDING_APPROVAL…); confirm-receipt is DELIVERED→CLOSED; unit test asserts every ORDER state is in the DB CHECK list.
+
+### 9. Overpayment was not rejected
+
+**Severity:** P1 · **Status:** FIXED
+**Files:** payments.service.js
+
+Balance computed under the invoice lock; a payment exceeding it throws 422 with the maximum acceptable amount.
