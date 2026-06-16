@@ -37,3 +37,4 @@
 - 2026-06-15 · @ronith · feat(delivery): deliveries state machine + POD signed URL
 - 2026-06-16 · @ronith · feat(jobs): payment-reminder + low-stock cron (fires in UTC) (I-12)
 - 2026-06-16 · @ronith · fix(jobs): pin cron + timestamps to Asia/Colombo, store UTC (I-12)
+- 2026-06-16 · @yasali · feat(web): Bloom Reaction spike — MediaPipe face landmarker
