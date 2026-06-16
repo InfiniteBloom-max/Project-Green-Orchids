@@ -162,3 +162,10 @@ Invented roles replaced with real actor tokens ADMIN/BUYER/INVENTORY/FINANCE/DEL
 **Files:** utils/outbox.js (new) · orders/payments/products services
 
 enqueueEmail(client,…) writes a notifications_outbox row inside the business txn; the outboxDispatch cron delivers with backoff.
+
+### 23. reject/cancel/confirm mutated without txn or audit-in-txn
+
+**Severity:** P2 · **Status:** FIXED
+**Files:** orders.service.js · orders.repository.js · middleware/audit.js
+
+These run inside tx(); status change, audit row and outbox enqueue commit together; rejection_reason/cancelled_by/cancelled_at persisted.
