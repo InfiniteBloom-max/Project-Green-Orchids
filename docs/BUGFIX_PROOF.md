@@ -183,3 +183,10 @@ Conversion reads quoted_unit_price, keeps tier discount 0 for RFQ orders, and re
 **Files:** migration 0009
 
 order/invoice/payment number sequences created so nextval() is gap-tolerant and race-free.
+
+### 26. Verify FK/aggregate index coverage on report joins
+
+**Severity:** P3 · **Status:** FIXED
+**Files:** (verify-only)
+
+Confirmed needed indexes exist (invoice_adjustments.invoice_id, payments.invoice_id); 60s report cache covers volume. No change.
