@@ -190,3 +190,10 @@ order/invoice/payment number sequences created so nextval() is gap-tolerant and 
 **Files:** (verify-only)
 
 Confirmed needed indexes exist (invoice_adjustments.invoice_id, payments.invoice_id); 60s report cache covers volume. No change.
+
+### 27. bloom_events had no index on triggered_at
+
+**Severity:** P3 · **Status:** FIXED
+**Files:** migration 0009
+
+Added time and (product_id, triggered_at) indexes for the weekly Bloom tile.
