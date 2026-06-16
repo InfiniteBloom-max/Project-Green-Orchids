@@ -169,3 +169,10 @@ enqueueEmail(client,…) writes a notifications_outbox row inside the business t
 **Files:** orders.service.js · orders.repository.js · middleware/audit.js
 
 These run inside tx(); status change, audit row and outbox enqueue commit together; rejection_reason/cancelled_by/cancelled_at persisted.
+
+### 24. RFQ conversion read quoted_price; no availability warning
+
+**Severity:** P2 · **Status:** FIXED
+**Files:** orders.service.js
+
+Conversion reads quoted_unit_price, keeps tier discount 0 for RFQ orders, and returns per-line availability warnings.
