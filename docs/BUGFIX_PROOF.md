@@ -120,3 +120,10 @@ Caller trade_account id resolved and compared to order.buyer_id to decide BUYER 
 **Files:** orders.service.js · orders.repository.js · orders.controller.js
 
 Buyer scoping resolves trade_accounts.id once (accountIdForUser); isAdmin checks the order.view.all permission, not an invented role.
+
+### 17. Append-only guarantee was inert (REVOKE gated on a missing role)
+
+**Severity:** P1 · **Status:** FIXED
+**Files:** migration 0009
+
+Role-independent BEFORE UPDATE/DELETE triggers RAISE on audit_logs, stock_movements and price_history.
