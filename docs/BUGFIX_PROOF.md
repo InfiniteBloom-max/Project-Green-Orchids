@@ -204,3 +204,10 @@ Added time and (product_id, triggered_at) indexes for the weekly Bloom tile.
 **Files:** migration 0009
 
 Added a partial active-token index and an expires index for cleanup.
+
+### 29. audit_logs JSONB not GIN-indexed
+
+**Severity:** P3 · **Status:** FIXED
+**Files:** (deferred)
+
+Deferred until JSONB content filtering is added; the spec filters (actor/action/entity/date) are b-tree indexed.
