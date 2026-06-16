@@ -141,3 +141,10 @@ auth exports bustUserStatus(); suspend handler calls it so the cached ACTIVE sta
 **Files:** middleware/audit.js
 
 Redaction recursive + regex (/secret|token|password|hash|api_key/i); INSERT corrected to actor_id/actor_role/entity_type; writeAudit accepts a tx client.
+
+### 20. INVENTORY_MANAGER could approve price changes
+
+**Severity:** P2 · **Status:** FIXED
+**Files:** migration 0009
+
+price.approve removed from INVENTORY_MANAGER, restoring the ADMIN-only / two-person separation.
