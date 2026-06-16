@@ -35,3 +35,4 @@
 - 2026-06-12 · @ronith · feat(reports): sales + inventory + credit cards wired to real queries
 - 2026-06-15 · @yasali · feat(web): delivery coordinator board — assign, status, POD
 - 2026-06-15 · @ronith · feat(delivery): deliveries state machine + POD signed URL
+- 2026-06-16 · @ronith · feat(jobs): payment-reminder + low-stock cron (fires in UTC) (I-12)
