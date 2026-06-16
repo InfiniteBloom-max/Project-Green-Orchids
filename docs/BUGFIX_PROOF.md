@@ -218,3 +218,7 @@ Deferred until JSONB content filtering is added; the spec filters (actor/action/
 **Files:** migration 0009
 
 Added trigram indexes on suppliers.name and categories.name for admin directory search.
+
+## Verification run
+
+`node scripts/verify_fixes.js` → **11 / 11 PASS** (DB-independent). Every edited file passes `node --check`.
