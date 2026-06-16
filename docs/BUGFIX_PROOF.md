@@ -211,3 +211,10 @@ Added a partial active-token index and an expires index for cleanup.
 **Files:** (deferred)
 
 Deferred until JSONB content filtering is added; the spec filters (actor/action/entity/date) are b-tree indexed.
+
+### 30. Supplier/category search columns lacked indexes
+
+**Severity:** P3 · **Status:** FIXED
+**Files:** migration 0009
+
+Added trigram indexes on suppliers.name and categories.name for admin directory search.
