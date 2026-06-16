@@ -127,3 +127,10 @@ Buyer scoping resolves trade_accounts.id once (accountIdForUser); isAdmin checks
 **Files:** migration 0009
 
 Role-independent BEFORE UPDATE/DELETE triggers RAISE on audit_logs, stock_movements and price_history.
+
+### 18. Suspension latency up to 30s (no cache-bust)
+
+**Severity:** P2 · **Status:** FIXED
+**Files:** middleware/auth.js · buyers.service.js
+
+auth exports bustUserStatus(); suspend handler calls it so the cached ACTIVE status is dropped immediately.
