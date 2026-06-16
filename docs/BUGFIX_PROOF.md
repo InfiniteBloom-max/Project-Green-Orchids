@@ -155,3 +155,10 @@ price.approve removed from INVENTORY_MANAGER, restoring the ADMIN-only / two-per
 **Files:** utils/stateMachine.js
 
 Invented roles replaced with real actor tokens ADMIN/BUYER/INVENTORY/FINANCE/DELIVERY/SYSTEM.
+
+### 22. Notifications sent via direct sendMail, not the outbox
+
+**Severity:** P2 · **Status:** FIXED
+**Files:** utils/outbox.js (new) · orders/payments/products services
+
+enqueueEmail(client,…) writes a notifications_outbox row inside the business txn; the outboxDispatch cron delivers with backoff.
