@@ -197,3 +197,10 @@ Confirmed needed indexes exist (invoice_adjustments.invoice_id, payments.invoice
 **Files:** migration 0009
 
 Added time and (product_id, triggered_at) indexes for the weekly Bloom tile.
+
+### 28. email_tokens lacked expiry/active index
+
+**Severity:** P3 · **Status:** FIXED
+**Files:** migration 0009
+
+Added a partial active-token index and an expires index for cleanup.
