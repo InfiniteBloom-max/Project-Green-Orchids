@@ -37,3 +37,4 @@
 - 2026-06-12 · @sithum · feat(payments): payment.record txn (FOR UPDATE invoice, audit row)
 - 2026-06-14 · @rashandi · chore: rebase onto develop (post-RFQ), regenerate lock
 - 2026-06-16 · @sithum · feat(rma): approved return increments stock + invoice_adjustment
+- 2026-06-17 · @sithum · test(finance): invoice→partial→statement→aging (9 green)
