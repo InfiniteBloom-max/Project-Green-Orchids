@@ -29,12 +29,8 @@
 - 2026-05-28 · @nadeera · chore(seed): 12 trade buyers w/ tiers + credit limits
 - 2026-05-28 · @sithum · docs(arch): price-change governance — 2/24h, 3rd needs approval
 - 2026-05-29 · @ronith · chore: freeze develop for branch-out (lock pinned, CI green)
-- 2026-05-29 · @rashandi · chore: branch from develop
-- 2026-06-04 · @rashandi · docs(ux): finance + RMA screen specs, every state drawn
-- 2026-06-09 · @rashandi · docs(ux): aging-report + statement layout finalised
-- 2026-06-11 · @sithum · feat(invoices): money math + invoice number sequence
-- 2026-06-11 · @rashandi · db: invoices + adjustments (folded into 0006)
-- 2026-06-12 · @sithum · feat(payments): payment.record txn (FOR UPDATE invoice, audit row)
-- 2026-06-14 · @rashandi · chore: rebase onto develop (post-RFQ), regenerate lock
-- 2026-06-14 · @yasali · test(e2e): golden path RFQ→quote→convert on staging seed
-- 2026-06-14 · @ronith · ci: staging smoke covers RFQ golden path + invoice generate
+- 2026-05-29 · @yasali · chore: branch from develop
+- 2026-06-10 · @sithum · feat(rfq): validation + state machine guards
+- 2026-06-12 · @yasali · test(rfq): e2e RFQ→quote→accept→convert + expired-reject (7 green)
+- 2026-06-13 · @yasali · chore: merge develop → branch, resolve seed.js conflict (I-11)
+- 2026-06-16 · @nadeera · feat(reports): order + revenue queries feed dashboard cards
