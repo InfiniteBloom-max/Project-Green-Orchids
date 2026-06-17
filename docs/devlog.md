@@ -40,3 +40,4 @@
 - 2026-06-16 · @yasali · feat(web): Bloom Reaction spike — MediaPipe face landmarker
 - 2026-06-17 · @ronith · chore: merge develop → branch — LARGE conflict (10 days behind) (I-14)
 - 2026-06-17 · @ronith · chore: resolve I-14 — seed split, api/types barrel, reports rebase
+- 2026-06-17 · @ronith · test(delivery): assign→dispatch→POD→buyer-confirm (5 green)
