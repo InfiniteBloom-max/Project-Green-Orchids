@@ -1,0 +1,13 @@
+const { Router } = require('express');
+const c = require('./cms.controller');
+const { requireAuth, optionalAuth } = require('../../middleware/auth');
+const { requirePermission } = require('../../middleware/rbac');
+const { validate } = require('../../middleware/validate');
+const { createSchema, updateSchema } = require('./cms.schema');
+const r = Router();
+r.get('/blocks', optionalAuth, c.list);
+r.get('/blocks/:key', optionalAuth, c.get);
+r.post('/blocks', requireAuth, requirePermission('ADMIN', 'CONTENT_MANAGER'), validate({ body: createSchema }), c.create);
+r.patch('/blocks/:key', requireAuth, requirePermission('ADMIN', 'CONTENT_MANAGER'), validate({ body: updateSchema }), c.update);
+r.patch('/blocks/:key/publish', requireAuth, requirePermission('ADMIN', 'CONTENT_MANAGER'), c.togglePublish);
+module.exports = r;
