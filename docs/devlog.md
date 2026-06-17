@@ -36,5 +36,5 @@
 - 2026-06-11 · @rashandi · db: invoices + adjustments (folded into 0006)
 - 2026-06-12 · @sithum · feat(payments): payment.record txn (FOR UPDATE invoice, audit row)
 - 2026-06-14 · @rashandi · chore: rebase onto develop (post-RFQ), regenerate lock
-- 2026-06-14 · @yasali · test(e2e): golden path RFQ→quote→convert on staging seed
-- 2026-06-14 · @ronith · ci: staging smoke covers RFQ golden path + invoice generate
+- 2026-06-16 · @sithum · feat(rma): approved return increments stock + invoice_adjustment
+- 2026-06-17 · @sithum · test(finance): invoice→partial→statement→aging (9 green)
