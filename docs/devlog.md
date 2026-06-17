@@ -29,8 +29,11 @@
 - 2026-05-28 · @nadeera · chore(seed): 12 trade buyers w/ tiers + credit limits
 - 2026-05-28 · @sithum · docs(arch): price-change governance — 2/24h, 3rd needs approval
 - 2026-05-29 · @ronith · chore: freeze develop for branch-out (lock pinned, CI green)
-- 2026-05-29 · @yasali · chore: branch from develop
-- 2026-06-10 · @sithum · feat(rfq): validation + state machine guards
-- 2026-06-12 · @yasali · test(rfq): e2e RFQ→quote→accept→convert + expired-reject (7 green)
-- 2026-06-13 · @yasali · chore: merge develop → branch, resolve seed.js conflict (I-11)
-- 2026-06-16 · @nadeera · feat(reports): order + revenue queries feed dashboard cards
+- 2026-05-29 · @sithum · chore: branch from develop
+- 2026-06-02 · @sithum · chore(api): add .env.example (placeholders) + ensure .env ignored
+- 2026-06-03 · @sithum · test(rbac): 11 permission-matrix cases (allow/deny per role) green
+- 2026-06-06 · @sithum · chore: rebase onto develop, resolve package-lock conflict (I-01)
+- 2026-06-06 · @sithum · test(auth): e2e login→refresh→revoke (6 green), coverage 71%
+- 2026-06-06 · @sithum · chore: force-push after rebase — broke @nadeera-p local (I-05)
+- 2026-06-09 · @sithum · feat(buyers): tier discount applied at price-resolution (FOR UPDATE)
+- 2026-06-09 · @sithum · test(pricing): governance — 2 ok, 3rd queued, same-price no-op (9 green)
