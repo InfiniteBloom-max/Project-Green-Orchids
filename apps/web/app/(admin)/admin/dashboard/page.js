@@ -101,8 +101,8 @@ export default function AdminDashboardPage() {
                   className="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-black/20 px-4 py-3 transition hover:bg-white/[0.06]"
                 >
                   <div className="min-w-0">
-                    <p className="truncate font-semibold text-white">#{o.orderNumber || o.id?.slice(0, 8)}</p>
-                    <p className="truncate text-xs text-white/35">{o.buyerName || o.buyer?.businessName || '—'} · {formatDate(o.createdAt, 'yyyy-MM-dd')}</p>
+                    <p className="truncate font-semibold text-white">#{o.order_no || o.orderNumber || o.id}</p>
+                    <p className="truncate text-xs text-white/35">{o.buyer_name || o.buyerName || o.buyer?.businessName || '—'} · {formatDate(o.created_at || o.createdAt, 'yyyy-MM-dd')}</p>
                   </div>
                   <div className="flex shrink-0 items-center gap-3">
                     <span className="font-semibold text-emerald-200">{formatLKR(o.total || o.totalAmount || 0)}</span>
@@ -130,8 +130,8 @@ export default function AdminDashboardPage() {
                   className="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-black/20 px-4 py-3 transition hover:bg-white/[0.06]"
                 >
                   <div className="min-w-0">
-                    <p className="truncate font-semibold text-white">{r.reference || r.rfqNumber || `RFQ-${r.id?.slice(0, 6)}`}</p>
-                    <p className="truncate text-xs text-white/35">{r.buyerName || r.buyer?.businessName || '—'} · {formatDate(r.createdAt, 'yyyy-MM-dd')}</p>
+                    <p className="truncate font-semibold text-white">{r.rfq_no || r.reference || r.rfqNumber || `RFQ-${r.id}`}</p>
+                    <p className="truncate text-xs text-white/35">{r.buyer_name || r.buyerName || r.buyer?.businessName || '—'} · {formatDate(r.created_at || r.createdAt, 'yyyy-MM-dd')}</p>
                   </div>
                   <StatusBadge status={r.status} />
                 </Link>

@@ -35,7 +35,9 @@ export default function AdminDeliveriesPage() {
     try {
       const params = new URLSearchParams({ page: String(page), limit: '20' });
       if (status) params.set('status', status);
-      const res = await api.get(`/admin/deliveries?${params}`).catch(() => api.get(`/deliveries?${params}`));
+      const res = await api.get(`/admin/deliveries?${params}`)
+        .catch(() => api.get(`/deliveries?${params}`)
+        .catch(() => ({ data: { deliveries: [], totalPages: 1 } })));
       const payload = res.data;
       setDeliveries(payload.deliveries || payload.data || (Array.isArray(payload) ? payload : []));
       setTotalPages(payload.totalPages || 1);

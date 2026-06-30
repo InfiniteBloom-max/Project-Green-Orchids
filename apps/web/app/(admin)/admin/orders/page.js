@@ -41,7 +41,7 @@ export default function AdminOrdersPage() {
       const res = await api.get(`/admin/orders?${params}`).catch(() => api.get(`/orders?adminView=true&${params}`));
       const payload = res.data;
       setOrders(payload.orders || payload.data || (Array.isArray(payload) ? payload : []));
-      setTotalPages(payload.totalPages || 1);
+      setTotalPages(payload.pagination?.pages || payload.totalPages || 1);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -97,11 +97,11 @@ export default function AdminOrdersPage() {
               <tbody className="divide-y divide-white/[0.05]">
                 {orders.map((o) => (
                   <tr key={o.id} className="group transition hover:bg-white/[0.03]">
-                    <td className="py-3 pr-4 font-mono text-xs font-semibold text-white">#{o.orderNumber || o.id?.slice(0, 8)}</td>
-                    <td className="py-3 pr-4 text-white/70">{o.buyerName || o.buyer?.businessName || '—'}</td>
+                    <td className="py-3 pr-4 font-mono text-xs font-semibold text-white">#{o.order_no || o.orderNumber || o.id}</td>
+                    <td className="py-3 pr-4 text-white/70">{o.buyer_name || o.buyerName || o.buyer?.businessName || '—'}</td>
                     <td className="py-3 pr-4 font-semibold text-emerald-200">{formatLKR(o.total || o.totalAmount || 0)}</td>
                     <td className="py-3 pr-4"><StatusBadge status={o.status} /></td>
-                    <td className="py-3 pr-4 text-white/35">{formatDate(o.createdAt, 'yyyy-MM-dd')}</td>
+                    <td className="py-3 pr-4 text-white/35">{formatDate(o.created_at || o.createdAt, 'yyyy-MM-dd')}</td>
                     <td className="py-3">
                       <Link
                         href={`/admin/orders/${o.id}`}

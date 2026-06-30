@@ -62,13 +62,13 @@ export default function AdminOrderDetailPage() {
         <div className="flex-1">
           <DashboardHero
             eyebrow="Order detail"
-            title={`Order #${order.orderNumber || order.id?.slice(0, 8)}`}
+            title={`Order #${order.order_no || order.orderNumber || order.id}`}
             tone="sky"
             stats={[
               { label: 'Status', value: order.status },
-              { label: 'Date', value: formatDate(order.createdAt, 'yyyy-MM-dd') },
+              { label: 'Date', value: formatDate(order.created_at || order.createdAt, 'yyyy-MM-dd') },
               { label: 'Total', value: formatLKR(order.total || order.totalAmount || 0) },
-              { label: 'Payment', value: order.paymentStatus || payment.status || '—' },
+              { label: 'Payment', value: order.payment_status || order.paymentStatus || payment.status || '—' },
             ]}
           />
         </div>
@@ -111,17 +111,17 @@ export default function AdminOrderDetailPage() {
         <div className="space-y-5">
           <GlassPanel title="Buyer">
             <div className="space-y-2 text-sm">
-              <p className="font-semibold text-white">{order.buyerName || order.buyer?.businessName || '—'}</p>
-              <p className="text-white/40">{order.buyerEmail || order.buyer?.email || '—'}</p>
+              <p className="font-semibold text-white">{order.buyer_name || order.buyerName || order.buyer?.businessName || '—'}</p>
+              <p className="text-white/40">{order.buyer_email || order.buyerEmail || order.buyer?.email || '—'}</p>
               {order.buyer?.id && (
                 <Link href={`/admin/buyers/${order.buyer.id}`} className="text-xs font-semibold text-emerald-300 hover:text-emerald-200">View buyer profile →</Link>
               )}
             </div>
           </GlassPanel>
 
-          {(order.shippingAddress || order.deliveryAddress) && (
+          {(order.shipping_address || order.shippingAddress || order.deliveryAddress) && (
             <GlassPanel title="Shipping address">
-              <p className="whitespace-pre-line text-sm text-white/60">{order.shippingAddress || order.deliveryAddress}</p>
+              <p className="whitespace-pre-line text-sm text-white/60">{order.shipping_address || order.shippingAddress || order.deliveryAddress}</p>
             </GlassPanel>
           )}
 
