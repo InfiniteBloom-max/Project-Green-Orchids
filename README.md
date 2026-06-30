@@ -15,6 +15,12 @@ A full-stack B2B wholesale commerce platform for a Sri Lankan orchid exporter â€
 
 ---
 
+## Public Homepage
+
+![Homepage](docs/screenshots/homepage.png)
+
+---
+
 ## Dashboards
 
 Four distinct role-based portals, each with a clean slate-900 sidebar and white content area:
