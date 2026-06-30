@@ -29,12 +29,24 @@
 - 2026-05-28 · @nadeera · chore(seed): 12 trade buyers w/ tiers + credit limits
 - 2026-05-28 · @sithum · docs(arch): price-change governance — 2/24h, 3rd needs approval
 - 2026-05-29 · @ronith · chore: freeze develop for branch-out (lock pinned, CI green)
-- 2026-05-29 · @rashandi · chore: branch from develop
+- 2026-05-29 · @rashandi · chore: branch from develop (finance/rma)
+- 2026-05-29 · @ronith · chore: branch from develop (delivery/reports)
+- 2026-06-01 · @ronith · ci: per-branch preview deploys + healthz smoke test
 - 2026-06-04 · @rashandi · docs(ux): finance + RMA screen specs, every state drawn
+- 2026-06-05 · @ronith · ci: add jest coverage gate (>60% on changed modules)
 - 2026-06-09 · @rashandi · docs(ux): aging-report + statement layout finalised
 - 2026-06-11 · @sithum · feat(invoices): money math + invoice number sequence
 - 2026-06-11 · @rashandi · db: invoices + adjustments (folded into 0006)
 - 2026-06-12 · @sithum · feat(payments): payment.record txn (FOR UPDATE invoice, audit row)
+- 2026-06-12 · @ronith · feat(reports): sales + inventory + credit cards wired to real queries
 - 2026-06-14 · @rashandi · chore: rebase onto develop (post-RFQ), regenerate lock
+- 2026-06-15 · @yasali · feat(web): delivery coordinator board — assign, status, POD
+- 2026-06-15 · @ronith · feat(delivery): deliveries state machine + POD signed URL
 - 2026-06-16 · @sithum · feat(rma): approved return increments stock + invoice_adjustment
+- 2026-06-16 · @ronith · feat(jobs): payment-reminder + low-stock cron (fires in UTC) (I-12)
+- 2026-06-16 · @ronith · fix(jobs): pin cron + timestamps to Asia/Colombo, store UTC (I-12)
+- 2026-06-16 · @yasali · feat(web): Bloom Reaction spike — MediaPipe face landmarker
 - 2026-06-17 · @sithum · test(finance): invoice→partial→statement→aging (9 green)
+- 2026-06-17 · @ronith · chore: merge develop → branch — LARGE conflict (10 days behind) (I-14)
+- 2026-06-17 · @ronith · chore: resolve I-14 — seed split, api/types barrel, reports rebase
+- 2026-06-17 · @ronith · test(delivery): assign→dispatch→POD→buyer-confirm (5 green)
