@@ -127,6 +127,13 @@ async function clearData(pool) {
   // categories has self-referencing FK; null children first
   await pool.query('UPDATE categories SET parent_id = NULL');
 
+  // The audit/ledger tables are append-only at runtime. Seeding is the one
+  // controlled reset path, so temporarily disable only user-defined triggers.
+  const appendOnlyTables = ['audit_logs', 'stock_movements', 'price_history'];
+  for (const table of appendOnlyTables) {
+    await pool.query(`ALTER TABLE ${table} DISABLE TRIGGER USER`);
+  }
+
   // Delete in reverse dependency order (children before parents)
   const tables = [
     'delivery_events',
@@ -156,6 +163,7 @@ async function clearData(pool) {
     'auth_sessions',
     'email_tokens',
     'login_history',
+    'cms_blocks',
     'users',
     'role_access_windows',
     'role_permissions',
@@ -163,33 +171,38 @@ async function clearData(pool) {
     'roles',
     'notifications_outbox',
     'audit_logs',
-    'cms_blocks',
     'settings',
     'buyer_tiers',
   ];
 
-  for (const table of tables) {
-    await pool.query(`DELETE FROM ${table}`);
-  }
+  try {
+    for (const table of tables) {
+      await pool.query(`DELETE FROM ${table}`);
+    }
 
-  // Reset sequences
-  const sequences = [
-    'roles_id_seq', 'permissions_id_seq',
-    'categories_id_seq', 'suppliers_id_seq',
-    'products_id_seq', 'product_images_id_seq',
-    'bulk_pricing_tiers_id_seq',
-    'orders_id_seq', 'order_items_id_seq',
-    'invoices_id_seq', 'payments_id_seq',
-    'invoice_adjustments_id_seq',
-    'rma_requests_id_seq', 'rma_items_id_seq',
-    'deliveries_id_seq', 'delivery_events_id_seq',
-    'stock_alerts_id_seq',
-    'price_change_requests_id_seq',
-  ];
-  for (const seq of sequences) {
-    try {
-      await pool.query(`ALTER SEQUENCE IF EXISTS ${seq} RESTART WITH 1`);
-    } catch (_) { /* may not exist yet */ }
+    // Reset sequences
+    const sequences = [
+      'roles_id_seq', 'permissions_id_seq',
+      'categories_id_seq', 'suppliers_id_seq',
+      'products_id_seq', 'product_images_id_seq',
+      'bulk_pricing_tiers_id_seq',
+      'orders_id_seq', 'order_items_id_seq',
+      'invoices_id_seq', 'payments_id_seq',
+      'invoice_adjustments_id_seq',
+      'rma_requests_id_seq', 'rma_items_id_seq',
+      'deliveries_id_seq', 'delivery_events_id_seq',
+      'stock_alerts_id_seq',
+      'price_change_requests_id_seq',
+    ];
+    for (const seq of sequences) {
+      try {
+        await pool.query(`ALTER SEQUENCE IF EXISTS ${seq} RESTART WITH 1`);
+      } catch (_) { /* may not exist yet */ }
+    }
+  } finally {
+    for (const table of appendOnlyTables) {
+      await pool.query(`ALTER TABLE ${table} ENABLE TRIGGER USER`);
+    }
   }
 }
 
@@ -234,11 +247,11 @@ async function seed() {
     // ---- 3. Staff users ----
     console.log('👤 Seeding staff users…');
     const staffDefs = [
-      { email: 'admin@example.invalid',         name: 'Priya Administrator', role: 'ADMIN' },
-      { email: 'buyer@example.invalid',         name: 'Sunil Tradebuyer',    role: 'TRADE_BUYER' },
-      { email: 'inventory@example.invalid',     name: 'Kamal Inventory',     role: 'INVENTORY_MANAGER' },
-      { email: 'finance@example.invalid',        name: 'Nimala Finance',      role: 'FINANCE_OFFICER' },
-      { email: 'delivery@example.invalid',       name: 'Dilan Delivery',      role: 'DELIVERY_COORDINATOR' },
+      { email: 'admin@example.invalid',         name: 'Admin User',          role: 'ADMIN' },
+      { email: 'buyer@example.invalid',         name: 'Trade Account',       role: 'TRADE_BUYER' },
+      { email: 'inventory@example.invalid',     name: 'Inventory Manager',   role: 'INVENTORY_MANAGER' },
+      { email: 'finance@example.invalid',        name: 'Finance Officer',     role: 'FINANCE_OFFICER' },
+      { email: 'delivery@example.invalid',       name: 'Delivery Staff',      role: 'DELIVERY_COORDINATOR' },
     ];
 
     const staffUsers = {};

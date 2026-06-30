@@ -4,128 +4,185 @@
 
 ### B2B Wholesale Orchid Trade Platform
 
-A full-stack wholesale commerce platform for a Sri Lankan orchid exporter — RFQ → quote → order, tier pricing, credit & invoicing, payments, returns (RMA), delivery tracking, and a dark glassmorphism UI.
+A full-stack B2B wholesale commerce platform for a Sri Lankan orchid exporter — RFQ → quote → order, tier pricing, credit & invoicing, payments, returns (RMA), delivery tracking, and a clean multi-role portal UI.
 
 ![Next.js](https://img.shields.io/badge/Next.js-14_App_Router-000?logo=nextdotjs)
 ![Express](https://img.shields.io/badge/API-Express-000?logo=express)
-![PostgreSQL](https://img.shields.io/badge/DB-PostgreSQL_18-336791?logo=postgresql&logoColor=white)
-![Tailwind](https://img.shields.io/badge/UI-TailwindCSS-38BDF8?logo=tailwindcss&logoColor=white)
-![Status](https://img.shields.io/badge/audit-30%2F30_fixed-2ea44f)
-![Tests](https://img.shields.io/badge/verify-11%2F11_green-2ea44f)
+![PostgreSQL](https://img.shields.io/badge/DB-PostgreSQL-336791?logo=postgresql)
+![Tailwind CSS](https://img.shields.io/badge/UI-Tailwind_CSS-06B6D4?logo=tailwindcss)
 
 </div>
 
 ---
 
-## ✨ Overview
+## Dashboards
 
-Project Green is a monorepo B2B platform with **five role-based portals** (Admin, Trade Buyer, Inventory, Finance, Delivery) over a single Express API and a 38-table PostgreSQL schema. It models the real wholesale lifecycle end-to-end with correct money handling, governed pricing, stock reservation under concurrency, and an append-only audit trail.
+Four distinct role-based portals, each with a clean slate-900 sidebar and white content area:
 
-| | |
+### Admin Suite — Operations Dashboard
+![Admin Dashboard](docs/screenshots/admin-dashboard.png)
+
+### Trade Portal — Buyer Dashboard
+![Buyer Dashboard](docs/screenshots/buyer-dashboard.png)
+
+### Finance Desk — Financial Overview
+![Finance Dashboard](docs/screenshots/finance-dashboard.png)
+
+### Inventory Hub — Stock Overview
+![Inventory Dashboard](docs/screenshots/inventory-dashboard.png)
+
+---
+
+## Features
+
+| Module | Capabilities |
 |---|---|
-| ![Public catalogue](docs/images/cat_top.png) | ![Admin dashboard](docs/images/p_admin_dash.png) |
-| Public catalogue | Admin operations dashboard |
-| ![Buyer dashboard](docs/images/p_buyer.png) | ![Finance](docs/images/p_finance.png) |
-| Buyer order cockpit | Finance receivables & aging |
+| **Catalogue** | 500+ orchid SKUs, categories, supplier links, images, tier pricing |
+| **RFQ → Quote** | Buyers submit requests, admin quotes, converts to order on acceptance |
+| **Orders** | Full lifecycle: PENDING → CONFIRMED → ALLOCATED → DISPATCHED → DELIVERED |
+| **Credit & Invoicing** | Per-buyer credit limits, NET-15/30/45/60 terms, invoice generation |
+| **Payments** | Record incoming payments, auto-reconcile to invoices |
+| **RMA / Returns** | Return merchandise authorisation with reason tracking |
+| **Delivery** | Delivery coordinator portal, track dispatched orders |
+| **CMS** | Admin-editable public homepage — hero, features, testimonials |
+| **RBAC** | 5 roles (Admin, Trade Buyer, Finance Officer, Inventory Manager, Delivery Coordinator) with granular permissions |
 
 ---
 
-## 🧩 Features by portal
+## Tech Stack
 
-- **Public** — landing (blooming-orchid video hero), live catalogue with trigram search, auth (login / register / verify / reset).
-- **Trade Buyer** — catalogue, cart, RFQ → quote → order, orders, invoices, returns (RMA), statements, account.
-- **Admin** — dashboard, buyer approvals & tiers, products CMS + images, pricing governance, RFQs, orders, RMA, deliveries, reports, CMS, users, security (sessions / login history / audit / price-history).
-- **Finance** — invoices, partial payments + reversal, credit monitor, statements, aging buckets.
-- **Inventory** — stock dashboard, products, movement ledger, low-stock alerts.
-- **Delivery** — coordinator board (assign → dispatch → in-transit → delivered), POD upload, status events.
-
----
-
-## 🛠 Tech stack
-
-**Web** — Next.js 14 (App Router) · React · TailwindCSS · TanStack Query · Axios
-**API** — Node.js · Express · PostgreSQL (`pg`) · Zod · JWT (access + rotating refresh) · bcryptjs · decimal.js · node-cron · Nodemailer · Cloudinary · Handlebars
-**Tooling** — npm workspaces · custom migration runner · faker seed (pinned)
+- **Frontend:** Next.js 14 App Router, React, Tailwind CSS
+- **Backend:** Express.js REST API, modular architecture
+- **Database:** PostgreSQL with full relational schema (migrations in `apps/api/migrations/`)
+- **Auth:** JWT (access + refresh tokens), bcrypt password hashing
+- **Emails:** Nodemailer (email verification, password reset)
 
 ---
 
-## 📁 Monorepo structure
+## Getting Started
 
-```
-apps/
-  web/                 Next.js 14 front end
-    app/(public|buyer|admin|finance|inventory|delivery)/   role portals
-    src/lib            api client, auth, cart store
-    src/components      ui / domain / layout / auth
-  api/                 Express back end
-    src/modules/<domain>/   <domain>.{routes,controller,service,repository,schema,test}.js
-    src/middleware      auth, rbac, audit, validate, errors, rateLimit, request_id
-    src/utils           money, stateMachine, pagination, time, outbox
-    src/jobs            cron: outboxDispatch, invoiceAging, quoteExpiry, stockCheck, sessionSweep
-    migrations/         0001 … 0009 (38 tables)
-scripts/                migrate.js · seed.js · verify_fixes.js
-docs/                   DATABASE.md · BUGFIX_PROOF.md · devlog.md · diagrams
-```
+### Prerequisites
 
----
+- Node.js 18+
+- PostgreSQL 14+ running locally
+- (Optional) pnpm / npm
 
-## 🗄 Database
-
-PostgreSQL 18 · **38 tables** · 9 migrations · full RBAC, state machines, and `SELECT … FOR UPDATE` stock reservation. See **[docs/DATABASE.md](docs/DATABASE.md)** for the full schema, ER diagram, role matrix, concurrency model, and edge cases.
-
----
-
-## 🚀 Getting started
+### 1. Install dependencies
 
 ```bash
-# 1. Postgres (create + migrate + seed)
-createdb project_green
-npm run migrate
-npm run seed
-
-# 2. API  → http://localhost:5000
-cd apps/api && npm install && npm run dev
-
-# 3. Web  → http://localhost:3000
-cd apps/web && npm install && npm run dev
+npm install
 ```
 
-Environment: copy `apps/api/.env.example` → `apps/api/.env` and fill in `DATABASE_URL`, `JWT_SECRET`, SMTP and Cloudinary keys.
+### 2. Set up the database
 
-### Demo accounts (seeded)
+Create a database named `project_green` and run the migrations:
+
+```bash
+psql -U postgres -c "CREATE DATABASE project_green;"
+psql -U postgres -d project_green -f apps/api/migrations/0001_extensions.sql
+psql -U postgres -d project_green -f apps/api/migrations/0002_roles_permissions.sql
+psql -U postgres -d project_green -f apps/api/migrations/0003_users_auth.sql
+psql -U postgres -d project_green -f apps/api/migrations/0004_trade_catalogue.sql
+psql -U postgres -d project_green -f apps/api/migrations/0005_pricing_rfq_cart_orders.sql
+psql -U postgres -d project_green -f apps/api/migrations/0006_invoices_payments_rma_delivery.sql
+psql -U postgres -d project_green -f apps/api/migrations/0007_crosscutting.sql
+```
+
+### 3. Seed demo data
+
+```bash
+node scripts/seed.js
+```
+
+This creates staff accounts, buyer accounts, a full orchid catalogue and sample orders.
+
+### 4. Configure environment
+
+Copy and edit the API env file:
+
+```bash
+cp apps/api/.env.example apps/api/.env
+```
+
+Key variables:
+
+```
+DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/project_green
+PORT=5000
+JWT_ACCESS_SECRET=your-secret
+JWT_REFRESH_SECRET=your-refresh-secret
+CORS_ORIGIN=http://localhost:3000
+```
+
+### 5. Start the servers
+
+**API (Express):**
+```bash
+cd apps/api
+node src/index.js
+```
+
+**Frontend (Next.js):**
+```bash
+cd apps/web
+NODE_OPTIONS=--max-old-space-size=4096 npx next build
+npx next start -p 3000
+```
+
+---
+
+## Demo Accounts
+
+After seeding, log in at `http://localhost:3000/login`:
+
 | Role | Email | Password |
 |---|---|---|
 | Admin | `admin@example.invalid` | `Staff@1234` |
-| Finance | `finance@example.invalid` | `Staff@1234` |
-| Inventory | `inventory@example.invalid` | `Staff@1234` |
-| Delivery | `delivery@example.invalid` | `Staff@1234` |
-| Trade Buyer | `buyer1@example.invalid` | `Buyer@1234` |
+| Trade Buyer | `buyer@example.invalid` | `Buyer@1234` |
+| Finance Officer | `finance@example.invalid` | `Staff@1234` |
+| Inventory Manager | `inventory@example.invalid` | `Staff@1234` |
+| Delivery Coordinator | `delivery@example.invalid` | `Staff@1234` |
 
 ---
 
-## ✅ Quality & verification
+## Project Structure
 
-- `node scripts/verify_fixes.js` → **11/11 green** (DB-independent checks of the core money / stock / RBAC / state-machine logic).
-- DB & Security audit: **30/30 findings remediated** — see **[docs/BUGFIX_PROOF.md](docs/BUGFIX_PROOF.md)**.
+```
+project-green/
+├── apps/
+│   ├── api/                  # Express REST API
+│   │   ├── migrations/       # PostgreSQL migration files
+│   │   └── src/
+│   │       └── modules/      # Feature modules (auth, orders, buyers, …)
+│   └── web/                  # Next.js 14 frontend
+│       └── app/
+│           ├── (admin)/      # Admin portal pages
+│           ├── (buyer)/      # Trade buyer portal pages
+│           ├── (finance)/    # Finance desk pages
+│           ├── (inventory)/  # Inventory hub pages
+│           ├── (delivery)/   # Delivery coordinator pages
+│           └── (public)/     # Public site (homepage, login, register)
+├── scripts/
+│   └── seed.js               # Database seeder
+└── docs/                     # Documentation & screenshots
+```
 
 ---
 
-## 🌿 Team — Group H
+## Portal Access
 
-| Member | Role | Lead branch | GitHub |
-|---|---|---|---|
-| Sithum Nimhan | Backend Dev & QA | `feature/auth-rbac-accounts` | [@Sithum77](https://github.com/Sithum77) |
-| Nadeera Prabhash | Software Engineer | `feature/catalogue-inventory` | [@darkgladiator77](https://github.com/darkgladiator77) |
-| Yasali Sarajika | Frontend Dev & QA | `feature/rfq-cart-orders` | [@Yasali13](https://github.com/Yasali13) |
-| Rashandi Tharushika | UI/UX & Docs Coord. | `feature/finance-invoices-rma` | [@rtwijendra](https://github.com/rtwijendra) |
-| Ronith Rashmikara | Project Manager / DevOps | `feature/delivery-reports-platform` | [@InfiniteBloom-max](https://github.com/InfiniteBloom-max) |
+Each role logs in to their own workspace:
 
----
-
-## 🔀 Workflow
-
-`main` (protected, releases) ← `develop` (integration) ← `feature/*` (one lead each). Conventional Commits; PR + review per [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md). Build window: **30 Apr → 17 Jun 2026**. The [issues](https://github.com/InfiniteBloom-max/Project-Green-Orchids/issues?q=is%3Aissue) and merge history double as the contribution ledger.
+| Role | Portal URL |
+|---|---|
+| Admin | `/admin/dashboard` |
+| Trade Buyer | `/buyer/dashboard` |
+| Finance Officer | `/finance/dashboard` |
+| Inventory Manager | `/inventory/dashboard` |
+| Delivery Coordinator | `/delivery/dashboard` |
 
 ---
 
-<div align="center"><sub>© 2026 K ORCHIDS · Project Green · Group H · Built for academic assessment.</sub></div>
+<div align="center">
+Built with Next.js, Express, and PostgreSQL · K ORCHIDS 2026
+</div>

@@ -15,7 +15,7 @@ Thumbs.db
 logs/
 *.log
 # QA / tooling artefacts (not product code)
-screenshots/
+/screenshots/
 catalogue-products.csv
 scripts/onepage.js
 scripts/driver.js
