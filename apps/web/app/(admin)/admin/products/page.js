@@ -3,8 +3,9 @@
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import api from '@/lib/api';
-import { Button, Input, Select } from '@/components/ui/Button';
+import { Button, Input } from '@/components/ui/Button';
 import { Table } from '@/components/ui/Table';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { Spinner, EmptyState, ErrorState } from '@/components/ui/Spinner';
 import { StockBand, StatusBadge } from '@/components/domain/StatusBadge';
 import { formatLKR } from '@/lib/utils';
@@ -20,6 +21,7 @@ export default function ProductsPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [selected, setSelected] = useState(new Set());
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -27,9 +29,18 @@ export default function ProductsPage() {
     try {
       const params = new URLSearchParams({ page: String(page), limit: '20' });
       if (search) params.set('search', search);
-      const res = await api.get(`/admin/products?${params}`);
-      setProducts(res.data.products || res.data.data || res.data);
-      setTotalPages(res.data.totalPages || 1);
+      const res = await api.get(`/products?${params}`);
+      const raw = res.data.data || res.data.products || (Array.isArray(res.data) ? res.data : []);
+      setProducts(raw.map((p) => ({
+        ...p,
+        imageUrl: p.primary_image || p.imageUrl || null,
+        supplierName: p.supplier_name || p.supplierName || '',
+        price: p.base_price || p.price || 0,
+        stock: p.stock_qty != null ? p.stock_qty : (p.stock ?? 0),
+        reserved: p.reserved_qty != null ? p.reserved_qty : (p.reserved ?? 0),
+        category: p.category_name || p.category || '',
+      })));
+      setTotalPages(res.data.pagination?.pages || res.data.totalPages || 1);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -52,7 +63,7 @@ export default function ProductsPage() {
     const ids = Array.from(selected);
     if (!ids.length) return toast.error('Select products');
     try {
-      await api.post('/admin/products/bulk', { ids, action });
+      await api.post('/products/bulk', { ids, action });
       toast.success(`${action} completed`);
       fetchProducts();
       setSelected(new Set());
@@ -61,10 +72,18 @@ export default function ProductsPage() {
 
   const handleExportCSV = async () => {
     try {
-      const res = await api.get('/admin/products/export/csv', { responseType: 'blob' });
+      const res = await api.get('/products/export/csv', { responseType: 'blob' });
       const url = URL.createObjectURL(new Blob([res.data]));
       const a = document.createElement('a'); a.href = url; a.download = 'products.csv'; a.click();
     } catch { toast.error('Export failed'); }
+  };
+
+  const handleDelete = async () => {
+    try {
+      await api.delete(`/products/${deleteTarget.id}`);
+      setProducts((p) => p.filter((x) => x.id !== deleteTarget.id));
+      toast.success('Product deleted');
+    } catch { toast.error('Failed to delete'); }
   };
 
   const cols = [
@@ -80,7 +99,8 @@ export default function ProductsPage() {
     { key: 'actions', label: '', render: (_, r) => (
       <div className="flex gap-1">
         <Link href={`/admin/products/${r.id}`}><Button size="sm" variant="outline">Edit</Button></Link>
-        <Button size="sm" variant="ghost" onClick={() => api.post(`/admin/products/${r.id}/duplicate`).then(() => { toast.success('Duplicated'); fetchProducts(); })}>Copy</Button>
+        <Button size="sm" variant="ghost" onClick={() => api.post(`/products/${r.id}/duplicate`).then(() => { toast.success('Duplicated'); fetchProducts(); }).catch(() => toast.error('Duplicate not supported'))}>Copy</Button>
+        <Button size="sm" variant="ghost" onClick={() => setDeleteTarget(r)}>Delete</Button>
       </div>
     )},
   ];
@@ -106,6 +126,16 @@ export default function ProductsPage() {
           <Pagination page={page} totalPages={totalPages} onChange={setPage} />
         </div>
       )}
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleDelete}
+        title="Delete product"
+        message={`Delete "${deleteTarget?.name}"? All associated inventory records will also be removed. This cannot be undone.`}
+        confirmLabel="Delete"
+        variant="danger"
+      />
     </div>
   );
 }

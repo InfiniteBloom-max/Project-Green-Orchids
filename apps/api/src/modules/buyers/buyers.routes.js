@@ -5,7 +5,7 @@ const { requirePermission } = require('../../middleware/rbac');
 const { validate } = require('../../middleware/validate');
 const { approveSchema, rejectSchema, suspendSchema, creditUpdateSchema, tierUpdateSchema } = require('./buyers.schema');
 const router = Router();
-router.use(requireAuth, requirePermission('ADMIN', 'SALES_MANAGER', 'BUYER_MANAGER'));
+router.use(requireAuth, requirePermission('order.view.all', 'user.manage', 'credit.view'));
 router.get('/', ctrl.list);
 router.get('/:id', ctrl.get);
 router.post('/:id/approve', validate({ body: approveSchema }), ctrl.approve);

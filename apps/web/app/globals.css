@@ -50,72 +50,10 @@
   50% { opacity: 0.9; transform: scale(1.15); }
 }
 
-/* ============ Dark portal theme ============
-   Applied via .portal-dark on the WorkspaceShell content column. Remaps the
-   residual light-theme utilities used across all portal pages (admin / buyer /
-   finance / inventory / delivery) so the whole app reads on the dark orchid
-   theme without editing every page. Colored accents and status pills are left
-   intact so they pop as tags against the dark surfaces. */
-.portal-dark { color: rgba(241, 245, 249, 0.82); }
-
-.portal-dark .text-slate-950,
-.portal-dark .text-slate-900,
-.portal-dark .text-slate-800,
-.portal-dark .text-gray-900,
-.portal-dark .text-gray-800 { color: #f1f5f9 !important; }
-
-.portal-dark .text-slate-700,
-.portal-dark .text-slate-600,
-.portal-dark .text-slate-500,
-.portal-dark .text-gray-700,
-.portal-dark .text-gray-600,
-.portal-dark .text-gray-500 { color: #9aa6ba !important; }
-
-.portal-dark .text-slate-400,
-.portal-dark .text-slate-300,
-.portal-dark .text-gray-400 { color: #6b7689 !important; }
-
-.portal-dark .bg-white,
-.portal-dark [class*="bg-white/"] { background-color: rgba(255, 255, 255, 0.045) !important; }
-
-.portal-dark .bg-slate-50,
-.portal-dark .bg-slate-100,
-.portal-dark .bg-gray-50,
-.portal-dark .bg-gray-100 { background-color: rgba(255, 255, 255, 0.06) !important; }
-
-.portal-dark .border-white,
-.portal-dark [class*="border-white/"],
-.portal-dark .border-slate-200,
-.portal-dark .border-slate-100,
-.portal-dark .border-gray-200,
-.portal-dark .border-gray-100 { border-color: rgba(255, 255, 255, 0.1) !important; }
-
-.portal-dark [class*="ring-slate-"] { --tw-ring-color: rgba(255, 255, 255, 0.08) !important; }
-
-.portal-dark [class*="divide-slate-"] > :not([hidden]) ~ :not([hidden]),
-.portal-dark [class*="divide-gray-"] > :not([hidden]) ~ :not([hidden]) { border-color: rgba(255, 255, 255, 0.08) !important; }
-
-.portal-dark input,
-.portal-dark select,
-.portal-dark textarea { color: #f1f5f9; }
-.portal-dark input::placeholder,
-.portal-dark textarea::placeholder { color: rgba(255, 255, 255, 0.4) !important; }
-.portal-dark select option { background-color: #15161a; color: #f1f5f9; }
-
-/* Light tint backgrounds used on a few cards → faint dark tints */
-.portal-dark .bg-green-50,
-.portal-dark .bg-sky-50,
-.portal-dark .bg-amber-50,
-.portal-dark .bg-rose-50,
-.portal-dark .bg-orange-50 { background-color: rgba(255, 255, 255, 0.05) !important; }
-
-/* Light gradient table headers (e.g. from-slate-50 to-green-50/70) → dark */
-.portal-dark [class*="from-slate-50"],
-.portal-dark [class*="from-gray-50"],
-.portal-dark [class*="from-green-50"] { --tw-gradient-from: rgba(255, 255, 255, 0.06) !important; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important; }
-.portal-dark [class*="to-green-50"],
-.portal-dark [class*="to-slate-50"],
-.portal-dark [class*="to-gray-50"] { --tw-gradient-to: rgba(255, 255, 255, 0.02) !important; }
+/* ============ Portal (light) ============
+   Portal pages sit on a white/slate-50 background.
+   The .portal-dark class is kept as a no-op for any legacy usage. */
+.portal-dark { /* intentionally empty — portals now use light theme */ }
 
 * {
   box-sizing: border-box;

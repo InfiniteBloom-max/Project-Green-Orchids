@@ -6,7 +6,7 @@ const { validate } = require('../../middleware/validate');
 const { createUserSchema, updateUserSchema } = require('./users.schema');
 
 const router = Router();
-router.use(requireAuth, requirePermission('ADMIN'));
+router.use(requireAuth, requirePermission('user.manage'));
 
 router.get('/', ctrl.list);
 router.post('/', validate({ body: createUserSchema }), ctrl.create);

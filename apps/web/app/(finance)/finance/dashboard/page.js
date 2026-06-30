@@ -1,80 +1,129 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import api from '@/lib/api';
-import { KpiCard } from '@/components/domain/StatusBadge';
-import { Card } from '@/components/ui/Card';
 import { Spinner } from '@/components/ui/Spinner';
-import { formatLKR } from '@/lib/utils';
+import { StatusBadge } from '@/components/domain/StatusBadge';
+import { formatLKR, formatDate } from '@/lib/utils';
+import { ActionTile, DashboardHero, GlassPanel, MetricCard, PrimaryAction } from '@/components/domain/DashboardUI';
 
-const BUCKET_TONES = {
-  '0-30': { bar: 'from-green-400 to-green-500', text: 'text-green-700' },
-  '31-60': { bar: 'from-amber-300 to-amber-400', text: 'text-amber-700' },
-  '61-90': { bar: 'from-orange-400 to-orange-500', text: 'text-orange-700' },
-  '90+': { bar: 'from-rose-500 to-orchid-500', text: 'text-rose-700' },
-};
+const quickActions = [
+  { href: '/finance/invoices',   title: 'Invoices',        description: 'View and manage all buyer invoices.',   icon: '🧾', tone: 'sky'     },
+  { href: '/finance/payments',   title: 'Record payment',  description: 'Log an incoming buyer payment.',        icon: '💳', tone: 'emerald' },
+  { href: '/finance/aging',      title: 'Ageing report',   description: 'Review overdue and at-risk invoices.',  icon: '📊', tone: 'amber'   },
+  { href: '/finance/statements', title: 'Statements',      description: 'Generate buyer account statements.',    icon: '📄', tone: 'violet'  },
+];
 
 export default function FinanceDashboardPage() {
-  const router = useRouter();
-  const [data, setData] = useState(null);
+  const [data, setData]     = useState({ summary: {}, invoices: [], payments: [] });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
-      const res = await api.get('/finance/dashboard').catch(() => ({ data: {} }));
-      setData(res.data);
+      const [sumRes, invRes, payRes] = await Promise.all([
+        api.get('/reports/summary').catch(() => api.get('/reports/revenue').catch(() => ({ data: {} }))),
+        api.get('/invoices?limit=5&sort=due_date:asc').catch(() => ({ data: [] })),
+        api.get('/payments?limit=5').catch(() => ({ data: [] })),
+      ]);
+      const sp = sumRes.data;
+      const ip = invRes.data;
+      const pp = payRes.data;
+      setData({
+        summary:  sp || {},
+        invoices: ip.invoices || ip.data || (Array.isArray(ip) ? ip : []),
+        payments: pp.payments || pp.data || (Array.isArray(pp) ? pp : []),
+      });
       setLoading(false);
     })();
   }, []);
 
   if (loading) return <Spinner className="py-24" size="lg" />;
-  const d = data || {};
 
-  const agingBuckets = d.agingBuckets || { '0-30': 0, '31-60': 0, '61-90': 0, '90+': 0 };
-  const maxAging = Math.max(...Object.values(agingBuckets), 1);
+  const s       = data.summary;
+  const overdue = data.invoices.filter((i) => i.status === 'OVERDUE').length;
+  const totalDue = data.invoices.reduce((a, i) => a + parseFloat(i.balance_due || i.balanceDue || 0), 0);
 
   return (
     <div className="space-y-7">
-      <div className="relative overflow-hidden rounded-3xl bg-brand-dark p-7 text-white shadow-pop md:p-9">
-        <div className="blob -top-12 right-8 h-52 w-52 animate-blob bg-sky-500/40" />
-        <div className="blob bottom-0 left-1/3 h-44 w-44 animate-blob bg-green-500/40" style={{ animationDelay: '3s' }} />
-        <div className="relative">
-          <p className="eyebrow text-green-300">Receivables desk</p>
-          <h1 className="mt-2 font-display text-3xl font-extrabold tracking-tight md:text-4xl">Finance Dashboard</h1>
-          <p className="mt-2 max-w-xl text-white/70">Collections, overdue exposure and aging — at a glance.</p>
-        </div>
+      <DashboardHero
+        eyebrow="Finance desk"
+        title="Financial overview"
+        description="Track revenue, monitor outstanding invoices and manage buyer payments."
+        tone="sky"
+        actions={<>
+          <PrimaryAction href="/finance/invoices" tone="sky" variant="solid">View invoices</PrimaryAction>
+          <PrimaryAction href="/finance/payments" tone="sky" variant="ghost">Record payment</PrimaryAction>
+        </>}
+        stats={[
+          { label: 'Open invoices', value: data.invoices.length },
+          { label: 'Overdue',       value: overdue },
+          { label: 'Total due',     value: formatLKR(totalDue) },
+        ]}
+      />
+
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <MetricCard label="Revenue (month)"   value={formatLKR(s.revenueThisMonth || s.revenue || 0)} detail="Current month sales" icon="💰" tone="emerald" href="/finance/statements" />
+        <MetricCard label="Payments received" value={formatLKR(s.paymentsThisMonth || 0)}            detail="Month to date"        icon="💳" tone="sky"     href="/finance/payments"   />
+        <MetricCard label="Overdue invoices"  value={overdue}                                         detail="Past due date"        icon="⚠️" tone="rose"    href="/finance/aging"      />
+        <MetricCard label="Outstanding total" value={formatLKR(totalDue)}                            detail="All open balances"    icon="📊" tone="amber"   href="/finance/invoices"   />
       </div>
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <KpiCard title="Total Receivables" value={formatLKR(d.totalReceivables || 0)} icon="📊" tone="green" />
-        <KpiCard title="Overdue Total" value={formatLKR(d.overdueTotal || 0)} icon="⚠️" tone="pink" />
-        <KpiCard title="Collected (Month)" value={formatLKR(d.collectedThisMonth || 0)} icon="✅" tone="sky" />
-        <KpiCard title="Outstanding Invoices" value={d.outstandingCount || 0} icon="🧾" tone="amber" />
+      <div className="grid gap-5 lg:grid-cols-2">
+        <GlassPanel
+          title="Open invoices"
+          subtitle="Sorted by due date ascending."
+          action={<Link href="/finance/invoices" className="text-[12px] font-semibold text-sky-600 hover:text-sky-700">View all →</Link>}
+        >
+          {data.invoices.length === 0 ? (
+            <p className="py-6 text-center text-sm text-slate-400">No open invoices</p>
+          ) : (
+            <div className="divide-y divide-slate-100">
+              {data.invoices.map((inv) => (
+                <Link key={inv.id} href={`/finance/invoices/${inv.id}`}
+                  className="flex items-center justify-between gap-4 py-3 -mx-5 px-5 rounded-xl transition hover:bg-slate-50">
+                  <div className="min-w-0">
+                    <p className="text-[13px] font-semibold text-slate-800">{inv.invoice_no || `INV-${inv.id}`}</p>
+                    <p className="text-[12px] text-slate-400">Due {formatDate(inv.due_date || inv.dueDate, 'dd MMM yyyy')}</p>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-3">
+                    <span className="text-[13px] font-semibold text-slate-700">{formatLKR(inv.balance_due || inv.total_amount || 0)}</span>
+                    <StatusBadge status={inv.status} />
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </GlassPanel>
+
+        <GlassPanel
+          title="Recent payments"
+          subtitle="Latest recorded buyer payments."
+          action={<Link href="/finance/payments" className="text-[12px] font-semibold text-emerald-600 hover:text-emerald-700">View all →</Link>}
+        >
+          {data.payments.length === 0 ? (
+            <p className="py-6 text-center text-sm text-slate-400">No payments recorded yet</p>
+          ) : (
+            <div className="divide-y divide-slate-100">
+              {data.payments.map((pay) => (
+                <div key={pay.id} className="flex items-center justify-between gap-4 py-3">
+                  <div className="min-w-0">
+                    <p className="text-[13px] font-semibold text-slate-800">{pay.payment_no || `PAY-${pay.id}`}</p>
+                    <p className="text-[12px] text-slate-400">{pay.method || '—'} · {formatDate(pay.created_at, 'dd MMM yyyy')}</p>
+                  </div>
+                  <span className="text-[13px] font-semibold text-emerald-600">+{formatLKR(pay.amount || 0)}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </GlassPanel>
       </div>
 
-      <Card>
-        <div className="mb-5 flex items-center justify-between">
-          <h3 className="text-sm font-bold text-slate-700">Aging analysis</h3>
-          <span className="text-xs font-semibold text-slate-400">Click a band to drill in</span>
+      <GlassPanel title="Quick actions" subtitle="Finance workspace shortcuts.">
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+          {quickActions.map((a) => <ActionTile key={a.href} {...a} />)}
         </div>
-        <div className="space-y-4">
-          {Object.entries(agingBuckets).map(([label, amount]) => {
-            const tone = BUCKET_TONES[label] || BUCKET_TONES['0-30'];
-            return (
-              <button key={label} className="w-full text-left transition hover:opacity-90" onClick={() => router.push(`/finance/aging?bucket=${label}`)}>
-                <div className="mb-1.5 flex justify-between text-sm">
-                  <span className="font-bold text-slate-600">{label} days</span>
-                  <span className={`font-extrabold ${tone.text}`}>{formatLKR(amount)}</span>
-                </div>
-                <div className="h-4 w-full overflow-hidden rounded-full bg-slate-100">
-                  <div className={`h-full rounded-full bg-gradient-to-r ${tone.bar} transition-all duration-700`} style={{ width: `${Math.max((amount / maxAging) * 100, 2)}%` }} />
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </Card>
+      </GlassPanel>
     </div>
   );
 }

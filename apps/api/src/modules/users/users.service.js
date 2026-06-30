@@ -25,11 +25,17 @@ const usersService = {
     const tempPassword = uuidv4().substring(0, 16);
     const passwordHash = await bcrypt.hash(tempPassword, 12);
 
+    const { query } = require('../../config/db');
+    let roleId = data.role_id;
+    if (!roleId && data.role) {
+      const roleRes = await query('SELECT id FROM roles WHERE name = $1', [data.role]);
+      roleId = roleRes.rows[0]?.id;
+    }
     const user = await usersRepository.create({
       email: data.email,
       passwordHash,
       name: data.name,
-      roleId: data.role_id,
+      roleId,
     });
 
     // Create password setup token
