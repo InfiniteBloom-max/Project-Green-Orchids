@@ -5,9 +5,9 @@ const usersRepository = {
     const countResult = await query('SELECT COUNT(*) FROM users');
     const total = parseInt(countResult.rows[0].count, 10);
     const result = await query(
-      `SELECT u.id, u.email, u.name, u.status, u.role_id, u.created_at, r.name as role_name
+      `SELECT u.id, u.email, u.full_name AS name, u.status, u.role_id, u.last_login_at, u.created_at, r.name as role_name
        FROM users u LEFT JOIN roles r ON r.id = u.role_id
-       ORDER BY u.${sort} ${order} LIMIT $1 OFFSET $2`,
+       ORDER BY u.created_at ${order} LIMIT $1 OFFSET $2`,
       [limit, offset]
     );
     return { rows: result.rows, total };
@@ -15,7 +15,7 @@ const usersRepository = {
 
   async findById(id) {
     const result = await query(
-      `SELECT u.*, r.name as role_name,
+      `SELECT u.id, u.email, u.full_name AS name, u.status, u.role_id, u.last_login_at, u.created_at, u.updated_at, r.name as role_name,
               ta.id as trade_account_id, ta.business_name, ta.account_status, ta.credit_limit, ta.tier
        FROM users u
        LEFT JOIN roles r ON r.id = u.role_id
@@ -28,8 +28,8 @@ const usersRepository = {
 
   async create({ email, passwordHash, name, roleId }) {
     const result = await query(
-      `INSERT INTO users (email, password_hash, name, status, role_id)
-       VALUES ($1, $2, $3, 'PENDING', $4) RETURNING *`,
+      `INSERT INTO users (email, password_hash, full_name, status, role_id)
+       VALUES ($1, $2, $3, 'ACTIVE', $4) RETURNING id, email, full_name AS name, status, role_id, created_at`,
       [email.toLowerCase(), passwordHash, name, roleId]
     );
     return result.rows[0];
@@ -41,7 +41,7 @@ const usersRepository = {
     const setClauses = keys.map((k, i) => `${k} = $${i + 2}`);
     const values = keys.map(k => updates[k]);
     const result = await query(
-      `UPDATE users SET ${setClauses.join(', ')}, updated_at = NOW() WHERE id = $1 RETURNING *`,
+      `UPDATE users SET ${setClauses.join(', ')}, updated_at = NOW() WHERE id = $1 RETURNING id, email, full_name AS name, status, role_id, updated_at`,
       [id, ...values]
     );
     return result.rows[0];

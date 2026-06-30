@@ -22,7 +22,7 @@ export default function AdminOrderDetailPage() {
     (async () => {
       try {
         const res = await api.get(`/admin/orders/${id}`).catch(() => api.get(`/orders/${id}`));
-        setOrder(res.data.order || res.data);
+        setOrder(res.data.data || res.data.order || res.data);
       } catch { toast.error('Failed to load order'); }
       setLoading(false);
     })();

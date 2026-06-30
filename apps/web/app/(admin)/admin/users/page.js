@@ -20,19 +20,21 @@ export default function UsersPage() {
 
   useEffect(() => {
     (async () => {
-      const res = await api.get('/admin/users').catch(() => ({ data: [] }));
-      setUsers(res.data.users || res.data.data || res.data);
+      const res = await api.get('/users').catch(() => ({ data: [] }));
+      const payload = res.data;
+      setUsers(payload.users || payload.data || (Array.isArray(payload) ? payload : []));
       setLoading(false);
     })();
   }, []);
 
   const handleCreate = async () => {
     try {
-      await api.post('/admin/users', form);
+      await api.post('/users', form);
       toast.success('User created');
       setShowCreate(false);
-      const res = await api.get('/admin/users');
-      setUsers(res.data.users || res.data.data || res.data);
+      const res = await api.get('/users');
+      const payload = res.data;
+      setUsers(payload.users || payload.data || (Array.isArray(payload) ? payload : []));
     } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
   };
 
@@ -45,7 +47,7 @@ export default function UsersPage() {
       label: 'Deactivate',
       action: async () => {
         try {
-          await api.post(`/admin/users/${id}/deactivate`);
+          await api.patch(`/users/${id}`, { status: 'INACTIVE' });
           setUsers((u) => u.map((x) => x.id === id ? { ...x, status: 'INACTIVE' } : x));
           toast.success('Deactivated');
         } catch { toast.error('Failed'); }
@@ -62,7 +64,7 @@ export default function UsersPage() {
       label: 'Send Reset',
       action: async () => {
         try {
-          await api.post(`/admin/users/${id}/reset-password`);
+          await api.post(`/auth/forgot-password`, { email: users.find((u) => u.id === id)?.email });
           toast.success('Password reset triggered');
         } catch { toast.error('Failed'); }
       },

@@ -25,7 +25,7 @@ export default function AdminDashboardPage() {
     (async () => {
       const [inventoryRes, buyersRes, ordersRes, rfqsRes, revenueRes] = await Promise.all([
         api.get('/inventory/dashboard').catch(() => ({ data: {} })),
-        api.get('/admin/buyers?limit=100').catch(() => ({ data: [] })),
+        api.get('/buyers?limit=100').catch(() => ({ data: [] })),
         api.get('/admin/orders?limit=5&sort=createdAt:desc').catch(() => api.get('/orders?limit=5&sort=createdAt:desc').catch(() => ({ data: [] }))),
         api.get('/rfqs?limit=5').catch(() => ({ data: [] })),
         api.get('/reports/summary').catch(() => api.get('/reports/revenue').catch(() => ({ data: {} }))),
