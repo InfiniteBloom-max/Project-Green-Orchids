@@ -1,7 +1,7 @@
 const s = require('./products.service');
 module.exports = {
   list: async (r, res, n) => { try { const d = await s.list(r.query); res.json({ success: true, ...d }); } catch (e) { n(e); } },
-  get: async (r, res, n) => { try { const d = await s.get(r.params.id); res.json({ success: true, data: d }); } catch (e) { n(e); } },
+  get: async (r, res, n) => { try { const d = await s.get(r.params.id, r.user?.id); res.json({ success: true, data: d }); } catch (e) { n(e); } },
   create: async (r, res, n) => { try { const d = await s.create(r.body, r.user.id); res.status(201).json({ success: true, data: d }); } catch (e) { n(e); } },
   update: async (r, res, n) => { try { const d = await s.update(r.params.id, r.body, r.user.id); res.json({ success: true, data: d }); } catch (e) { n(e); } },
   uploadImage: async (r, res, n) => { try { const d = await s.uploadImage(r.params.id, r.file, r.user.id); res.status(201).json({ success: true, data: d }); } catch (e) { n(e); } },

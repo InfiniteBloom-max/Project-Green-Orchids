@@ -3,7 +3,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import api from '@/lib/api';
-import { Button, Input } from '@/components/ui/Button';
+import { Button, Input, Select, Textarea } from '@/components/ui/Button';
+import { Modal } from '@/components/ui/Modal';
 import { Table } from '@/components/ui/Table';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { Spinner, EmptyState, ErrorState } from '@/components/ui/Spinner';
@@ -23,6 +24,9 @@ export default function ProductsPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [selected, setSelected] = useState(new Set());
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [adjustTarget, setAdjustTarget] = useState(null);
+  const [adjustForm, setAdjustForm] = useState({ type: 'RECEIVE', quantity: '', note: '' });
+  const [adjusting, setAdjusting] = useState(false);
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -87,6 +91,29 @@ export default function ProductsPage() {
     } catch { toast.error('Failed to delete'); }
   };
 
+  const openAdjust = (product) => {
+    setAdjustForm({ type: 'RECEIVE', quantity: '', note: '' });
+    setAdjustTarget(product);
+  };
+
+  const handleAdjustStock = async () => {
+    const quantity = parseInt(adjustForm.quantity, 10);
+    if (!quantity || quantity < 1) return toast.error('Enter a quantity of at least 1');
+    setAdjusting(true);
+    try {
+      await api.post(`/products/${adjustTarget.id}/stock-adjustment`, {
+        type: adjustForm.type, quantity, note: adjustForm.note || undefined,
+      });
+      toast.success('Stock adjusted');
+      setAdjustTarget(null);
+      fetchProducts();
+    } catch (err) {
+      toast.error(err.response?.data?.error?.message || 'Adjustment failed');
+    } finally {
+      setAdjusting(false);
+    }
+  };
+
   const cols = [
     { key: 'select', label: <input type="checkbox" onChange={(e) => setSelected(e.target.checked ? new Set(products.map((p) => p.id)) : new Set())} checked={selected.size === products.length && products.length > 0} />, render: (_, r) => <input type="checkbox" checked={selected.has(r.id)} onChange={() => toggleSelect(r.id)} /> },
     { key: 'imageUrl', label: 'Image', render: (v) => v ? <img src={v} className="w-10 h-10 object-cover rounded" /> : '🌿' },
@@ -100,6 +127,7 @@ export default function ProductsPage() {
     { key: 'actions', label: '', render: (_, r) => (
       <div className="flex gap-1">
         <Link href={`/admin/products/${r.id}`}><Button size="sm" variant="outline">Edit</Button></Link>
+        <Button size="sm" variant="ghost" onClick={() => openAdjust(r)}>Adjust Stock</Button>
         <Button size="sm" variant="ghost" onClick={() => api.post(`/products/${r.id}/duplicate`).then(() => { toast.success('Duplicated'); fetchProducts(); }).catch(() => toast.error('Duplicate not supported'))}>Copy</Button>
         <Button size="sm" variant="ghost" onClick={() => setDeleteTarget(r)}>Delete</Button>
       </div>
@@ -136,10 +164,47 @@ export default function ProductsPage() {
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDelete}
         title="Delete product"
-        message={`Delete "${deleteTarget?.name}"? All associated inventory records will also be removed. This cannot be undone.`}
-        confirmLabel="Delete"
+        message={`Discontinue "${deleteTarget?.name}"? It will be marked DISCONTINUED and hidden from the buyer catalogue. Existing orders and stock history are preserved.`}
+        confirmLabel="Discontinue"
         variant="danger"
       />
+
+      <Modal open={!!adjustTarget} onClose={() => setAdjustTarget(null)} title="Adjust Stock" size="sm">
+        {adjustTarget && (
+          <div className="space-y-4">
+            <p className="text-sm text-gray-600">{adjustTarget.name} · Current stock: <strong>{adjustTarget.stock}</strong></p>
+            <Select
+              label="Adjustment type"
+              value={adjustForm.type}
+              onChange={(e) => setAdjustForm((f) => ({ ...f, type: e.target.value }))}
+              options={[
+                { value: 'RECEIVE', label: 'Receive stock (+)' },
+                { value: 'RESTOCK', label: 'Restock (+)' },
+                { value: 'DEDUCT', label: 'Deduct (-)' },
+                { value: 'WRITE_OFF', label: 'Write off / damaged (-)' },
+                { value: 'RESERVATION_CONVERT', label: 'Convert reservation (-)' },
+              ]}
+            />
+            <Input
+              label="Quantity"
+              type="number"
+              min="1"
+              value={adjustForm.quantity}
+              onChange={(e) => setAdjustForm((f) => ({ ...f, quantity: e.target.value }))}
+            />
+            <Textarea
+              label="Note (optional)"
+              value={adjustForm.note}
+              onChange={(e) => setAdjustForm((f) => ({ ...f, note: e.target.value }))}
+              placeholder="Reason for this adjustment"
+            />
+            <div className="flex justify-end gap-3">
+              <Button variant="outline" onClick={() => setAdjustTarget(null)}>Cancel</Button>
+              <Button onClick={handleAdjustStock} loading={adjusting}>Apply Adjustment</Button>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

@@ -32,16 +32,12 @@ export default function CartPage() {
   const handleCheckout = async () => {
     setPlacing(true);
     try {
-      const res = await api.post('/orders', {
-        items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
-        poReference: checkoutForm.poReference,
-        note: checkoutForm.note,
-      });
+      const res = await api.post('/orders', { notes: checkoutForm.note || undefined });
       toast.success('Order placed successfully!');
       clearCart();
-      router.push(`/buyer/orders/${res.data.id}`);
+      router.push(`/buyer/orders/${res.data.data.id}`);
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to place order');
+      toast.error(err.response?.data?.error?.message || 'Failed to place order');
     } finally {
       setPlacing(false);
       setShowCheckout(false);

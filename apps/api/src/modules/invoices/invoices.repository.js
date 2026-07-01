@@ -1,5 +1,9 @@
 const { query } = require('../../config/db');
 const repo = {
+  async accountIdForUser(userId) {
+    const r = await query(`SELECT id FROM trade_accounts WHERE user_id = $1`, [userId]);
+    return r.rows[0] || null;
+  },
   async findAll(buyerId, isAdmin, filters, { limit, offset, sort, order }) {
     let where = 'WHERE 1=1'; const params = []; let p = 1;
     if (!isAdmin && buyerId) { where += ` AND i.buyer_id = $${p++}`; params.push(buyerId); }
@@ -9,8 +13,8 @@ const repo = {
     const ct = await query(`SELECT COUNT(*) FROM invoices i ${where}`, params);
     const total = parseInt(ct.rows[0].count, 10);
     const r = await query(
-      `SELECT i.*, u.name as buyer_name, o.order_number FROM invoices i
-       LEFT JOIN users u ON u.id = i.buyer_id LEFT JOIN orders o ON o.id = i.order_id ${where}
+      `SELECT i.*, ta.business_name as buyer_name, o.order_no FROM invoices i
+       LEFT JOIN trade_accounts ta ON ta.id = i.buyer_id LEFT JOIN orders o ON o.id = i.order_id ${where}
        ORDER BY i.${sort === 'due_date' ? 'due_date' : sort === 'total_amount' ? 'total_amount' : 'created_at'} ${order}
        LIMIT $${p++} OFFSET $${p++}`,
       [...params, limit, offset]
@@ -19,11 +23,11 @@ const repo = {
   },
   async findById(id) {
     const r = await query(
-      `SELECT i.*, u.name as buyer_name, u.email as buyer_email, o.order_number,
+      `SELECT i.*, ta.business_name as buyer_name, u.email as buyer_email, o.order_no,
               ta.business_name, ta.credit_limit
-       FROM invoices i LEFT JOIN users u ON u.id = i.buyer_id
-       LEFT JOIN orders o ON o.id = i.order_id
-       LEFT JOIN trade_accounts ta ON ta.user_id = i.buyer_id WHERE i.id = $1`, [id]
+       FROM invoices i LEFT JOIN trade_accounts ta ON ta.id = i.buyer_id
+       LEFT JOIN users u ON u.id = ta.user_id
+       LEFT JOIN orders o ON o.id = i.order_id WHERE i.id = $1`, [id]
     );
     return r.rows[0] || null;
   },

@@ -27,7 +27,7 @@ export default function ProductDetailPage() {
     (async () => {
       try {
         const res = await api.get(`/products/${id}`);
-        const p = res.data;
+        const p = res.data.data || res.data;
         setProduct(p);
         setQty(p.moq || 1);
       } catch (err) {

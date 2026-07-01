@@ -424,6 +424,14 @@ function BlocksTab({ blocks, onRefresh }) {
     } catch { toast.error('Failed'); }
   };
 
+  const handleTogglePublish = async (block) => {
+    try {
+      await api.patch(`/cms/blocks/${block.key}/publish`);
+      toast.success(block.is_published ? 'Unpublished' : 'Published');
+      onRefresh();
+    } catch { toast.error('Failed to change publish status'); }
+  };
+
   return (
     <div className="space-y-5">
       <GlassPanel
@@ -443,7 +451,7 @@ function BlocksTab({ blocks, onRefresh }) {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-200">
-                  {['Key', 'Type', 'Title', 'Updated', ''].map((h) => (
+                  {['Key', 'Type', 'Title', 'Updated', 'Status', ''].map((h) => (
                     <th key={h} className="pb-3 pr-4 text-left text-xs font-semibold uppercase tracking-[0.08em] text-slate-400">{h}</th>
                   ))}
                 </tr>
@@ -452,9 +460,20 @@ function BlocksTab({ blocks, onRefresh }) {
                 {blocks.map((b) => (
                   <tr key={b.id || b.key} className="group transition hover:bg-slate-50">
                     <td className="py-3 pr-4 font-mono text-xs text-slate-600">{b.key}</td>
-                    <td className="py-3 pr-4 text-slate-500">{b.type}</td>
+                    <td className="py-3 pr-4 text-slate-500">{b.block_type || b.type}</td>
                     <td className="py-3 pr-4 text-slate-600">{b.title || '—'}</td>
-                    <td className="py-3 pr-4 text-slate-400">{formatDate(b.updatedAt)}</td>
+                    <td className="py-3 pr-4 text-slate-400">{formatDate(b.updated_at || b.updatedAt)}</td>
+                    <td className="py-3 pr-4">
+                      <button
+                        onClick={() => handleTogglePublish(b)}
+                        className={cn(
+                          'rounded-full px-3 py-1 text-xs font-semibold transition',
+                          b.is_published ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                        )}
+                      >
+                        {b.is_published ? '● Published' : '○ Draft'}
+                      </button>
+                    </td>
                     <td className="py-3">
                       <div className="flex gap-2 opacity-0 transition group-hover:opacity-100">
                         <button onClick={() => openEdit(b)} className="rounded-lg border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-500 transition hover:bg-slate-50 hover:text-slate-800">Edit</button>

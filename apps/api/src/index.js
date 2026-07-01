@@ -5,31 +5,18 @@ const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-const multer = require('multer');
 
 const requestId = require('./middleware/request_id');
 const { globalLimiter } = require('./middleware/rateLimit');
 const { auditMiddleware } = require('./middleware/audit');
 const { errorHandler, notFoundHandler, setupGlobalHandlers } = require('./middleware/errors');
 const { registerJobs } = require('./jobs');
+const { UPLOADS_ROOT } = require('./middleware/upload');
 
 // Setup global error handlers
 setupGlobalHandlers();
 
 const app = express();
-
-// ── Multer config for image uploads ──
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
-  fileFilter: (_req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only image files are allowed'), false);
-    }
-  },
-});
 
 // ── Middleware Chain ──
 app.use(helmet());
@@ -56,6 +43,12 @@ app.get('/healthz', async (_req, res) => {
     res.status(503).json({ status: 'unhealthy', error: err.message });
   }
 });
+
+// ── Uploaded file serving (POD photos, etc.) ──
+app.use('/uploads', (req, res, next) => {
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  next();
+}, express.static(UPLOADS_ROOT));
 
 // ── API Routes ──
 const api = express.Router();

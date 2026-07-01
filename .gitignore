@@ -14,6 +14,9 @@ Thumbs.db
 # logs
 logs/
 *.log
+# uploaded user content
+apps/api/uploads/*
+!apps/api/uploads/.gitkeep
 # QA / tooling artefacts (not product code)
 /screenshots/
 catalogue-products.csv

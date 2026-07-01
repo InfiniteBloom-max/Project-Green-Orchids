@@ -1,46 +1,55 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import Link from 'next/link';
 import api from '@/lib/api';
-import { Button } from '@/components/ui/Button';
+import { Button, Input, Select } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { StatusBadge } from '@/components/domain/StatusBadge';
 import { Spinner, ErrorState } from '@/components/ui/Spinner';
 import { PageHeader } from '@/components/domain/DashboardUI';
+import { Modal } from '@/components/ui/Modal';
 import { formatLKR, formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
 export default function InvoiceDetailPage() {
   const { id } = useParams();
-  const router = useRouter();
   const [invoice, setInvoice] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showPay, setShowPay] = useState(false);
+  const [paying, setPaying] = useState(false);
+  const [payForm, setPayForm] = useState({ amount: '', method: 'ONLINE', reference: '' });
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const res = await api.get(`/invoices/${id}`);
-        setInvoice(res.data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [id]);
+  const load = async () => {
+    try {
+      const res = await api.get(`/invoices/${id}`);
+      const inv = res.data.data || res.data;
+      setInvoice(inv);
+      setPayForm((f) => ({ ...f, amount: String(inv.balance_due || '') }));
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { load(); }, [id]);
 
   const handlePay = async () => {
+    const amount = parseFloat(payForm.amount);
+    if (!amount || amount <= 0) return toast.error('Enter a valid amount');
+    setPaying(true);
     try {
-      // Initiate PayHere payment
-      const res = await api.post(`/invoices/${id}/pay`);
-      if (res.data.paymentUrl) {
-        window.location.href = res.data.paymentUrl;
-      }
-      toast.success('Redirecting to payment gateway...');
+      await api.post(`/invoices/${id}/pay`, { amount, method: payForm.method, reference: payForm.reference || undefined });
+      toast.success('Payment recorded');
+      setShowPay(false);
+      load();
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Payment initiation failed');
+      toast.error(err.response?.data?.error?.message || 'Payment failed');
+    } finally {
+      setPaying(false);
     }
   };
 
@@ -61,63 +70,90 @@ export default function InvoiceDetailPage() {
   if (error) return <ErrorState message={error} />;
   if (!invoice) return <ErrorState message="Invoice not found" />;
 
+  const canPay = Number(invoice.balance_due) > 0 && !['CANCELLED', 'VOID'].includes(invoice.status);
+
   return (
     <div className="space-y-6">
       <PageHeader
         tone="violet"
         back={{ href: '/buyer/invoices', label: 'Back' }}
-        title={`Invoice #${invoice.invoiceNo || invoice.id}`}
-        description={`${formatDate(invoice.createdAt)} · Due: ${formatDate(invoice.dueDate)}`}
+        title={`Invoice #${invoice.invoice_no}`}
+        description={`${formatDate(invoice.created_at)} · Due: ${formatDate(invoice.due_date)}`}
         actions={<StatusBadge status={invoice.status} />}
       />
 
-      <Card>
-        <h3 className="text-sm font-medium mb-3">Items</h3>
-        <table className="w-full text-sm">
-          <thead><tr className="border-b"><th className="text-left py-2">Description</th><th className="text-right py-2">Qty</th><th className="text-right py-2">Price</th><th className="text-right py-2">Total</th></tr></thead>
-          <tbody>
-            {invoice.items?.map((item, i) => (
-              <tr key={i} className="border-b last:border-b-0">
-                <td className="py-2">{item.description || item.productName}</td>
-                <td className="text-right py-2">{item.quantity}</td>
-                <td className="text-right py-2">{formatLKR(item.unitPrice)}</td>
-                <td className="text-right py-2">{formatLKR(item.unitPrice * item.quantity)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </Card>
-
       <div className="grid grid-cols-2 gap-4">
         <Card>
+          <h3 className="text-sm font-medium mb-3">Summary</h3>
           <div className="space-y-2">
-            <div className="flex justify-between text-sm"><span>Subtotal</span><span>{formatLKR(invoice.subtotal)}</span></div>
-            <div className="flex justify-between text-sm"><span>Tax</span><span>{formatLKR(invoice.tax || 0)}</span></div>
-            <div className="flex justify-between font-bold text-lg border-t pt-2"><span>Total</span><span>{formatLKR(invoice.total)}</span></div>
-            {invoice.totalPaid > 0 && <div className="flex justify-between text-sm text-green-700"><span>Paid</span><span>{formatLKR(invoice.totalPaid)}</span></div>}
-            <div className="flex justify-between text-sm font-medium"><span>Balance</span><span>{formatLKR(invoice.balance)}</span></div>
+            {invoice.order_no && (
+              <div className="flex justify-between text-sm">
+                <span>Order</span>
+                <Link href={`/buyer/orders/${invoice.order_id}`} className="text-violet-600 hover:underline">{invoice.order_no}</Link>
+              </div>
+            )}
+            <div className="flex justify-between font-bold text-lg border-t pt-2"><span>Total</span><span>{formatLKR(invoice.total_amount)}</span></div>
+            {Number(invoice.paid_amount) > 0 && <div className="flex justify-between text-sm text-green-700"><span>Paid</span><span>{formatLKR(invoice.paid_amount)}</span></div>}
+            <div className="flex justify-between text-sm font-medium"><span>Balance</span><span>{formatLKR(invoice.balance_due)}</span></div>
           </div>
         </Card>
 
-        {invoice.payments?.length > 0 && (
-          <Card>
-            <h3 className="text-sm font-medium mb-2">Payment History</h3>
+        <Card>
+          <h3 className="text-sm font-medium mb-2">Payment History</h3>
+          {!invoice.payments?.length ? (
+            <p className="text-sm text-gray-400 py-4 text-center">No payments recorded yet</p>
+          ) : (
             <div className="space-y-2">
-              {invoice.payments.map((p, i) => (
-                <div key={i} className="text-sm flex justify-between border-b pb-1">
-                  <span>{formatDate(p.date || p.createdAt)}</span>
-                  <span>{formatLKR(p.amount)}</span>
+              {invoice.payments.map((p) => (
+                <div key={p.id} className="text-sm flex justify-between border-b pb-1 last:border-b-0">
+                  <span>{formatDate(p.received_at)} · {p.method}{p.reversed_at ? ' (reversed)' : ''}</span>
+                  <span className={p.reversed_at ? 'text-gray-400 line-through' : ''}>{formatLKR(p.amount)}</span>
                 </div>
               ))}
             </div>
-          </Card>
-        )}
+          )}
+        </Card>
       </div>
 
       <div className="flex gap-3 justify-end">
         <Button variant="outline" onClick={handleDownloadPDF}>Download PDF</Button>
-        {invoice.status === 'UNPAID' && <Button onClick={handlePay}>Pay Now</Button>}
+        {canPay && <Button onClick={() => setShowPay(true)}>Make a Payment</Button>}
       </div>
+
+      <Modal open={showPay} onClose={() => setShowPay(false)} title="Make a Payment" size="sm">
+        <div className="space-y-4">
+          <p className="text-sm text-gray-600">Balance due: <strong>{formatLKR(invoice.balance_due)}</strong></p>
+          <Input
+            label="Amount (LKR)"
+            type="number"
+            step="0.01"
+            max={invoice.balance_due}
+            value={payForm.amount}
+            onChange={(e) => setPayForm((f) => ({ ...f, amount: e.target.value }))}
+          />
+          <Select
+            label="Method"
+            value={payForm.method}
+            onChange={(e) => setPayForm((f) => ({ ...f, method: e.target.value }))}
+            options={[
+              { value: 'ONLINE', label: 'Online' },
+              { value: 'BANK_TRANSFER', label: 'Bank Transfer' },
+              { value: 'CHEQUE', label: 'Cheque' },
+              { value: 'CASH', label: 'Cash' },
+            ]}
+          />
+          <Input
+            label="Reference (optional)"
+            value={payForm.reference}
+            onChange={(e) => setPayForm((f) => ({ ...f, reference: e.target.value }))}
+            placeholder="Transaction / cheque number"
+          />
+          <div className="flex justify-end gap-3">
+            <Button variant="outline" onClick={() => setShowPay(false)}>Cancel</Button>
+            <Button onClick={handlePay} loading={paying}>Confirm Payment</Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

@@ -36,6 +36,9 @@ export default function AdminDeliveriesPage() {
   const [status, setStatus] = useState('');
   const [confirm, setConfirm] = useState({ open: false, delivery: null });
   const [assignTo, setAssignTo] = useState('');
+  const [podFile, setPodFile] = useState(null);
+  const [podPreview, setPodPreview] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const fetchDeliveries = useCallback(async () => {
     setLoading(true);
@@ -63,7 +66,15 @@ export default function AdminDeliveriesPage() {
 
   const openConfirm = (d) => {
     setAssignTo(coordinators[0]?.id || '');
+    setPodFile(null);
+    setPodPreview(null);
     setConfirm({ open: true, delivery: d });
+  };
+
+  const handlePodFileChange = (e) => {
+    const file = e.target.files?.[0];
+    setPodFile(file || null);
+    setPodPreview(file ? URL.createObjectURL(file) : null);
   };
 
   const handleAdvance = async () => {
@@ -71,13 +82,27 @@ export default function AdminDeliveriesPage() {
     const action = NEXT_ACTION[d.status];
     if (!action) return;
     if (d.status === 'PENDING' && !assignTo) { toast.error('Select a delivery coordinator'); return; }
+    if (d.status === 'IN_TRANSIT' && !podFile) { toast.error('Attach a proof-of-delivery photo'); return; }
+    setSubmitting(true);
     try {
-      const payload = d.status === 'PENDING' ? { assignedTo: assignTo } : {};
-      const { data } = await api[action.method](action.endpoint(d.id), payload);
+      let data;
+      if (d.status === 'IN_TRANSIT') {
+        const form = new FormData();
+        form.append('photo', podFile);
+        const res = await api.patch(action.endpoint(d.id), form, { headers: { 'Content-Type': 'multipart/form-data' } });
+        data = res.data;
+      } else {
+        const payload = d.status === 'PENDING' ? { assignedTo: assignTo } : {};
+        const res = await api[action.method](action.endpoint(d.id), payload);
+        data = res.data;
+      }
       setDeliveries((list) => list.map((x) => x.id === d.id ? { ...x, ...data } : x));
       toast.success('Delivery updated');
+      setConfirm({ open: false, delivery: null });
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to update delivery');
+      toast.error(err.response?.data?.error?.message || 'Failed to update delivery');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -162,7 +187,26 @@ export default function AdminDeliveriesPage() {
             </select>
             <div className="mt-6 flex justify-end gap-3">
               <button onClick={() => setConfirm({ open: false, delivery: null })} className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Cancel</button>
-              <button onClick={() => { handleAdvance(); setConfirm({ open: false, delivery: null }); }} className="rounded-xl bg-sky-500 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-400">Assign</button>
+              <button disabled={submitting} onClick={handleAdvance} className="rounded-xl bg-sky-500 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-400 disabled:opacity-60">{submitting ? 'Assigning…' : 'Assign'}</button>
+            </div>
+          </div>
+        </div>
+      ) : confirm.open && confirm.delivery?.status === 'IN_TRANSIT' ? (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/50 p-4" onClick={() => setConfirm({ open: false, delivery: null })}>
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-base font-semibold text-slate-800">Mark as delivered</h3>
+            <p className="mt-1 text-sm text-slate-500">Delivery #{String(confirm.delivery.id).padStart(5, '0')} · attach a proof-of-delivery photo</p>
+            <label className="mt-4 flex aspect-video cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 transition hover:border-emerald-400">
+              {podPreview ? (
+                <img src={podPreview} alt="Proof of delivery preview" className="h-full w-full object-cover" />
+              ) : (
+                <span className="text-sm text-slate-400">📷 Click to take/upload a photo</span>
+              )}
+              <input type="file" accept="image/*" capture="environment" className="hidden" onChange={handlePodFileChange} />
+            </label>
+            <div className="mt-6 flex justify-end gap-3">
+              <button onClick={() => setConfirm({ open: false, delivery: null })} className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Cancel</button>
+              <button disabled={submitting || !podFile} onClick={handleAdvance} className="rounded-xl bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-400 disabled:opacity-60">{submitting ? 'Uploading…' : 'Confirm Delivered'}</button>
             </div>
           </div>
         </div>

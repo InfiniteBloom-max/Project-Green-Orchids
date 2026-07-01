@@ -43,12 +43,41 @@ const service = {
     return { data: rows, pagination: { page: o.page, limit: o.limit, total, pages: Math.ceil(total / o.limit) } };
   },
 
-  async get(id) {
+  async get(id, userId) {
     const p = await repo.findById(id);
     if (!p) throw new AppError('NOT_FOUND', 'Product not found', 404);
     const images = await repo.findImages(id);
     const bulkTiers = await repo.findBulkTiers(id);
-    return { ...p, images, bulk_tiers: bulkTiers };
+
+    let discount = 0;
+    if (userId) {
+      const tier = await repo.tierDiscountForUser(userId);
+      discount = tier || 0;
+    }
+    const basePrice = Number(p.base_price || 0);
+
+    return {
+      id: p.id,
+      sku: p.sku,
+      name: p.name,
+      description: p.description,
+      categoryId: p.category_id,
+      supplierId: p.supplier_id,
+      supplierName: p.supplier_name,
+      type: p.product_type,
+      unit: p.unit_size,
+      stock: p.stock_qty,
+      reserved: p.reserved_qty,
+      available: Math.max(0, Number(p.stock_qty || 0) - Number(p.reserved_qty || 0)),
+      moq: p.moq,
+      status: p.status,
+      basePrice,
+      price: basePrice,
+      discount,
+      tierPrice: Number((basePrice * (1 - discount / 100)).toFixed(2)),
+      images: images.map((im) => im.url),
+      bulkTiers: bulkTiers.map((bt) => ({ minQty: bt.min_quantity, price: Number(bt.unit_price) })),
+    };
   },
 
   async create(data, actor) {
@@ -92,8 +121,17 @@ const service = {
     const p = await repo.findById(productId);
     if (!p) throw new AppError('NOT_FOUND', 'Product not found', 404);
 
+    // stock_movements.movement_type only accepts a fixed set of values (see 0005 migration) -
+    // map the buyer-facing adjustment "type" onto that real enum.
+    const MOVEMENT_TYPE = {
+      RECEIVE: 'PURCHASE', RESTOCK: 'PURCHASE',
+      DEDUCT: 'MANUAL_ADJUSTMENT', WRITE_OFF: 'DAMAGE_WRITE_OFF', RESERVATION_CONVERT: 'ORDER_FULFILL',
+    };
+    const movementType = MOVEMENT_TYPE[data.type];
+    if (!movementType) throw new AppError('INVALID_TYPE', `Unsupported adjustment type: ${data.type}`, 400);
+
     await tx(async (client) => {
-      let newQty = p.stock_qty;
+      let newQty = Number(p.stock_qty);
       switch (data.type) {
         case 'RECEIVE': case 'RESTOCK': newQty += data.quantity; break;
         case 'DEDUCT': case 'WRITE_OFF': case 'RESERVATION_CONVERT': newQty -= data.quantity; break;
@@ -101,9 +139,9 @@ const service = {
       if (newQty < 0) throw new AppError('INSUFFICIENT_STOCK', 'Stock cannot go below zero', 400);
 
       await repo.updateStock(client, productId, newQty);
+      const note = `${data.type}: ${p.stock_qty} -> ${newQty}${data.note ? ` — ${data.note}` : ''}`;
       await repo.createStockMovement({
-        product_id: productId, movement_type: data.type, quantity: data.quantity,
-        quantity_before: p.stock_qty, quantity_after: newQty, note: data.note,
+        product_id: productId, movement_type: movementType, quantity: data.quantity, note,
         reference_type: data.reference_type, reference_id: data.reference_id, created_by: actor,
       });
     });

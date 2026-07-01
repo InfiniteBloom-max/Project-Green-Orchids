@@ -34,8 +34,18 @@ const repo = {
     return r.rows;
   },
 
+  async tierDiscountForUser(userId) {
+    const r = await query(
+      `SELECT COALESCE(bt.discount_rate,0) AS discount_rate
+       FROM trade_accounts ta LEFT JOIN buyer_tiers bt ON bt.id = ta.tier_id
+       WHERE ta.user_id = $1`,
+      [userId]
+    );
+    return Number(r.rows[0]?.discount_rate || 0);
+  },
+
   async findBulkTiers(productId) {
-    const r = await query('SELECT * FROM product_bulk_tiers WHERE product_id = $1 ORDER BY min_qty ASC', [productId]);
+    const r = await query('SELECT * FROM bulk_pricing_tiers WHERE product_id = $1 ORDER BY min_quantity ASC', [productId]);
     return r.rows;
   },
 
@@ -134,9 +144,9 @@ const repo = {
 
   async createStockMovement(data) {
     const r = await query(
-      `INSERT INTO stock_movements (product_id, movement_type, quantity, quantity_before, quantity_after, note, reference_type, reference_id, created_by)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *`,
-      [data.product_id, data.movement_type, data.quantity, data.quantity_before, data.quantity_after, data.note, data.reference_type, data.reference_id, data.created_by]
+      `INSERT INTO stock_movements (product_id, movement_type, qty, note, ref_table, ref_id, performed_by)
+       VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
+      [data.product_id, data.movement_type, data.quantity, data.note, data.reference_type, data.reference_id, data.created_by]
     );
     return r.rows[0];
   },
@@ -148,7 +158,7 @@ const repo = {
   async getStockMovements(productId, { limit, offset }) {
     const ct = await query('SELECT COUNT(*) FROM stock_movements WHERE product_id = $1', [productId]);
     const total = parseInt(ct.rows[0].count, 10);
-    const r = await query('SELECT * FROM stock_movements WHERE product_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3', [productId, limit, offset]);
+    const r = await query('SELECT * FROM stock_movements WHERE product_id = $1 ORDER BY occurred_at DESC LIMIT $2 OFFSET $3', [productId, limit, offset]);
     return { rows: r.rows, total };
   },
 

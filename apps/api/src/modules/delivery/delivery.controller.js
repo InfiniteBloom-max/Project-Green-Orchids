@@ -1,4 +1,5 @@
 const svc = require('./delivery.service');
+const { publicUrl } = require('../../middleware/upload');
 
 const list = async (req, res, next) => {
   try {
@@ -36,7 +37,8 @@ const inTransit = async (req, res, next) => {
 
 const uploadPod = async (req, res, next) => {
   try {
-    const podUrl = req.body.podUrl || null;
+    const podUrl = req.file ? publicUrl('pod', req.file.filename) : (req.body.podUrl || null);
+    if (!podUrl) return res.status(400).json({ success: false, error: { code: 'POD_REQUIRED', message: 'A proof-of-delivery photo is required' } });
     res.json(await svc.transition(Number(req.params.id), 'DELIVERED', { podUrl, actorId: req.user.id }));
   } catch (e) { next(e); }
 };
