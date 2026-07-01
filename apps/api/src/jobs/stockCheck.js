@@ -6,7 +6,7 @@ async function stockCheck() {
     // Find products below reorder level
     const lowStock = await query(
       `SELECT id, name, stock_qty, reorder_level FROM products
-       WHERE is_active = true AND stock_qty <= reorder_level`
+       WHERE status = 'ACTIVE' AND stock_qty <= reorder_level`
     );
 
     let alertsCreated = 0;
@@ -19,9 +19,9 @@ async function stockCheck() {
 
       if (existing.rows.length === 0) {
         await query(
-          `INSERT INTO stock_alerts (product_id, alert_type, message, status)
+          `INSERT INTO stock_alerts (product_id, alert_type, threshold_value, status)
            VALUES ($1, 'LOW_STOCK', $2, 'OPEN')`,
-          [product.id, `${product.name} is below reorder level (${product.stock_qty}/${product.reorder_level})`]
+          [product.id, product.reorder_level]
         );
         alertsCreated++;
       }
@@ -42,7 +42,7 @@ async function stockCheck() {
         for (const admin of admins.rows) {
           await sendMail({
             to: admin.email,
-            subject: 'Low Stock Alert - K ORCHIDS',
+            subject: 'Low Stock Alert - ORCHIDS',
             template: 'low_stock_digest',
             data: { products: productsList },
           });

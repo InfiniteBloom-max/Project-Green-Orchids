@@ -1,90 +1,105 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import api from '@/lib/api';
-import { Button, Input, Textarea } from '@/components/ui/Button';
+import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { Spinner } from '@/components/ui/Spinner';
+import { StatusBadge } from '@/components/domain/StatusBadge';
+import { Spinner, EmptyState } from '@/components/ui/Spinner';
+import { PageHeader, MetricCard } from '@/components/domain/DashboardUI';
+import { formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
 export default function SettingsPage() {
-  const [settings, setSettings] = useState(null);
+  const [health, setHealth] = useState([]);
+  const [outbox, setOutbox] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [retrying, setRetrying] = useState(null);
 
-  useEffect(() => {
-    (async () => {
-      const res = await api.get('/admin/settings').catch(() => ({ data: {} }));
-      setSettings(res.data);
+  const load = useCallback(async () => {
+    try {
+      const [h, o] = await Promise.all([
+        api.get('/notifications/outbox/health'),
+        api.get('/notifications/outbox?status=FAILED&limit=20'),
+      ]);
+      setHealth(h.data.data || []);
+      setOutbox(o.data.data || []);
+    } catch {
+      toast.error('Failed to load notification health');
+    } finally {
       setLoading(false);
-    })();
+    }
   }, []);
 
-  const update = (key, value) => setSettings((s) => ({ ...s, [key]: value }));
+  useEffect(() => { load(); }, [load]);
 
-  const handleSave = async () => {
-    setSaving(true);
+  const handleRetry = async (id) => {
+    setRetrying(id);
     try {
-      await api.put('/admin/settings', settings);
-      toast.success('Settings saved');
+      await api.post(`/notifications/outbox/${id}/retry`);
+      toast.success('Retried');
+      load();
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed');
-    } finally { setSaving(false); }
+      toast.error(err.response?.data?.error?.message || 'Retry failed');
+    } finally {
+      setRetrying(null);
+    }
   };
 
-  if (loading) return <Spinner className="py-20" />;
-  if (!settings) return null;
+  if (loading) return <Spinner className="py-24" size="lg" />;
+
+  const byStatus = Object.fromEntries(health.map((h) => [h.status, Number(h.count)]));
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Settings</h1>
+      <PageHeader
+        eyebrow="Platform"
+        title="Settings"
+        description="Monitor email/notification delivery health and retry failed sends."
+      />
+
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <MetricCard label="Total notifications" value={byStatus.TOTAL || 0} icon="📬" tone="sky" />
+        <MetricCard label="Sent" value={byStatus.SENT || 0} icon="✅" tone="emerald" />
+        <MetricCard label="Pending" value={byStatus.PENDING || 0} icon="⏳" tone="amber" />
+        <MetricCard label="Failed" value={byStatus.FAILED || 0} icon="⚠️" tone="rose" />
+      </div>
 
       <Card>
-        <h3 className="text-sm font-medium mb-4">Business Profile</h3>
-        <div className="space-y-4 max-w-lg">
-          <Input label="Business Name" value={settings.businessName || ''} onChange={(e) => update('businessName', e.target.value)} />
-          <Input label="Business Address" value={settings.businessAddress || ''} onChange={(e) => update('businessAddress', e.target.value)} />
-          <Input label="Contact Email" type="email" value={settings.contactEmail || ''} onChange={(e) => update('contactEmail', e.target.value)} />
-          <Input label="Phone" value={settings.phone || ''} onChange={(e) => update('phone', e.target.value)} />
-        </div>
+        <h3 className="text-sm font-medium mb-3">Failed notifications</h3>
+        {outbox.length === 0 ? (
+          <EmptyState title="No failed notifications" description="All outbound emails are sending successfully." />
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left py-2 pr-4">Recipient</th>
+                  <th className="text-left py-2 pr-4">Template</th>
+                  <th className="text-left py-2 pr-4">Attempts</th>
+                  <th className="text-left py-2 pr-4">Last Error</th>
+                  <th className="text-left py-2 pr-4">Created</th>
+                  <th className="py-2"></th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {outbox.map((n) => (
+                  <tr key={n.id}>
+                    <td className="py-2 pr-4">{n.recipient_email || '—'}</td>
+                    <td className="py-2 pr-4 font-mono text-xs">{n.template}</td>
+                    <td className="py-2 pr-4">{n.attempts}</td>
+                    <td className="py-2 pr-4 max-w-xs truncate text-rose-600" title={n.last_error}>{n.last_error || '—'}</td>
+                    <td className="py-2 pr-4 text-gray-400">{formatDate(n.created_at)}</td>
+                    <td className="py-2">
+                      <Button size="sm" variant="outline" loading={retrying === n.id} onClick={() => handleRetry(n.id)}>Retry</Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </Card>
-
-      <Card>
-        <h3 className="text-sm font-medium mb-4">RMA Settings</h3>
-        <div className="space-y-4 max-w-lg">
-          <Input label="RMA Window (days after delivery)" type="number" value={settings.rmaWindow || '7'} onChange={(e) => update('rmaWindow', e.target.value)} />
-        </div>
-      </Card>
-
-      <Card>
-        <h3 className="text-sm font-medium mb-4">Session & Security</h3>
-        <div className="space-y-4 max-w-lg">
-          <Input label="Max Concurrent Sessions" type="number" value={settings.sessionCap || '5'} onChange={(e) => update('sessionCap', e.target.value)} />
-          <Input label="Lockout Threshold (failed attempts)" type="number" value={settings.lockoutThreshold || '5'} onChange={(e) => update('lockoutThreshold', e.target.value)} />
-          <Input label="Lockout Duration (minutes)" type="number" value={settings.lockoutDuration || '30'} onChange={(e) => update('lockoutDuration', e.target.value)} />
-        </div>
-      </Card>
-
-      <Card>
-        <h3 className="text-sm font-medium mb-4">Inventory Defaults</h3>
-        <div className="space-y-4 max-w-lg">
-          <Input label="Low Stock Threshold" type="number" value={settings.lowStockThreshold || '5'} onChange={(e) => update('lowStockThreshold', e.target.value)} />
-        </div>
-      </Card>
-
-      <Card>
-        <h3 className="text-sm font-medium mb-4">Notifications</h3>
-        <div className="space-y-3 max-w-lg">
-          {['orderConfirmation', 'lowStockAlert', 'overdueReminder', 'rmaUpdate', 'approvalRequest'].map((key) => (
-            <label key={key} className="flex items-center gap-3 text-sm">
-              <input type="checkbox" checked={settings[`notify_${key}`] !== false} onChange={(e) => update(`notify_${key}`, e.target.checked)} className="rounded" />
-              {key.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase())}
-            </label>
-          ))}
-        </div>
-      </Card>
-
-      <Button onClick={handleSave} loading={saving} size="lg">Save Settings</Button>
     </div>
   );
 }

@@ -6,7 +6,7 @@ const repo = {
     const ct = await query(`SELECT COUNT(*) FROM price_change_requests r ${where}`, params);
     const total = parseInt(ct.rows[0].count, 10);
     const r = await query(
-      `SELECT r.*, p.name as product_name, u.name as requested_by_name
+      `SELECT r.*, p.name as product_name, u.full_name as requested_by_name
        FROM price_change_requests r
        LEFT JOIN products p ON p.id = r.product_id
        LEFT JOIN users u ON u.id = r.requested_by ${where}
@@ -20,10 +20,10 @@ const repo = {
     return r.rows[0] || null;
   },
   async approve(client, id, decidedBy, note) {
-    await (client || query)('UPDATE price_change_requests SET status=$1, decided_by=$2, decided_at=NOW(), decision_note=$3 WHERE id=$4', ['APPROVED', decidedBy, note, id]);
+    await (client ? client.query.bind(client) : query)('UPDATE price_change_requests SET status=$1, decided_by=$2, decided_at=NOW(), decision_note=$3 WHERE id=$4', ['APPROVED', decidedBy, note, id]);
   },
   async reject(client, id, decidedBy, note) {
-    await (client || query)('UPDATE price_change_requests SET status=$1, decided_by=$2, decided_at=NOW(), decision_note=$3 WHERE id=$4', ['REJECTED', decidedBy, note, id]);
+    await (client ? client.query.bind(client) : query)('UPDATE price_change_requests SET status=$1, decided_by=$2, decided_at=NOW(), decision_note=$3 WHERE id=$4', ['REJECTED', decidedBy, note, id]);
   },
   async findAllHistory(filters, { limit, offset }) {
     let where = 'WHERE 1=1'; const params = []; let p = 1;

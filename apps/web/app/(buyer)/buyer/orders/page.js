@@ -6,6 +6,7 @@ import api from '@/lib/api';
 import { Table } from '@/components/ui/Table';
 import { StatusBadge, StatusStepper } from '@/components/domain/StatusBadge';
 import { Spinner, EmptyState, ErrorState } from '@/components/ui/Spinner';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import { formatLKR, formatDate } from '@/lib/utils';
 
 const STATUSES = ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
@@ -41,7 +42,7 @@ export default function OrdersListPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Orders</h1>
+      <PageHeader tone="violet" title="Orders" description="Track and manage your placed orders." />
 
       <div className="flex gap-2 flex-wrap">
         <button onClick={() => setFilter('')} className={`px-3 py-1 text-sm rounded-full ${!filter ? 'bg-green-700 text-white' : 'bg-gray-100'}`}>All</button>

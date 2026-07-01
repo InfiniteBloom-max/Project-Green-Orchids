@@ -6,6 +6,8 @@ import { Button, Input } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Table } from '@/components/ui/Table';
 import { Modal } from '@/components/ui/Modal';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import { Spinner, EmptyState } from '@/components/ui/Spinner';
 import { formatLKR } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -16,6 +18,7 @@ export default function TiersPage() {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({ name: '', discount: '0', creditLimit: '100000', paymentTerms: 'Net 30', minOrders: '0' });
+  const [confirm, setConfirm] = useState({ open: false, action: null, title: '', message: '', label: '', variant: 'danger' });
 
   useEffect(() => {
     (async () => {
@@ -49,23 +52,34 @@ export default function TiersPage() {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!confirm('Delete this tier? This may affect buyers assigned to it.')) return;
-    try {
-      await api.delete(`/admin/tiers/${id}`);
-      setTiers((t) => t.filter((x) => x.id !== id));
-      toast.success('Tier deleted');
-    } catch { toast.error('Failed'); }
+  const handleDelete = (id) => {
+    setConfirm({
+      open: true,
+      title: 'Delete tier',
+      message: 'Delete this tier? This may affect buyers assigned to it.',
+      label: 'Delete',
+      variant: 'danger',
+      action: async () => {
+        try {
+          await api.delete(`/admin/tiers/${id}`);
+          setTiers((t) => t.filter((x) => x.id !== id));
+          toast.success('Tier deleted');
+        } catch { toast.error('Failed'); }
+      },
+    });
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Tier Management</h1>
-        <Button onClick={() => { setEditing(null); setForm({ name: '', discount: '0', creditLimit: '100000', paymentTerms: 'Net 30', minOrders: '0' }); setShowForm(true); }}>Add Tier</Button>
-      </div>
+      <PageHeader
+        eyebrow="Tiers"
+        title="Tier Management"
+        description="Configure buyer tier discounts, credit limits, and payment terms."
+        actions={<Button onClick={() => { setEditing(null); setForm({ name: '', discount: '0', creditLimit: '100000', paymentTerms: 'Net 30', minOrders: '0' }); setShowForm(true); }}>Add Tier</Button>}
+        tone="emerald"
+      />
 
-      <div className="bg-yellow-50 text-yellow-800 text-sm p-3 rounded-lg">⚠ Changing tier parameters will only affect future orders. Existing buyers keep their current terms until renewed.</div>
+      <div className="rounded-2xl border border-amber-100 bg-amber-50 p-3 text-sm text-amber-700">⚠ Changing tier parameters will only affect future orders. Existing buyers keep their current terms until renewed.</div>
 
       {loading ? <Spinner className="py-20" /> : tiers.length === 0 ? <EmptyState title="No tiers" /> : (
         <Table
@@ -99,6 +113,16 @@ export default function TiersPage() {
           </div>
         </div>
       </Modal>
+
+      <ConfirmDialog
+        open={confirm.open}
+        onClose={() => setConfirm((c) => ({ ...c, open: false }))}
+        onConfirm={() => confirm.action?.()}
+        title={confirm.title}
+        message={confirm.message}
+        confirmLabel={confirm.label}
+        variant={confirm.variant}
+      />
     </div>
   );
 }

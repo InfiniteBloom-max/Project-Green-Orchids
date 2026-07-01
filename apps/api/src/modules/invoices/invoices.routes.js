@@ -1,12 +1,16 @@
 const { Router } = require('express');
 const c = require('./invoices.controller');
-const { requireAuth } = require('../../middleware/auth');
+const { requireAuth, requireApprovedBuyer } = require('../../middleware/auth');
 const { requirePermission } = require('../../middleware/rbac');
+const { validate } = require('../../middleware/validate');
+const { paySchema } = require('./invoices.schema');
 const r = Router();
 r.use(requireAuth);
 r.get('/', c.list);
 r.get('/statements', c.statement);
-r.get('/aging', requirePermission('ADMIN', 'FINANCE_MANAGER'), c.aging);
+r.get('/statements/pdf', c.statementPdf);
+r.get('/aging', requirePermission('invoice.view.all'), c.aging);
 r.get('/:id', c.get);
 r.get('/:id/pdf', c.pdf);
+r.post('/:id/pay', requireApprovedBuyer, validate({ body: paySchema }), c.pay);
 module.exports = r;

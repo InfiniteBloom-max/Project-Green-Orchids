@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * seed.js – Deterministic seed script for Project Green (K ORCHIDS B2B platform).
+ * seed.js – Deterministic seed script for Project Green (ORCHIDS B2B platform).
  *
  * Usage:
  *   DATABASE_URL=postgresql://... node scripts/seed.js
@@ -221,9 +221,9 @@ async function seed() {
     console.log('📊 Seeding buyer tiers…');
     const tierRes = await pool.query(`
       INSERT INTO buyer_tiers (name, discount_rate, credit_cap, priority) VALUES
-        ('SILVER',  3.00, 500000.00,  1),
-        ('GOLD',    5.00, 1000000.00, 2),
-        ('PLATINUM',7.00, 2500000.00, 3)
+        ('SILVER',  3.00, 40000000.00,  1),
+        ('GOLD',    5.00, 60000000.00, 2),
+        ('PLATINUM',7.00, 90000000.00, 3)
       RETURNING id, name, discount_rate, credit_cap
     `);
     const tiers = {};
@@ -356,7 +356,7 @@ async function seed() {
         VALUES ($1,$2,$3,$4,$5,'ORCHID',$6,$7,$8,$9,$10,$11,'ACTIVE')
         RETURNING id
       `, [
-        sku, orchid.name, `${orchid.name} - premium quality orchid from K ORCHIDS collection`,
+        sku, orchid.name, `${orchid.name} - premium quality orchid from ORCHIDS collection`,
         catId, pick(supplierIds), orchid.unit, basePrice, moq,
         stockQty, reservedQty, Math.floor(stockQty * 0.2),
       ]);
@@ -452,8 +452,8 @@ async function seed() {
         ON CONFLICT DO NOTHING
       `, [
         pid,
-        `k-orchids/products/kor-${imgId}`,
-        `https://res.cloudinary.com/k-orchids/image/upload/v1/products/kor-${imgId}.jpg`,
+        `orchids/products/orc-${imgId}`,
+        `https://res.cloudinary.com/orchids/image/upload/v1/products/orc-${imgId}.jpg`,
       ]);
     }
     console.log(`   → ${realProductIds.length} placeholder images`);
@@ -522,8 +522,8 @@ async function seed() {
         const buyer = pick(activeBuyers);
         const orderDate = daysAgo(day);
 
-        // Pick a status along the flow based on how old the order is
-        let statusIdx = Math.min(Math.floor((DAYS_OF_ORDERS - day) / 12), orderStatusFlow.length - 1);
+        // Pick a status along the flow based on how old the order is (larger `day` = placed longer ago = further along)
+        let statusIdx = Math.min(Math.floor(day / 12), orderStatusFlow.length - 1);
         // Add some randomness
         if (faker.number.float({min:0,max:1}) < 0.15) statusIdx = Math.max(0, statusIdx - 1);
         const status = orderStatusFlow[statusIdx];
@@ -727,7 +727,7 @@ async function seed() {
           const delStatus = orderStatus === 'RETURNED' ? 'FAILED' :
                             orderStatus === 'DELIVERED' ? 'DELIVERED' : 'DISPATCHED';
           const podUrl = delStatus === 'DELIVERED'
-            ? `https://res.cloudinary.com/k-orchids/pod/ORD-${String(order.id).padStart(7, '0')}.pdf`
+            ? `https://res.cloudinary.com/orchids/pod/ORD-${String(order.id).padStart(7, '0')}.pdf`
             : null;
           const { rows: [del] } = await pool.query(`
             INSERT INTO deliveries (order_id, assigned_to, status, dispatch_date, pod_url, pod_uploaded_at,
@@ -785,7 +785,7 @@ async function seed() {
     await pool.query(`
       INSERT INTO cms_blocks (key, type, content, is_published, updated_by)
       VALUES
-        ('home_hero', 'HERO', '{"heading":"Welcome to K ORCHIDS","subheading":"Premium Wholesale Orchids from Sri Lanka","cta_text":"Browse Catalogue","cta_url":"/products","background_image":"/assets/hero-orchids.jpg"}', true, $1),
+        ('home_hero', 'HERO', '{"heading":"Welcome to ORCHIDS","subheading":"Premium Wholesale Orchids from Sri Lanka","cta_text":"Browse Catalogue","cta_url":"/products","background_image":"/assets/hero-orchids.jpg"}', true, $1),
         ('announcement_bar', 'BANNER', '{"text":"🎉 Free delivery on orders over LKR 100,000","enabled":true,"bg_color":"#2d6a4f","text_color":"#ffffff"}', true, $1)
       ON CONFLICT (key) DO UPDATE
         SET content = EXCLUDED.content, updated_by = EXCLUDED.updated_by, updated_at = NOW()

@@ -69,7 +69,7 @@ export function CartProvider({ children }) {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(async () => {
       try {
-        await api.put('/cart', { items: cartItems });
+        await api.put('/cart', { items: cartItems.map((i) => ({ productId: i.productId, quantity: i.quantity })) });
       } catch {
         // Silently fail - mirror is source of truth
       }

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import { Card } from '@/components/ui/Card';
 import { Table } from '@/components/ui/Table';
 import { CreditBar, TierBadge, StatusBadge } from '@/components/domain/StatusBadge';
@@ -22,7 +23,11 @@ export default function CreditMonitorPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Credit Monitor</h1>
+      <PageHeader
+        tone="sky"
+        title="Credit Monitor"
+        description="Monitor buyer credit usage, limits, and reliability scores."
+      />
       {loading ? <Spinner className="py-20" /> : buyers.length === 0 ? <EmptyState title="No buyers" /> : (
         <div className="space-y-4">
           {buyers.map((buyer) => (

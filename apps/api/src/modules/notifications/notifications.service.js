@@ -12,12 +12,12 @@ const service = {
   async retry(id) {
     const item = await repo.findOutboxById(id);
     if (!item) throw new AppError('NOT_FOUND', 'Notification not found', 404);
-    if (!['FAILED', 'DEAD'].includes(item.status)) throw new AppError('INVALID_STATE', 'Can only retry failed notifications', 409);
+    if (item.status !== 'FAILED') throw new AppError('INVALID_STATE', 'Can only retry failed notifications', 409);
 
     try {
       await sendMail({
-        to: item.recipient, subject: item.subject,
-        template: item.template, data: item.template_data,
+        to: item.recipient_email, subject: `ORCHIDS: ${item.template}`,
+        template: item.template, data: item.payload || {},
       });
       await repo.updateStatus(null, id, 'SENT');
     } catch (err) {

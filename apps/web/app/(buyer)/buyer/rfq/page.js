@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/Card';
 import { Table } from '@/components/ui/Table';
 import { StatusBadge } from '@/components/domain/StatusBadge';
 import { Spinner, EmptyState, ErrorState } from '@/components/ui/Spinner';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import { formatDate, formatLKR } from '@/lib/utils';
 
 export default function RFQListPage() {
@@ -39,10 +40,12 @@ export default function RFQListPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Request for Quotes</h1>
-        <Link href="/buyer/rfq/new"><Button>New RFQ</Button></Link>
-      </div>
+      <PageHeader
+        tone="violet"
+        title="Request for Quotes"
+        description="View your submitted RFQs and respond to quotes."
+        actions={<Link href="/buyer/rfq/new"><Button>New RFQ</Button></Link>}
+      />
 
       {error && <ErrorState message={error} onRetry={() => window.location.reload()} />}
 

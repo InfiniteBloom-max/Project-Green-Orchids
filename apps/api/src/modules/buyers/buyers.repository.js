@@ -54,7 +54,7 @@ const buyersRepository = {
   async approve(client, { userId, tier, creditLimit, paymentTerms, approvedBy }) {
     const tierRes = await query('SELECT id FROM buyer_tiers WHERE name = $1', [tier]);
     const tierId = tierRes.rows[0]?.id;
-    await (client || query)(
+    await (client ? client.query.bind(client) : query)(
       `UPDATE trade_accounts SET account_status = 'ACTIVE', tier_id = $1, credit_limit = $2,
        payment_term = $3, approved_by = $4, approved_at = NOW(), updated_at = NOW()
        WHERE user_id = $5`,
@@ -63,7 +63,7 @@ const buyersRepository = {
   },
 
   async reject(client, { userId, reason }) {
-    await (client || query)(
+    await (client ? client.query.bind(client) : query)(
       `UPDATE trade_accounts SET account_status = 'CLOSED', updated_at = NOW()
        WHERE user_id = $1`,
       [userId]
@@ -71,7 +71,7 @@ const buyersRepository = {
   },
 
   async suspend(client, { userId, reason }) {
-    await (client || query)(
+    await (client ? client.query.bind(client) : query)(
       `UPDATE trade_accounts SET account_status = 'SUSPENDED', updated_at = NOW()
        WHERE user_id = $1`,
       [userId]
@@ -79,14 +79,14 @@ const buyersRepository = {
   },
 
   async reactivate(client, userId) {
-    await (client || query)(
+    await (client ? client.query.bind(client) : query)(
       `UPDATE trade_accounts SET account_status = 'ACTIVE', updated_at = NOW() WHERE user_id = $1`,
       [userId]
     );
   },
 
   async updateCredit(client, { userId, creditLimit }) {
-    await (client || query)(
+    await (client ? client.query.bind(client) : query)(
       `UPDATE trade_accounts SET credit_limit = $1, updated_at = NOW() WHERE user_id = $2`,
       [creditLimit, userId]
     );
@@ -96,7 +96,7 @@ const buyersRepository = {
     const tierRes = await query('SELECT id FROM buyer_tiers WHERE name = $1', [tier]);
     const tierId = tierRes.rows[0]?.id;
     if (!tierId) return;
-    await (client || query)(
+    await (client ? client.query.bind(client) : query)(
       `UPDATE trade_accounts SET tier_id = $1, updated_at = NOW() WHERE user_id = $2`,
       [tierId, userId]
     );

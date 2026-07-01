@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { StatusBadge, TimelineView } from '@/components/domain/StatusBadge';
 import { Spinner, ErrorState } from '@/components/ui/Spinner';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import { formatLKR, formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
@@ -16,6 +18,7 @@ export default function RFQDetailPage() {
   const [rfq, setRfq] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [confirmAction, setConfirmAction] = useState(null); // 'accept' | 'reject' | null
 
   useEffect(() => {
     (async () => {
@@ -32,21 +35,35 @@ export default function RFQDetailPage() {
 
   const handleAccept = async () => {
     try {
-      await api.post(`/rfqs/${id}/accept`);
+      await api.patch(`/rfqs/${id}/accept`);
       toast.success('Quote accepted');
       setRfq((r) => ({ ...r, status: 'ACCEPTED' }));
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to accept');
+      toast.error(err.response?.data?.error?.message || 'Failed to accept');
     }
   };
 
   const handleReject = async () => {
     try {
-      await api.post(`/rfqs/${id}/reject`);
+      await api.patch(`/rfqs/${id}/reject`);
       toast.success('Quote rejected');
       setRfq((r) => ({ ...r, status: 'REJECTED' }));
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to reject');
+      toast.error(err.response?.data?.error?.message || 'Failed to reject');
+    }
+  };
+
+  const [converting, setConverting] = useState(false);
+  const handleConvert = async () => {
+    setConverting(true);
+    try {
+      const res = await api.post('/orders/from-rfq', { rfq_id: id });
+      toast.success('Order placed');
+      router.push(`/buyer/orders/${res.data.data.id}`);
+    } catch (err) {
+      toast.error(err.response?.data?.error?.message || 'Failed to convert to order');
+    } finally {
+      setConverting(false);
     }
   };
 
@@ -58,15 +75,13 @@ export default function RFQDetailPage() {
 
   return (
     <div className="space-y-6">
-      <button onClick={() => router.back()} className="text-sm text-green-700 hover:underline">&larr; Back</button>
-
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">RFQ #{rfq.rfqNo || rfq.id}</h1>
-          <p className="text-sm text-gray-500">Submitted: {formatDate(rfq.createdAt)}</p>
-        </div>
-        <StatusBadge status={rfq.status} />
-      </div>
+      <PageHeader
+        tone="violet"
+        back={{ href: '/buyer/rfq', label: 'Back' }}
+        title={`RFQ #${rfq.rfqNo || rfq.id}`}
+        description={`Submitted: ${formatDate(rfq.createdAt)}`}
+        actions={<StatusBadge status={rfq.status} />}
+      />
 
       {/* Quote */}
       {rfq.quotedAt && !isExpired && !['EXPIRED', 'ACCEPTED', 'REJECTED'].includes(rfq.status) && (
@@ -106,8 +121,21 @@ export default function RFQDetailPage() {
 
       {rfq.status === 'QUOTED' && !isExpired && (
         <div className="flex justify-end gap-3">
-          <Button variant="danger" onClick={handleReject}>Reject Quote</Button>
-          <Button onClick={handleAccept}>Accept Quote</Button>
+          <Button variant="danger" onClick={() => setConfirmAction('reject')}>Reject Quote</Button>
+          <Button onClick={() => setConfirmAction('accept')}>Accept Quote</Button>
+        </div>
+      )}
+
+      {rfq.status === 'ACCEPTED' && (
+        <div className="flex items-center justify-between gap-3 rounded-lg bg-green-50 p-4">
+          <p className="text-sm text-green-800">Quote accepted. Convert it into an order at these quoted prices.</p>
+          <Button onClick={handleConvert} loading={converting}>Convert to Order</Button>
+        </div>
+      )}
+
+      {rfq.status === 'CONVERTED' && (
+        <div className="bg-gray-100 p-4 rounded-lg text-sm text-gray-600">
+          This quote has been converted into an order.
         </div>
       )}
 
@@ -118,6 +146,25 @@ export default function RFQDetailPage() {
           <TimelineView events={rfq.timeline} />
         </Card>
       )}
+
+      <ConfirmDialog
+        open={confirmAction === 'accept'}
+        onClose={() => setConfirmAction(null)}
+        onConfirm={handleAccept}
+        title="Accept quote"
+        message="Accept this quote and place the order at the quoted prices? This commits you to purchase."
+        confirmLabel="Accept quote"
+        variant="info"
+      />
+      <ConfirmDialog
+        open={confirmAction === 'reject'}
+        onClose={() => setConfirmAction(null)}
+        onConfirm={handleReject}
+        title="Reject quote"
+        message="Reject this quote? You'll need to submit a new RFQ if you change your mind."
+        confirmLabel="Reject quote"
+        variant="danger"
+      />
     </div>
   );
 }

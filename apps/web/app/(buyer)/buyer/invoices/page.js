@@ -6,6 +6,7 @@ import api from '@/lib/api';
 import { Table } from '@/components/ui/Table';
 import { StatusBadge } from '@/components/domain/StatusBadge';
 import { Spinner, EmptyState, ErrorState } from '@/components/ui/Spinner';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import { formatLKR, formatDate } from '@/lib/utils';
 
 export default function InvoicesListPage() {
@@ -40,7 +41,7 @@ export default function InvoicesListPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Invoices</h1>
+      <PageHeader tone="violet" title="Invoices" description="View and manage your invoices and payment status." />
       <div className="flex gap-2">
         {['', 'PAID', 'UNPAID', 'PARTIAL', 'OVERDUE'].map((s) => (
           <button key={s} onClick={() => setFilter(s)} className={`px-3 py-1 text-sm rounded-full ${filter === s ? 'bg-green-700 text-white' : 'bg-gray-100'}`}>

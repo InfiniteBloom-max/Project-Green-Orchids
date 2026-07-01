@@ -8,6 +8,7 @@ import { Pagination } from '@/components/ui/Pagination';
 import { Spinner, EmptyState } from '@/components/ui/Spinner';
 import { formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
+import { PageHeader } from '@/components/domain/DashboardUI';
 
 export default function MovementsPage() {
   const [movements, setMovements] = useState([]);
@@ -35,10 +36,13 @@ export default function MovementsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Stock Movements</h1>
-        <Button variant="outline" size="sm" onClick={handleExport}>Export CSV</Button>
-      </div>
+      <PageHeader
+        eyebrow="Inventory"
+        title="Stock Movements"
+        description="Track stock in, stock out, returns, and adjustments across your inventory."
+        tone="amber"
+        actions={<Button variant="outline" size="sm" onClick={handleExport}>Export CSV</Button>}
+      />
 
       <div className="flex gap-2">
         <select value={filter.type} onChange={(e) => setFilter((f) => ({ ...f, type: e.target.value }))} className="px-3 py-2 border rounded text-sm">

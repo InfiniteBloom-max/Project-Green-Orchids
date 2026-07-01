@@ -2,7 +2,7 @@ const { query } = require('../../config/db');
 const repo = {
   async nextRmaNumber() { const r = await query("SELECT nextval('rma_number_seq') as num"); return `RMA-${String(r.rows[0].num).padStart(6,'0')}`; },
   async create(client, data) {
-    const r = await (client || query)(
+    const r = await (client ? client.query.bind(client) : query)(
       `INSERT INTO rma (rma_number, order_id, order_item_id, buyer_id, quantity, reason, return_type, status, notes)
        VALUES ($1,$2,$3,$4,$5,$6,$7,'PENDING',$8) RETURNING *`,
       [data.rma_number, data.order_id, data.order_item_id, data.buyer_id, data.quantity, data.reason, data.return_type, data.notes]
@@ -31,11 +31,11 @@ const repo = {
     );
     return r.rows[0] || null;
   },
-  async updateStatus(client, id, status) { await (client || query)('UPDATE rma SET status=$1,updated_at=NOW() WHERE id=$2', [status, id]); },
+  async updateStatus(client, id, status) { await (client ? client.query.bind(client) : query)('UPDATE rma SET status=$1,updated_at=NOW() WHERE id=$2', [status, id]); },
   async update(client, id, data) {
     const keys = Object.keys(data); if (!keys.length) return;
     const sets = keys.map((k,i)=>`${k}=$${i+2}`); const vals = keys.map(k=>data[k]);
-    await (client || query)(`UPDATE rma SET ${sets.join(',')},updated_at=NOW() WHERE id=$1`,[id,...vals]);
+    await (client ? client.query.bind(client) : query)(`UPDATE rma SET ${sets.join(',')},updated_at=NOW() WHERE id=$1`,[id,...vals]);
   },
 };
 module.exports = repo;

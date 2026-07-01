@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/auth';
 import { Button, Input } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { TierBadge } from '@/components/domain/StatusBadge';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import { formatDate } from '@/lib/utils';
 import api from '@/lib/api';
 import toast from 'react-hot-toast';
@@ -35,15 +36,15 @@ export default function AccountPage() {
 
   const loadSessions = async () => {
     try {
-      const res = await api.get('/auth/sessions');
-      setSessions(res.data.sessions || res.data);
+      const res = await api.get('/auth/me/sessions');
+      setSessions(res.data.data || []);
     } catch {}
     setShowSessions(true);
   };
 
   const signOutOthers = async () => {
     try {
-      await api.post('/auth/signout-others');
+      await api.post('/auth/me/sessions/revoke-others');
       toast.success('Signed out other devices');
       loadSessions();
     } catch {
@@ -53,7 +54,7 @@ export default function AccountPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Account Settings</h1>
+      <PageHeader tone="violet" title="Account Settings" description="Manage your business profile, tier benefits, password, and active sessions." />
 
       {/* Profile */}
       <Card>
@@ -100,10 +101,10 @@ export default function AccountPage() {
           <Button variant="outline" size="sm" onClick={loadSessions}>View Sessions</Button>
         ) : (
           <div className="space-y-2">
-            {sessions.map((s, i) => (
-              <div key={i} className="text-sm flex justify-between py-1 border-b">
-                <span>{s.device || s.userAgent} <span className="text-gray-400">({s.ip})</span></span>
-                <span className="text-gray-500">{formatDate(s.createdAt)}</span>
+            {sessions.map((s) => (
+              <div key={s.id} className="text-sm flex justify-between py-1 border-b">
+                <span>{s.device_info || 'Unknown device'} <span className="text-gray-400">({s.ip_address})</span></span>
+                <span className="text-gray-500">{formatDate(s.created_at)}</span>
               </div>
             ))}
             <Button variant="outline" size="sm" onClick={signOutOthers}>Sign Out Other Devices</Button>

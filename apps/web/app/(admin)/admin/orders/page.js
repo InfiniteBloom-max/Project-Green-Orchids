@@ -75,7 +75,7 @@ export default function AdminOrdersPage() {
           <select
             value={status}
             onChange={(e) => { setStatus(e.target.value); setPage(1); }}
-            className="rounded-xl border border-white/10 bg-white/[0.05] px-4 py-2.5 text-sm text-white outline-none transition focus:border-emerald-400/50"
+            className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 outline-none transition focus:border-emerald-400"
           >
             {STATUS_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
@@ -88,24 +88,24 @@ export default function AdminOrdersPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-white/10">
+                <tr className="border-b border-slate-200">
                   {['Order #', 'Buyer', 'Total (LKR)', 'Status', 'Date', ''].map((h) => (
-                    <th key={h} className="pb-3 pr-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-white/35">{h}</th>
+                    <th key={h} className="pb-3 pr-4 text-left text-xs font-semibold uppercase tracking-[0.08em] text-slate-400">{h}</th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/[0.05]">
+              <tbody className="divide-y divide-slate-100">
                 {orders.map((o) => (
-                  <tr key={o.id} className="group transition hover:bg-white/[0.03]">
-                    <td className="py-3 pr-4 font-mono text-xs font-semibold text-white">#{o.order_no || o.orderNumber || o.id}</td>
-                    <td className="py-3 pr-4 text-white/70">{o.buyer_name || o.buyerName || o.buyer?.businessName || '—'}</td>
-                    <td className="py-3 pr-4 font-semibold text-emerald-200">{formatLKR(o.total || o.totalAmount || 0)}</td>
+                  <tr key={o.id} className="group transition hover:bg-slate-50">
+                    <td className="py-3 pr-4 font-mono text-xs font-semibold text-slate-800">#{o.order_no || o.orderNumber || o.id}</td>
+                    <td className="py-3 pr-4 text-slate-600">{o.buyer_name || o.buyerName || o.buyer?.businessName || '—'}</td>
+                    <td className="py-3 pr-4 font-semibold text-emerald-600">{formatLKR(o.total || o.totalAmount || 0)}</td>
                     <td className="py-3 pr-4"><StatusBadge status={o.status} /></td>
-                    <td className="py-3 pr-4 text-white/35">{formatDate(o.created_at || o.createdAt, 'yyyy-MM-dd')}</td>
+                    <td className="py-3 pr-4 text-slate-400">{formatDate(o.created_at || o.createdAt, 'yyyy-MM-dd')}</td>
                     <td className="py-3">
                       <Link
                         href={`/admin/orders/${o.id}`}
-                        className="rounded-lg border border-white/10 bg-white/[0.05] px-3 py-1 text-xs font-semibold text-white/55 opacity-0 transition group-hover:opacity-100 hover:bg-white/[0.1] hover:text-white"
+                        className="rounded-lg border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-500 opacity-0 transition group-hover:opacity-100 hover:bg-slate-50 hover:text-slate-800"
                       >
                         View
                       </Link>

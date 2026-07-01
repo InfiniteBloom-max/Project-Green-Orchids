@@ -38,7 +38,7 @@ let transporter = null;
 function getTransporter() {
   if (transporter) return transporter;
 
-  if (env.isProd) {
+  if (env.SMTP_USER && env.SMTP_PASS) {
     transporter = nodemailer.createTransport({
       host: env.SMTP_HOST,
       port: env.SMTP_PORT,
@@ -83,7 +83,7 @@ async function sendMail({ to, subject, template, data, html }) {
   const bodyHtml = html || renderTemplate(template, data);
 
   const mailOptions = {
-    from: `"K ORCHIDS" <${env.EMAIL_FROM}>`,
+    from: `"ORCHIDS" <${env.EMAIL_FROM}>`,
     to,
     subject,
     html: bodyHtml,

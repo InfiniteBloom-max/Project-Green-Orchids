@@ -8,6 +8,7 @@ import { useCart } from '@/lib/cartStore';
 import { Input } from '@/components/ui/Button';
 import { ProductCard } from '@/components/domain/ProductCard';
 import { Spinner, EmptyState, ErrorState } from '@/components/ui/Spinner';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import toast from 'react-hot-toast';
 
 export default function BuyerCataloguePage() {
@@ -81,7 +82,7 @@ export default function BuyerCataloguePage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Catalogue</h1>
+      <PageHeader tone="violet" title="Catalogue" description="Browse available products and add them to your cart." />
       {user?.tier && (
         <div className="text-sm bg-green-50 text-green-700 px-4 py-2 rounded-lg">
           Current tier: <strong>{user.tier}</strong>

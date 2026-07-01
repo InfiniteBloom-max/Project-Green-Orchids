@@ -9,6 +9,7 @@ import { Table } from '@/components/ui/Table';
 import { Pagination } from '@/components/ui/Pagination';
 import { Spinner, EmptyState } from '@/components/ui/Spinner';
 import { StatusBadge, AuditDiffViewer } from '@/components/domain/StatusBadge';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import { formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
@@ -94,7 +95,12 @@ export default function SecurityPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Security Panel</h1>
+      <PageHeader
+        eyebrow="Security"
+        title="Security Panel"
+        description="Monitor login activity, active sessions, locked accounts, and audit logs."
+        tone="emerald"
+      />
       <Tabs tabs={tabs} active={tab} onChange={setTab} />
 
       {loading ? <Spinner className="py-20" /> : (

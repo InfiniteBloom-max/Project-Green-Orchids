@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { Table } from '@/components/ui/Table';
 import { StatusBadge } from '@/components/domain/StatusBadge';
 import { Spinner, EmptyState } from '@/components/ui/Spinner';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import { formatDate } from '@/lib/utils';
 
 export default function ReturnsListPage() {
@@ -35,10 +36,12 @@ export default function ReturnsListPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Returns</h1>
-        <Link href="/buyer/returns/new"><Button>New Return</Button></Link>
-      </div>
+      <PageHeader
+        tone="violet"
+        title="Returns"
+        description="View and track your return (RMA) requests."
+        actions={<Link href="/buyer/returns/new"><Button>New Return</Button></Link>}
+      />
       {loading ? <Spinner className="py-20" /> : returns.length === 0 ? <EmptyState title="No returns" /> : (
         <Table columns={columns} rows={returns} onRowClick={(r) => router.push(`/buyer/returns/${r.id}`)} />
       )}

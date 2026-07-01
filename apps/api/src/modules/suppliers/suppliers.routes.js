@@ -5,7 +5,7 @@ const { requirePermission } = require('../../middleware/rbac');
 const { validate } = require('../../middleware/validate');
 const { createSchema, updateSchema } = require('./suppliers.schema');
 const r = Router();
-r.use(requireAuth, requirePermission('ADMIN', 'INVENTORY_MANAGER', 'SALES_MANAGER'));
+r.use(requireAuth, requirePermission('product.edit'));
 r.get('/', c.list);
 r.post('/', validate({ body: createSchema }), c.create);
 r.get('/:id', c.get);

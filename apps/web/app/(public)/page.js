@@ -193,7 +193,7 @@ export default function LandingPage() {
           {[
             { h: 'Shop', links: [['Catalogue', '/catalogue'], ['Pricing', '/catalogue#pricing'], ['Request a quote', '/register']] },
             { h: 'Company', links: [['About', '#about'], ['Sign in', '/login'], ['Apply', '/register']] },
-            { h: 'Support', links: [['Contact', 'mailto:trade@korchids.lk'], ['Trade terms', '#about'], ['Help centre', '#about']] },
+            { h: 'Support', links: [['Contact', 'mailto:trade@orchids.lk'], ['Trade terms', '#about'], ['Help centre', '#about']] },
           ].map((col) => (
             <div key={col.h}>
               <p className="eyebrow text-emerald-300/80">{col.h}</p>
@@ -211,7 +211,7 @@ export default function LandingPage() {
         </div>
 
         <div className="mx-auto mt-14 flex max-w-6xl flex-col items-center justify-between gap-4 border-t border-white/10 pt-7 text-xs font-medium text-white/40 sm:flex-row">
-          <span>© {new Date().getFullYear()} K Orchids Wholesale · Colombo, Sri Lanka</span>
+          <span>© {new Date().getFullYear()} ORCHIDS Wholesale · Colombo, Sri Lanka</span>
           <span className="flex items-center gap-6">
             <Link href="#about" className="transition hover:text-white/70">Privacy</Link>
             <Link href="#about" className="transition hover:text-white/70">Terms</Link>

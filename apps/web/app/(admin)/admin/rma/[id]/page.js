@@ -7,6 +7,8 @@ import { Button, Select, Textarea } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Modal } from '@/components/ui/Modal';
 import { StatusBadge, TimelineView } from '@/components/domain/StatusBadge';
+import { PageHeader } from '@/components/domain/DashboardUI';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { Spinner, ErrorState } from '@/components/ui/Spinner';
 import { formatDate, formatLKR } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -20,6 +22,7 @@ export default function AdminRMADetailPage() {
   const [resolution, setResolution] = useState('');
   const [inventoryAction, setInventoryAction] = useState('return_to_stock');
   const [actionLoading, setActionLoading] = useState(false);
+  const [confirmReject, setConfirmReject] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -60,11 +63,14 @@ export default function AdminRMADetailPage() {
 
   return (
     <div className="space-y-6">
-      <button onClick={() => router.back()} className="text-sm text-green-700 hover:underline">&larr; Back</button>
-      <div className="flex items-center justify-between">
-        <div><h1 className="text-2xl font-bold">RMA #{rma.rmaNo || rma.id}</h1><p className="text-sm text-gray-500">Order #{rma.orderNo} &middot; {rma.buyerName}</p></div>
-        <StatusBadge status={rma.status} />
-      </div>
+      <PageHeader
+        eyebrow="RMA"
+        title={`RMA #${rma.rmaNo || rma.id}`}
+        description={`Order #${rma.orderNo} · ${rma.buyerName}`}
+        back={{ href: '/admin/rma', label: 'Back to RMAs' }}
+        actions={<StatusBadge status={rma.status} />}
+        tone="emerald"
+      />
 
       <Card>
         <h3 className="text-sm font-medium mb-2">Details</h3>
@@ -90,7 +96,7 @@ export default function AdminRMADetailPage() {
       <div className="flex gap-3">
         {rma.status === 'SUBMITTED' && (
           <>
-            <Button variant="danger" onClick={handleReject} loading={actionLoading}>Reject</Button>
+            <Button variant="danger" onClick={() => setConfirmReject(true)} loading={actionLoading}>Reject</Button>
             <Button onClick={handleApprove} loading={actionLoading}>Approve</Button>
           </>
         )}
@@ -116,6 +122,16 @@ export default function AdminRMADetailPage() {
       {rma.timeline?.length > 0 && (
         <Card><h3 className="text-sm font-medium mb-4">Timeline</h3><TimelineView events={rma.timeline} /></Card>
       )}
+
+      <ConfirmDialog
+        open={confirmReject}
+        onClose={() => setConfirmReject(false)}
+        onConfirm={handleReject}
+        title="Reject return request"
+        message="Reject this RMA? The buyer will be notified and no refund or exchange will be processed."
+        confirmLabel="Reject RMA"
+        variant="danger"
+      />
     </div>
   );
 }

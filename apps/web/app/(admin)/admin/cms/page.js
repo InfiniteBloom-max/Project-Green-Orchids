@@ -30,7 +30,7 @@ const BLOCK_TYPES = [
 function GlassField({ label, children }) {
   return (
     <div className="space-y-1.5">
-      <label className="block text-xs font-semibold uppercase tracking-[0.15em] text-white/40">{label}</label>
+      <label className="block text-xs font-semibold uppercase tracking-[0.1em] text-slate-400">{label}</label>
       {children}
     </div>
   );
@@ -43,7 +43,7 @@ function GlassInput({ value, onChange, type = 'text', placeholder }) {
       value={value}
       onChange={onChange}
       placeholder={placeholder}
-      className="w-full rounded-xl border border-white/10 bg-white/[0.05] px-4 py-2.5 text-sm text-white placeholder:text-white/25 outline-none transition focus:border-emerald-400/50 focus:bg-white/[0.08] focus:ring-1 focus:ring-emerald-400/30"
+      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-800 placeholder:text-slate-400 outline-none transition focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30"
     />
   );
 }
@@ -55,7 +55,7 @@ function GlassTextarea({ value, onChange, placeholder, rows = 4 }) {
       onChange={onChange}
       placeholder={placeholder}
       rows={rows}
-      className="w-full rounded-xl border border-white/10 bg-white/[0.05] px-4 py-2.5 text-sm text-white placeholder:text-white/25 outline-none transition focus:border-emerald-400/50 focus:bg-white/[0.08] focus:ring-1 focus:ring-emerald-400/30"
+      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-800 placeholder:text-slate-400 outline-none transition focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30"
     />
   );
 }
@@ -67,7 +67,7 @@ function GlassToggle({ value, onChange, label }) {
       onClick={() => onChange(!value)}
       className={cn(
         'relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200',
-        value ? 'bg-emerald-500' : 'bg-white/15'
+        value ? 'bg-emerald-500' : 'bg-slate-200'
       )}
     >
       <span className={cn('inline-block h-4 w-4 rounded-full bg-white shadow transition-transform duration-200', value ? 'translate-x-6' : 'translate-x-1')} />
@@ -128,7 +128,7 @@ function HomepageTab({ blocks }) {
             <GlassField label="Video URL"><GlassInput value={f('hero').videoUrl || ''} onChange={(e) => set('hero', 'videoUrl', e.target.value)} placeholder="/hero.mp4" /></GlassField>
             <GlassField label="Poster image URL"><GlassInput value={f('hero').posterUrl || ''} onChange={(e) => set('hero', 'posterUrl', e.target.value)} placeholder="/hero-poster.jpg" /></GlassField>
           </div>
-          <GlassField label="Headline"><GlassInput value={f('hero').headline || ''} onChange={(e) => set('hero', 'headline', e.target.value)} placeholder="Welcome to K Orchids" /></GlassField>
+          <GlassField label="Headline"><GlassInput value={f('hero').headline || ''} onChange={(e) => set('hero', 'headline', e.target.value)} placeholder="Welcome to ORCHIDS" /></GlassField>
           <GlassField label="Subheadline"><GlassInput value={f('hero').subheadline || ''} onChange={(e) => set('hero', 'subheadline', e.target.value)} placeholder="Sri Lanka's premier wholesale orchid marketplace" /></GlassField>
           <div className="grid gap-4 sm:grid-cols-2">
             <GlassField label="CTA button text"><GlassInput value={f('hero').ctaText || ''} onChange={(e) => set('hero', 'ctaText', e.target.value)} placeholder="Browse Catalogue" /></GlassField>
@@ -148,7 +148,7 @@ function HomepageTab({ blocks }) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <GlassToggle value={!!f('announcement').enabled} onChange={(v) => set('announcement', 'enabled', v)} />
-              <span className="text-sm font-medium text-white/55">Bar enabled</span>
+              <span className="text-sm font-medium text-slate-600">Bar enabled</span>
             </div>
             <SaveButton loading={saving.announcement} onClick={() => save('announcement')} />
           </div>
@@ -162,7 +162,7 @@ function HomepageTab({ blocks }) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <GlassToggle value={!!f('featured_section').enabled} onChange={(v) => set('featured_section', 'enabled', v)} />
-              <span className="text-sm font-medium text-white/55">Section enabled</span>
+              <span className="text-sm font-medium text-slate-600">Section enabled</span>
             </div>
             <SaveButton loading={saving.featured_section} onClick={() => save('featured_section')} />
           </div>
@@ -171,7 +171,7 @@ function HomepageTab({ blocks }) {
 
       <GlassPanel title="About section" subtitle="Company story and identity block.">
         <div className="space-y-4">
-          <GlassField label="Title"><GlassInput value={f('about_section').title || ''} onChange={(e) => set('about_section', 'title', e.target.value)} placeholder="About K Orchids" /></GlassField>
+          <GlassField label="Title"><GlassInput value={f('about_section').title || ''} onChange={(e) => set('about_section', 'title', e.target.value)} placeholder="About ORCHIDS" /></GlassField>
           <GlassField label="Body text"><GlassTextarea value={f('about_section').body || ''} onChange={(e) => set('about_section', 'body', e.target.value)} placeholder="Our story..." rows={5} /></GlassField>
           <GlassField label="Image URL"><GlassInput value={f('about_section').imageUrl || ''} onChange={(e) => set('about_section', 'imageUrl', e.target.value)} placeholder="/about.jpg" /></GlassField>
           <div className="flex justify-end"><SaveButton loading={saving.about_section} onClick={() => save('about_section')} /></div>
@@ -219,9 +219,9 @@ function BrandingTab({ blocks }) {
       <GlassPanel title="Brand identity" subtitle="Logo, company name and footer text.">
         <div className="space-y-4">
           <GlassField label="Logo URL"><GlassInput value={f('brand').logoUrl || ''} onChange={(e) => set('brand', 'logoUrl', e.target.value)} placeholder="/logo.svg" /></GlassField>
-          <GlassField label="Company name"><GlassInput value={f('brand').companyName || ''} onChange={(e) => set('brand', 'companyName', e.target.value)} placeholder="K Orchids" /></GlassField>
+          <GlassField label="Company name"><GlassInput value={f('brand').companyName || ''} onChange={(e) => set('brand', 'companyName', e.target.value)} placeholder="ORCHIDS" /></GlassField>
           <GlassField label="Tagline"><GlassInput value={f('brand').tagline || ''} onChange={(e) => set('brand', 'tagline', e.target.value)} placeholder="Sri Lanka's premier wholesale orchid marketplace" /></GlassField>
-          <GlassField label="Footer text"><GlassInput value={f('brand').footerText || ''} onChange={(e) => set('brand', 'footerText', e.target.value)} placeholder="© 2026 K Orchids. All rights reserved." /></GlassField>
+          <GlassField label="Footer text"><GlassInput value={f('brand').footerText || ''} onChange={(e) => set('brand', 'footerText', e.target.value)} placeholder="© 2026 ORCHIDS. All rights reserved." /></GlassField>
           <div className="flex justify-end"><SaveButton loading={saving.brand} onClick={() => save('brand')} /></div>
         </div>
       </GlassPanel>
@@ -235,7 +235,7 @@ function BrandingTab({ blocks }) {
                   type="color"
                   value={f('theme').primary || '#22c55e'}
                   onChange={(e) => set('theme', 'primary', e.target.value)}
-                  className="h-10 w-14 cursor-pointer rounded-lg border border-white/10 bg-transparent"
+                  className="h-10 w-14 cursor-pointer rounded-lg border border-slate-200 bg-transparent"
                 />
                 <GlassInput value={f('theme').primary || ''} onChange={(e) => set('theme', 'primary', e.target.value)} placeholder="#22c55e" />
               </div>
@@ -246,7 +246,7 @@ function BrandingTab({ blocks }) {
                   type="color"
                   value={f('theme').accent || '#a855f7'}
                   onChange={(e) => set('theme', 'accent', e.target.value)}
-                  className="h-10 w-14 cursor-pointer rounded-lg border border-white/10 bg-transparent"
+                  className="h-10 w-14 cursor-pointer rounded-lg border border-slate-200 bg-transparent"
                 />
                 <GlassInput value={f('theme').accent || ''} onChange={(e) => set('theme', 'accent', e.target.value)} placeholder="#a855f7" />
               </div>
@@ -258,9 +258,9 @@ function BrandingTab({ blocks }) {
 
       <GlassPanel title="Social links" subtitle="Platform profiles and contact channels.">
         <div className="space-y-4">
-          <GlassField label="Instagram URL"><GlassInput value={f('social').instagram || ''} onChange={(e) => set('social', 'instagram', e.target.value)} placeholder="https://instagram.com/korchids" /></GlassField>
-          <GlassField label="Facebook URL"><GlassInput value={f('social').facebook || ''} onChange={(e) => set('social', 'facebook', e.target.value)} placeholder="https://facebook.com/korchids" /></GlassField>
-          <GlassField label="LinkedIn URL"><GlassInput value={f('social').linkedin || ''} onChange={(e) => set('social', 'linkedin', e.target.value)} placeholder="https://linkedin.com/company/korchids" /></GlassField>
+          <GlassField label="Instagram URL"><GlassInput value={f('social').instagram || ''} onChange={(e) => set('social', 'instagram', e.target.value)} placeholder="https://instagram.com/orchids" /></GlassField>
+          <GlassField label="Facebook URL"><GlassInput value={f('social').facebook || ''} onChange={(e) => set('social', 'facebook', e.target.value)} placeholder="https://facebook.com/orchids" /></GlassField>
+          <GlassField label="LinkedIn URL"><GlassInput value={f('social').linkedin || ''} onChange={(e) => set('social', 'linkedin', e.target.value)} placeholder="https://linkedin.com/company/orchids" /></GlassField>
           <GlassField label="WhatsApp number"><GlassInput value={f('social').whatsapp || ''} onChange={(e) => set('social', 'whatsapp', e.target.value)} placeholder="+94771234567" /></GlassField>
           <div className="flex justify-end"><SaveButton loading={saving.social} onClick={() => save('social')} /></div>
         </div>
@@ -325,8 +325,8 @@ function MediaTab() {
   return (
     <div className="space-y-5">
       {noEndpoint && (
-        <div className="rounded-2xl border border-amber-400/20 bg-amber-400/5 px-5 py-4 text-sm font-medium text-amber-200">
-          Media upload API endpoint is not yet available. The UI is ready — connect <code className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-xs">POST /api/cms/media</code> to enable uploads.
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm font-medium text-amber-800">
+          Media upload API endpoint is not yet available. The UI is ready — connect <code className="rounded bg-amber-100 px-1.5 py-0.5 font-mono text-xs">POST /api/cms/media</code> to enable uploads.
         </div>
       )}
 
@@ -334,7 +334,7 @@ function MediaTab() {
         title="Media library"
         subtitle="Uploaded images and assets for use across the site."
         action={
-          <label className={cn('cursor-pointer rounded-xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-2 text-sm font-semibold text-emerald-200 transition hover:bg-emerald-400/20', uploading && 'opacity-60 cursor-not-allowed')}>
+          <label className={cn('cursor-pointer rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100', uploading && 'opacity-60 cursor-not-allowed')}>
             {uploading ? 'Uploading…' : '+ Upload image'}
             <input type="file" accept="image/*" className="hidden" onChange={handleUpload} disabled={uploading} />
           </label>
@@ -345,8 +345,8 @@ function MediaTab() {
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {media.map((item, idx) => (
-              <div key={item.id || idx} className="group relative overflow-hidden rounded-2xl border border-white/10 bg-black/20">
-                <div className="aspect-square overflow-hidden bg-white/5">
+              <div key={item.id || idx} className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
+                <div className="aspect-square overflow-hidden bg-slate-100">
                   <img
                     src={item.url || item.path}
                     alt={item.filename || item.name}
@@ -355,11 +355,11 @@ function MediaTab() {
                   />
                 </div>
                 <div className="p-3">
-                  <p className="truncate text-xs font-medium text-white/60">{item.filename || item.name}</p>
+                  <p className="truncate text-xs font-medium text-slate-600">{item.filename || item.name}</p>
                   <div className="mt-2 flex gap-2">
                     <button
                       onClick={() => { navigator.clipboard.writeText(item.url || item.path); toast.success('URL copied'); }}
-                      className="flex-1 rounded-lg border border-white/10 bg-white/[0.05] py-1 text-xs font-semibold text-white/50 transition hover:bg-white/[0.1] hover:text-white"
+                      className="flex-1 rounded-lg border border-slate-200 bg-white py-1 text-xs font-semibold text-slate-500 transition hover:bg-slate-50 hover:text-slate-800"
                     >
                       Copy URL
                     </button>
@@ -424,6 +424,14 @@ function BlocksTab({ blocks, onRefresh }) {
     } catch { toast.error('Failed'); }
   };
 
+  const handleTogglePublish = async (block) => {
+    try {
+      await api.patch(`/cms/blocks/${block.key}/publish`);
+      toast.success(block.is_published ? 'Unpublished' : 'Published');
+      onRefresh();
+    } catch { toast.error('Failed to change publish status'); }
+  };
+
   return (
     <div className="space-y-5">
       <GlassPanel
@@ -442,22 +450,33 @@ function BlocksTab({ blocks, onRefresh }) {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-white/10">
-                  {['Key', 'Type', 'Title', 'Updated', ''].map((h) => (
-                    <th key={h} className="pb-3 pr-4 text-left text-xs font-semibold uppercase tracking-[0.12em] text-white/35">{h}</th>
+                <tr className="border-b border-slate-200">
+                  {['Key', 'Type', 'Title', 'Updated', 'Status', ''].map((h) => (
+                    <th key={h} className="pb-3 pr-4 text-left text-xs font-semibold uppercase tracking-[0.08em] text-slate-400">{h}</th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/[0.05]">
+              <tbody className="divide-y divide-slate-100">
                 {blocks.map((b) => (
-                  <tr key={b.id || b.key} className="group transition hover:bg-white/[0.03]">
-                    <td className="py-3 pr-4 font-mono text-xs text-white/70">{b.key}</td>
-                    <td className="py-3 pr-4 text-white/55">{b.type}</td>
-                    <td className="py-3 pr-4 text-white/70">{b.title || '—'}</td>
-                    <td className="py-3 pr-4 text-white/35">{formatDate(b.updatedAt)}</td>
+                  <tr key={b.id || b.key} className="group transition hover:bg-slate-50">
+                    <td className="py-3 pr-4 font-mono text-xs text-slate-600">{b.key}</td>
+                    <td className="py-3 pr-4 text-slate-500">{b.block_type || b.type}</td>
+                    <td className="py-3 pr-4 text-slate-600">{b.title || '—'}</td>
+                    <td className="py-3 pr-4 text-slate-400">{formatDate(b.updated_at || b.updatedAt)}</td>
+                    <td className="py-3 pr-4">
+                      <button
+                        onClick={() => handleTogglePublish(b)}
+                        className={cn(
+                          'rounded-full px-3 py-1 text-xs font-semibold transition',
+                          b.is_published ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                        )}
+                      >
+                        {b.is_published ? '● Published' : '○ Draft'}
+                      </button>
+                    </td>
                     <td className="py-3">
                       <div className="flex gap-2 opacity-0 transition group-hover:opacity-100">
-                        <button onClick={() => openEdit(b)} className="rounded-lg border border-white/10 bg-white/[0.05] px-3 py-1 text-xs font-semibold text-white/55 transition hover:bg-white/[0.1] hover:text-white">Edit</button>
+                        <button onClick={() => openEdit(b)} className="rounded-lg border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-500 transition hover:bg-slate-50 hover:text-slate-800">Edit</button>
                         <button onClick={() => setDeleteTarget(b)} className="rounded-lg border border-rose-400/20 bg-rose-400/10 px-3 py-1 text-xs font-semibold text-rose-300 transition hover:bg-rose-400/20">Delete</button>
                       </div>
                     </td>
@@ -535,7 +554,7 @@ export default function CMSPage() {
         tone="violet"
       />
 
-      <div className="flex flex-wrap gap-1.5 rounded-2xl border border-white/10 bg-white/[0.03] p-1.5">
+      <div className="flex flex-wrap gap-1.5 rounded-2xl border border-slate-200 bg-white p-1.5">
         {TABS.map((t) => (
           <button
             key={t.key}
@@ -543,8 +562,8 @@ export default function CMSPage() {
             className={cn(
               'flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition',
               tab === t.key
-                ? 'bg-white/[0.1] text-white shadow-sm'
-                : 'text-white/40 hover:bg-white/[0.05] hover:text-white/70'
+                ? 'bg-slate-900 text-white shadow-sm'
+                : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'
             )}
           >
             <span>{t.icon}</span>

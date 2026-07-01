@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { StatusBadge, StatusStepper, InvoiceCard } from '@/components/domain';
 import { Spinner, ErrorState } from '@/components/ui/Spinner';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import { formatLKR, formatDate } from '@/lib/utils';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
@@ -20,6 +22,7 @@ export default function OrderDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
+  const [confirmCancel, setConfirmCancel] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -35,7 +38,6 @@ export default function OrderDetailPage() {
   }, [id]);
 
   const handleCancel = async () => {
-    if (!confirm('Cancel this order?')) return;
     setActionLoading(true);
     try {
       await api.post(`/orders/${id}/cancel`);
@@ -71,15 +73,13 @@ export default function OrderDetailPage() {
 
   return (
     <div className="space-y-6">
-      <button onClick={() => router.back()} className="text-sm text-green-700 hover:underline">&larr; Back</button>
-
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Order #{order.orderNo || order.id}</h1>
-          <p className="text-sm text-gray-500">{formatDate(order.createdAt)}</p>
-        </div>
-        <StatusBadge status={order.status} />
-      </div>
+      <PageHeader
+        tone="violet"
+        back={{ href: '/buyer/orders', label: 'Back' }}
+        title={`Order #${order.orderNo || order.id}`}
+        description={formatDate(order.createdAt)}
+        actions={<StatusBadge status={order.status} />}
+      />
 
       <StatusStepper steps={STEP_MAP} current={order.status} />
 
@@ -109,10 +109,20 @@ export default function OrderDetailPage() {
 
       {/* Actions */}
       <div className="flex gap-3">
-        {canCancel && <Button variant="danger" onClick={handleCancel} loading={actionLoading}>Cancel Order</Button>}
+        {canCancel && <Button variant="danger" onClick={() => setConfirmCancel(true)} loading={actionLoading}>Cancel Order</Button>}
         {canConfirm && <Button onClick={handleConfirmReceipt} loading={actionLoading}>Confirm Receipt</Button>}
         {canReturn && <Link href={`/buyer/returns/new?orderId=${order.id}`}><Button variant="outline">Request Return</Button></Link>}
       </div>
+
+      <ConfirmDialog
+        open={confirmCancel}
+        onClose={() => setConfirmCancel(false)}
+        onConfirm={handleCancel}
+        title="Cancel order"
+        message="Cancel this order? This cannot be undone."
+        confirmLabel="Cancel order"
+        variant="danger"
+      />
     </div>
   );
 }
