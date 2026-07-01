@@ -10,6 +10,7 @@ const service = {
   inventoryTurnover: () => repo.inventoryTurnover(),
   supplierContribution: (q) => repo.supplierContribution(q.from, q.to),
   returnsAnalytics: (q) => repo.returnsAnalytics(q.from, q.to),
+  summary: () => repo.summary(),
 };
 
 async function handleReport(req, res, next, method, ...args) {

@@ -8,4 +8,5 @@ module.exports = {
   inventoryTurnover: (r, res, n) => handleReport(r, res, n, service.inventoryTurnover),
   supplierContribution: (r, res, n) => handleReport(r, res, n, service.supplierContribution, r.query),
   returnsAnalytics: (r, res, n) => handleReport(r, res, n, service.returnsAnalytics, r.query),
+  summary: async (r, res, n) => { try { const d = await service.summary(); res.json(d); } catch (e) { n(e); } },
 };

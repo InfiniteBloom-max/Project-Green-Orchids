@@ -3,6 +3,7 @@ const { AppError } = require('../../middleware/errors');
 const { writeAudit } = require('../../middleware/audit');
 const { calculateBalanceDue } = require('../../utils/money');
 const { enqueueEmail } = require('../../utils/outbox');
+const { paginate } = require('../../utils/pagination');
 const repo = require('./payments.repository');
 
 // Decide invoice status from money state (Finding 10 / F1.3):
@@ -16,6 +17,12 @@ function invoiceStatus(total, adjustments, paid, balance) {
 }
 
 const service = {
+  async list(queryParams) {
+    const o = paginate(queryParams);
+    const { rows, total } = await repo.findAll(o);
+    return { data: rows, pagination: { page: o.page, limit: o.limit, total, pages: Math.ceil(total / o.limit) } };
+  },
+
   async create(data, actor) {
     let payment;
     await tx(async (client) => {

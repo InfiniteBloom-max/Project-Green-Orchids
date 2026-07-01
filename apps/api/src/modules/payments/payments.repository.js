@@ -4,6 +4,24 @@ const repo = {
     const r = await query("SELECT nextval('payment_number_seq') as num");
     return `PAY-${String(r.rows[0].num).padStart(6, '0')}`;
   },
+  async findAll({ limit, offset }) {
+    const ct = await query('SELECT COUNT(*) FROM payments');
+    const total = parseInt(ct.rows[0].count, 10);
+    const r = await query(
+      `SELECT p.*, ta.business_name AS buyer_name
+       FROM payments p LEFT JOIN trade_accounts ta ON ta.id = p.buyer_id
+       ORDER BY p.received_at DESC LIMIT $1 OFFSET $2`,
+      [limit, offset]
+    );
+    return { rows: r.rows, total };
+  },
+  async sumThisMonth() {
+    const r = await query(
+      `SELECT COALESCE(SUM(amount),0) AS total FROM payments
+       WHERE reversed_at IS NULL AND received_at >= DATE_TRUNC('month', NOW())`
+    );
+    return Number(r.rows[0].total);
+  },
   // Schema columns: payment_no, invoice_id, buyer_id, amount, method, reference, recorded_by, received_at
   async create(client, data) {
     const r = await (client ? client.query.bind(client) : query)(

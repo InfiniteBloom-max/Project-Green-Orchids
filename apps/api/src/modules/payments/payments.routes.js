@@ -5,6 +5,7 @@ const { requirePermission } = require('../../middleware/rbac');
 const { validate } = require('../../middleware/validate');
 const { createSchema, reverseSchema } = require('./payments.schema');
 const r = Router();
+r.get('/', requireAuth, requirePermission('payment.record'), c.list);
 r.post('/', requireAuth, requirePermission('payment.record'), validate({ body: createSchema }), c.create);
 r.post('/:id/reverse', requireAuth, requirePermission('payment.reverse'), validate({ body: reverseSchema }), c.reverse);
 r.post('/payhere/notify', c.payhereNotify);

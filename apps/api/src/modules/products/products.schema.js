@@ -55,4 +55,9 @@ const priceChangeSchema = z.object({
   reason: z.string().min(5).max(500),
 }).strict();
 
-module.exports = { createSchema, updateSchema, stockAdjustmentSchema, priceChangeSchema };
+const bulkActionSchema = z.object({
+  ids: z.array(z.coerce.number().int().positive()).min(1),
+  action: z.enum(['hide', 'show']),
+}).strict();
+
+module.exports = { createSchema, updateSchema, stockAdjustmentSchema, priceChangeSchema, bulkActionSchema };

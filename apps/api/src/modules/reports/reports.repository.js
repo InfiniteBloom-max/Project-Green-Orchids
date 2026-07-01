@@ -101,5 +101,17 @@ const repo = {
        ${where ? 'WHERE' + where.substring(4) : ''} GROUP BY r.reason_category ORDER BY count DESC`, params
     )).rows;
   },
+  async summary() {
+    const [revenue, payments] = await Promise.all([
+      query(`SELECT COALESCE(SUM(total),0) AS total FROM orders
+             WHERE status = 'APPROVED' AND created_at >= DATE_TRUNC('month', NOW())`),
+      query(`SELECT COALESCE(SUM(amount),0) AS total FROM payments
+             WHERE reversed_at IS NULL AND received_at >= DATE_TRUNC('month', NOW())`),
+    ]);
+    return {
+      revenueThisMonth: Number(revenue.rows[0].total),
+      paymentsThisMonth: Number(payments.rows[0].total),
+    };
+  },
 };
 module.exports = repo;

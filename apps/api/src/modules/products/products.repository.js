@@ -4,20 +4,20 @@ const repo = {
   async findAll(filters, { limit, offset, sort, order }) {
     let where = 'WHERE 1=1'; const params = []; let p = 1;
     if (filters.type) { where += ` AND p.product_type = $${p++}`; params.push(filters.type); }
-    if (filters.category) { where += ` AND p.category = $${p++}`; params.push(filters.category); }
+    if (filters.category) { where += ` AND c.name = $${p++}`; params.push(filters.category); }
     if (filters.supplier_id) { where += ` AND p.supplier_id = $${p++}`; params.push(filters.supplier_id); }
-    if (filters.status !== undefined) { where += ` AND p.is_active = $${p++}`; params.push(filters.status === 'active'); }
-    if (filters.search) { where += ` AND (p.name ILIKE $${p} OR p.display_name ILIKE $${p} OR p.description ILIKE $${p} OR p.genus ILIKE $${p} OR p.hybrid_name ILIKE $${p})`; params.push(`%${filters.search}%`); p++; }
+    if (filters.status) { where += ` AND p.status = $${p++}`; params.push(filters.status.toUpperCase()); }
+    if (filters.search) { where += ` AND (p.name ILIKE $${p} OR p.description ILIKE $${p} OR p.sku ILIKE $${p})`; params.push(`%${filters.search}%`); p++; }
     if (filters.min_price) { where += ` AND p.base_price >= $${p++}`; params.push(filters.min_price); }
     if (filters.max_price) { where += ` AND p.base_price <= $${p++}`; params.push(filters.max_price); }
 
-    const ct = await query(`SELECT COUNT(*) FROM products p ${where}`, params);
+    const ct = await query(`SELECT COUNT(*) FROM products p LEFT JOIN categories c ON c.id = p.category_id ${where}`, params);
     const total = parseInt(ct.rows[0].count, 10);
     const sorts = { name: 'p.name', base_price: 'p.base_price', stock_qty: 'p.stock_qty', created_at: 'p.created_at' };
     const sortCol = sorts[sort] || 'p.created_at';
     const r = await query(
-      `SELECT p.*, s.name as supplier_name, (SELECT url FROM product_images WHERE product_id = p.id AND is_primary = true LIMIT 1) as primary_image
-       FROM products p LEFT JOIN suppliers s ON s.id = p.supplier_id ${where}
+      `SELECT p.*, s.name as supplier_name, c.name as category_name, (SELECT url FROM product_images WHERE product_id = p.id AND is_primary = true LIMIT 1) as primary_image
+       FROM products p LEFT JOIN suppliers s ON s.id = p.supplier_id LEFT JOIN categories c ON c.id = p.category_id ${where}
        ORDER BY ${sortCol} ${order} LIMIT $${p++} OFFSET $${p++}`,
       [...params, limit, offset]
     );
@@ -56,6 +56,52 @@ const repo = {
     const vals = keys.map(k => data[k]);
     const r = await query(`UPDATE products SET ${sets.join(',')}, updated_at = NOW() WHERE id = $1 RETURNING *`, [id, ...vals]);
     return r.rows[0];
+  },
+
+  async bulkUpdateStatus(ids, status) {
+    const r = await query(
+      `UPDATE products SET status = $1, updated_at = NOW() WHERE id = ANY($2::int[]) RETURNING id`,
+      [status, ids]
+    );
+    return r.rows.length;
+  },
+
+  // Soft delete - a hard DELETE would violate FK constraints from any product
+  // with order/RFQ/stock history, so mark discontinued instead.
+  async softRemove(id) {
+    const r = await query(
+      `UPDATE products SET status = 'DISCONTINUED', updated_at = NOW() WHERE id = $1 RETURNING id`,
+      [id]
+    );
+    return r.rows[0] || null;
+  },
+
+  async duplicate(id) {
+    const src = await query('SELECT * FROM products WHERE id = $1', [id]);
+    if (!src.rows.length) return null;
+    const p = src.rows[0];
+    const sku = `${p.sku}-COPY-${Date.now().toString(36).toUpperCase()}`;
+    const r = await query(
+      `INSERT INTO products (sku, name, description, category_id, supplier_id, product_type, unit_size, base_price, moq, stock_qty, reorder_level, status)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,0,$10,'INACTIVE') RETURNING *`,
+      [sku, `${p.name} (Copy)`, p.description, p.category_id, p.supplier_id, p.product_type, p.unit_size, p.base_price, p.moq, p.reorder_level]
+    );
+    return r.rows[0];
+  },
+
+  async findAllForExport(filters) {
+    let where = 'WHERE 1=1'; const params = []; let p = 1;
+    if (filters.status) { where += ` AND p.status = $${p++}`; params.push(filters.status.toUpperCase()); }
+    const r = await query(
+      `SELECT p.sku, p.name, c.name AS category, s.name AS supplier, p.product_type, p.unit_size,
+              p.base_price, p.moq, p.stock_qty, p.reserved_qty, p.reorder_level, p.status
+       FROM products p
+       LEFT JOIN categories c ON c.id = p.category_id
+       LEFT JOIN suppliers s ON s.id = p.supplier_id
+       ${where} ORDER BY p.name`,
+      params
+    );
+    return r.rows;
   },
 
   async addImage(productId, data) {

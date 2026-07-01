@@ -4,8 +4,38 @@ const { writeAudit } = require('../../middleware/audit');
 const repo = require('./products.repository');
 const { paginate } = require('../../utils/pagination');
 const { enqueueEmail } = require('../../utils/outbox');
+const { stringify } = require('csv-stringify/sync');
+
+const BULK_ACTION_STATUS = { hide: 'INACTIVE', show: 'ACTIVE' };
 
 const service = {
+  async bulkAction(ids, action, actor) {
+    const status = BULK_ACTION_STATUS[action];
+    if (!status) throw new AppError('INVALID_ACTION', `Unsupported bulk action: ${action}`, 400);
+    const count = await repo.bulkUpdateStatus(ids, status);
+    await writeAudit({ actor, action: 'PRODUCT_BULK_' + action.toUpperCase(), entity: 'products', entityId: ids.join(','), after: { ids, status } });
+    return { updated: count };
+  },
+
+  async exportCsv(q) {
+    const rows = await repo.findAllForExport({ status: q.status });
+    return stringify(rows, { header: true });
+  },
+
+  async duplicate(id, actor) {
+    const p = await repo.duplicate(id);
+    if (!p) throw new AppError('NOT_FOUND', 'Product not found', 404);
+    await writeAudit({ actor, action: 'PRODUCT_DUPLICATED', entity: 'products', entityId: p.id, after: { source_id: id, sku: p.sku } });
+    return p;
+  },
+
+  async remove(id, actor) {
+    const p = await repo.softRemove(id);
+    if (!p) throw new AppError('NOT_FOUND', 'Product not found', 404);
+    await writeAudit({ actor, action: 'PRODUCT_DISCONTINUED', entity: 'products', entityId: id });
+  },
+
+
   async list(q) {
     const o = paginate(q);
     const filters = { type: q.type, category: q.category, supplier_id: q.supplier_id, status: q.status, search: q.search, min_price: q.min_price, max_price: q.max_price };
