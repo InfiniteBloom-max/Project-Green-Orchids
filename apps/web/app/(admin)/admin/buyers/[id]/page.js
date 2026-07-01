@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/Card';
 import { Tabs } from '@/components/ui/Tabs';
 import { Table } from '@/components/ui/Table';
 import { StatusBadge, TierBadge, CreditBar } from '@/components/domain/StatusBadge';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import { Spinner, ErrorState, EmptyState } from '@/components/ui/Spinner';
 import { formatLKR, formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -78,14 +79,14 @@ export default function BuyerDetailPage() {
 
   return (
     <div className="space-y-6">
-      <button onClick={() => router.back()} className="text-sm text-green-700 hover:underline">&larr; Back</button>
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{buyer.businessName}</h1>
-        <div className="flex gap-2">
-          <TierBadge tier={buyer.tier} />
-          <StatusBadge status={buyer.status} />
-        </div>
-      </div>
+      <PageHeader
+        eyebrow="Buyer"
+        title={buyer.businessName}
+        description="View buyer account details, credit terms, and activity history."
+        back={{ href: '/admin/buyers', label: 'Back to Buyers' }}
+        actions={<><TierBadge tier={buyer.tier} /><StatusBadge status={buyer.status} /></>}
+        tone="emerald"
+      />
 
       <Card className="grid grid-cols-3 gap-4">
         <div><span className="text-xs text-gray-500">Email</span><p className="font-medium">{buyer.email}</p></div>

@@ -6,6 +6,7 @@ import api from '@/lib/api';
 import { Card } from '@/components/ui/Card';
 import { StatusBadge, TimelineView } from '@/components/domain/StatusBadge';
 import { Spinner, ErrorState } from '@/components/ui/Spinner';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import { formatDate, formatLKR } from '@/lib/utils';
 
 export default function ReturnDetailPage() {
@@ -34,15 +35,13 @@ export default function ReturnDetailPage() {
 
   return (
     <div className="space-y-6">
-      <button onClick={() => router.back()} className="text-sm text-green-700 hover:underline">&larr; Back</button>
-
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">RMA #{rma.rmaNo || rma.id}</h1>
-          <p className="text-sm text-gray-500">{formatDate(rma.createdAt)} &middot; Order #{rma.orderNo}</p>
-        </div>
-        <StatusBadge status={rma.status} />
-      </div>
+      <PageHeader
+        tone="violet"
+        back={{ href: '/buyer/returns', label: 'Back' }}
+        title={`RMA #${rma.rmaNo || rma.id}`}
+        description={`${formatDate(rma.createdAt)} · Order #${rma.orderNo}`}
+        actions={<StatusBadge status={rma.status} />}
+      />
 
       <Card>
         <h3 className="text-sm font-medium mb-2">Return Details</h3>

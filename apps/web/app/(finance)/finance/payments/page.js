@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import { Table } from '@/components/ui/Table';
 import { Spinner, EmptyState } from '@/components/ui/Spinner';
 import { formatLKR, formatDate } from '@/lib/utils';
@@ -20,7 +21,11 @@ export default function PaymentsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Payment History</h1>
+      <PageHeader
+        tone="sky"
+        title="Payment History"
+        description="Browse recorded payments across all invoices."
+      />
       {loading ? <Spinner className="py-20" /> : payments.length === 0 ? <EmptyState title="No payments" /> : (
         <Table
           columns={[

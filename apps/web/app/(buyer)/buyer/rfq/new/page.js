@@ -7,6 +7,7 @@ import { Button, Input, Textarea } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { RFQLineBuilder } from '@/components/domain/ProductCard';
 import { Spinner } from '@/components/ui/Spinner';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import toast from 'react-hot-toast';
 
 const DRAFT_KEY = 'pg_rfq_draft_v1';
@@ -61,7 +62,7 @@ export default function NewRFQPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">New RFQ</h1>
+      <PageHeader tone="violet" title="New RFQ" description="Request a custom quote for bulk quantities on one or more products." />
       <Card>
         <form onSubmit={handleSubmit} className="space-y-6">
           <RFQLineBuilder lines={lines} onChange={setLines} products={products} />

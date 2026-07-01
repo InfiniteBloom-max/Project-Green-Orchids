@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import { Button, Input, Select } from '@/components/ui/Button';
 import { Table } from '@/components/ui/Table';
 import { Spinner, EmptyState } from '@/components/ui/Spinner';
@@ -38,7 +39,11 @@ export default function StatementsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Statement Generator</h1>
+      <PageHeader
+        tone="sky"
+        title="Statement Generator"
+        description="Generate and download monthly account statements for a buyer."
+      />
       <div className="flex gap-4 items-end">
         <Select label="Buyer" value={selectedBuyer} onChange={(e) => setSelectedBuyer(e.target.value)} options={buyers.map((b) => ({ value: b.id, label: b.businessName || b.email }))} className="max-w-sm" />
         <Input label="Month" type="month" value={month} onChange={(e) => setMonth(e.target.value)} className="max-w-[200px]" />

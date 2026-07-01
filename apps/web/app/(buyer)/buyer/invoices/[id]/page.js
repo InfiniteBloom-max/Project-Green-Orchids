@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { StatusBadge } from '@/components/domain/StatusBadge';
 import { Spinner, ErrorState } from '@/components/ui/Spinner';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import { formatLKR, formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
@@ -62,15 +63,13 @@ export default function InvoiceDetailPage() {
 
   return (
     <div className="space-y-6">
-      <button onClick={() => router.back()} className="text-sm text-green-700 hover:underline">&larr; Back</button>
-
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Invoice #{invoice.invoiceNo || invoice.id}</h1>
-          <p className="text-sm text-gray-500">{formatDate(invoice.createdAt)} &middot; Due: {formatDate(invoice.dueDate)}</p>
-        </div>
-        <StatusBadge status={invoice.status} />
-      </div>
+      <PageHeader
+        tone="violet"
+        back={{ href: '/buyer/invoices', label: 'Back' }}
+        title={`Invoice #${invoice.invoiceNo || invoice.id}`}
+        description={`${formatDate(invoice.createdAt)} · Due: ${formatDate(invoice.dueDate)}`}
+        actions={<StatusBadge status={invoice.status} />}
+      />
 
       <Card>
         <h3 className="text-sm font-medium mb-3">Items</h3>

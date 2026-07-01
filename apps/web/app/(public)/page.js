@@ -193,7 +193,7 @@ export default function LandingPage() {
           {[
             { h: 'Shop', links: [['Catalogue', '/catalogue'], ['Pricing', '/catalogue#pricing'], ['Request a quote', '/register']] },
             { h: 'Company', links: [['About', '#about'], ['Sign in', '/login'], ['Apply', '/register']] },
-            { h: 'Support', links: [['Contact', 'mailto:trade@korchids.lk'], ['Trade terms', '#about'], ['Help centre', '#about']] },
+            { h: 'Support', links: [['Contact', 'mailto:trade@orchids.lk'], ['Trade terms', '#about'], ['Help centre', '#about']] },
           ].map((col) => (
             <div key={col.h}>
               <p className="eyebrow text-emerald-300/80">{col.h}</p>

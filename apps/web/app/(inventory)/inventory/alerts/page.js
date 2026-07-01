@@ -8,6 +8,7 @@ import { Table } from '@/components/ui/Table';
 import { Spinner, EmptyState } from '@/components/ui/Spinner';
 import { formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
+import { PageHeader } from '@/components/domain/DashboardUI';
 
 export default function AlertsPage() {
   const [alerts, setAlerts] = useState([]);
@@ -32,7 +33,12 @@ export default function AlertsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Stock Alerts</h1>
+      <PageHeader
+        eyebrow="Inventory"
+        title="Stock Alerts"
+        description="Review low-stock and out-of-stock alerts and acknowledge them once addressed."
+        tone="amber"
+      />
       {loading ? <Spinner className="py-20" /> : alerts.length === 0 ? <EmptyState title="No alerts" /> : (
         <Table
           columns={[

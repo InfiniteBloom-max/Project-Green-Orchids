@@ -11,6 +11,7 @@ import { CreditBar } from '@/components/domain/StatusBadge';
 import { EmptyState } from '@/components/ui/Spinner';
 import { formatLKR } from '@/lib/utils';
 import { Modal } from '@/components/ui/Modal';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import api from '@/lib/api';
 import toast from 'react-hot-toast';
 
@@ -50,7 +51,7 @@ export default function CartPage() {
   if (items.length === 0) {
     return (
       <div className="space-y-4">
-        <h1 className="text-2xl font-bold">Cart</h1>
+        <PageHeader tone="violet" title="Cart" description="Review items before checkout and adjust quantities as needed." />
         <EmptyState title="Your cart is empty" description="Browse the catalogue to add products" action={<Button onClick={() => router.push('/buyer/catalogue')}>Browse Catalogue</Button>} />
       </div>
     );
@@ -58,10 +59,12 @@ export default function CartPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Cart ({items.length} items)</h1>
-        <button onClick={clearCart} className="text-sm text-red-600 hover:underline">Clear cart</button>
-      </div>
+      <PageHeader
+        tone="violet"
+        title={`Cart (${items.length} items)`}
+        description="Review items before checkout and adjust quantities as needed."
+        actions={<button onClick={clearCart} className="text-sm text-red-600 hover:underline">Clear cart</button>}
+      />
 
       {/* Stock warnings */}
       {items.filter((i) => i.stock != null && i.quantity > i.stock).map((i) => (

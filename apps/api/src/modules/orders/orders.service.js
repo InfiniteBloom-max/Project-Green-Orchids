@@ -178,6 +178,10 @@ const service = {
       });
 
       await repo.updateStatus(client, id, 'APPROVED');
+      await client.query(
+        `INSERT INTO deliveries (order_id) VALUES ($1) ON CONFLICT (order_id) DO NOTHING`,
+        [id],
+      );
       await writeAudit({ actor, action: 'ORDER_APPROVED', entityType: 'orders', entityId: String(id),
         before: { status: order.status }, after: { status: 'APPROVED' } }, client);
       await enqueueEmail(client, {

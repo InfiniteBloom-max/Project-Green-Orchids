@@ -6,6 +6,7 @@ import { Button, Input, Textarea } from '@/components/ui/Button';
 import { Table } from '@/components/ui/Table';
 import { Modal } from '@/components/ui/Modal';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import { Spinner, EmptyState } from '@/components/ui/Spinner';
 import toast from 'react-hot-toast';
 
@@ -57,10 +58,13 @@ export default function SuppliersPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Supplier Management</h1>
-        <Button onClick={() => { setEditing(null); setForm({ name: '', contactPerson: '', email: '', phone: '', address: '', leadTime: '' }); setShowForm(true); }}>Add Supplier</Button>
-      </div>
+      <PageHeader
+        eyebrow="Suppliers"
+        title="Supplier Management"
+        description="Manage supplier records and lead times."
+        actions={<Button onClick={() => { setEditing(null); setForm({ name: '', contactPerson: '', email: '', phone: '', address: '', leadTime: '' }); setShowForm(true); }}>Add Supplier</Button>}
+        tone="emerald"
+      />
       {loading ? <Spinner className="py-20" /> : suppliers.length === 0 ? <EmptyState title="No suppliers" /> : (
         <Table
           columns={[

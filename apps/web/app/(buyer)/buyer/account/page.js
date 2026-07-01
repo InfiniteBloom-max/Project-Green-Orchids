@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/auth';
 import { Button, Input } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { TierBadge } from '@/components/domain/StatusBadge';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import { formatDate } from '@/lib/utils';
 import api from '@/lib/api';
 import toast from 'react-hot-toast';
@@ -53,7 +54,7 @@ export default function AccountPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Account Settings</h1>
+      <PageHeader tone="violet" title="Account Settings" description="Manage your business profile, tier benefits, password, and active sessions." />
 
       {/* Profile */}
       <Card>

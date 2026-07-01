@@ -21,7 +21,6 @@ const navItems = [
   { href: '/admin/cms', label: 'CMS', icon: '📝' },
   { href: '/admin/users', label: 'Users', icon: '🔑' },
   { href: '/admin/security', label: 'Security', icon: '🔒' },
-  { href: '/admin/settings', label: 'Settings', icon: '⚙️' },
 ];
 
 export default function AdminLayout({ children }) {

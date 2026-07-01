@@ -51,6 +51,31 @@ export function DashboardHero({ eyebrow, title, description, actions, stats = []
 }
 
 /* ─────────────────────────────────────────────
+   PageHeader — compact header for list/detail pages
+   (same visual language as DashboardHero, no stat pills)
+   ───────────────────────────────────────────── */
+export function PageHeader({ eyebrow, title, description, actions, back, tone: t = 'emerald' }) {
+  const c = tone(t);
+  return (
+    <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+      <div>
+        {back && (
+          <Link href={back.href} className="mb-2 inline-flex items-center gap-1 text-[12px] font-semibold text-slate-400 hover:text-slate-600">
+            ← {back.label || 'Back'}
+          </Link>
+        )}
+        {eyebrow && <p className={cn('text-[11px] font-bold uppercase tracking-widest', c.heading)}>{eyebrow}</p>}
+        <h1 className="mt-1 text-2xl font-bold text-slate-900 md:text-[26px]">{title}</h1>
+        {description && (
+          <p className="mt-1.5 max-w-2xl text-[14px] leading-relaxed text-slate-500">{description}</p>
+        )}
+      </div>
+      {actions && <div className="flex shrink-0 flex-wrap gap-2">{actions}</div>}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────
    MetricCard
    White card with coloured icon area + big number
    ───────────────────────────────────────────── */

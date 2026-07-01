@@ -9,6 +9,7 @@ import { Table } from '@/components/ui/Table';
 import { Modal } from '@/components/ui/Modal';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { StatusBadge, TierBadge } from '@/components/domain/StatusBadge';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import { Spinner, EmptyState } from '@/components/ui/Spinner';
 import { formatDate, formatLKR } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -95,7 +96,12 @@ export default function BuyersPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Buyer Management</h1>
+      <PageHeader
+        eyebrow="Buyers"
+        title="Buyer Management"
+        description="Review buyer approval requests and manage the buyer directory."
+        tone="emerald"
+      />
 
       <Tabs tabs={[{ key: 'approvals', label: 'Approval Queue', count: approvals.length }, { key: 'directory', label: 'Directory' }]} active={tab} onChange={setTab} />
 

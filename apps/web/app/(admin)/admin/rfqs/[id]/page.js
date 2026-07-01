@@ -7,6 +7,7 @@ import { Button, Input } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { DatePicker } from '@/components/ui/DatePicker';
 import { StatusBadge, TierBadge } from '@/components/domain/StatusBadge';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import { Spinner, ErrorState } from '@/components/ui/Spinner';
 import { formatLKR, formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -62,12 +63,14 @@ export default function AdminRFQDetailPage() {
 
   return (
     <div className="space-y-6">
-      <button onClick={() => router.back()} className="text-sm text-green-700 hover:underline">&larr; Back</button>
-
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">RFQ #{rfq.rfqNo || rfq.id}</h1>
-        <StatusBadge status={rfq.status} />
-      </div>
+      <PageHeader
+        eyebrow="RFQ"
+        title={`RFQ #${rfq.rfqNo || rfq.id}`}
+        description="Review the request and send a quote to the buyer."
+        back={{ href: '/admin/rfqs', label: 'Back to RFQs' }}
+        actions={<StatusBadge status={rfq.status} />}
+        tone="emerald"
+      />
 
       {/* Buyer Context */}
       <Card>

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { StatusBadge, TimelineView } from '@/components/domain/StatusBadge';
 import { Spinner, ErrorState } from '@/components/ui/Spinner';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import { formatLKR, formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
@@ -58,15 +59,13 @@ export default function RFQDetailPage() {
 
   return (
     <div className="space-y-6">
-      <button onClick={() => router.back()} className="text-sm text-green-700 hover:underline">&larr; Back</button>
-
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">RFQ #{rfq.rfqNo || rfq.id}</h1>
-          <p className="text-sm text-gray-500">Submitted: {formatDate(rfq.createdAt)}</p>
-        </div>
-        <StatusBadge status={rfq.status} />
-      </div>
+      <PageHeader
+        tone="violet"
+        back={{ href: '/buyer/rfq', label: 'Back' }}
+        title={`RFQ #${rfq.rfqNo || rfq.id}`}
+        description={`Submitted: ${formatDate(rfq.createdAt)}`}
+        actions={<StatusBadge status={rfq.status} />}
+      />
 
       {/* Quote */}
       {rfq.quotedAt && !isExpired && !['EXPIRED', 'ACCEPTED', 'REJECTED'].includes(rfq.status) && (

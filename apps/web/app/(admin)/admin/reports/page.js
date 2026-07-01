@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/Card';
 import { Tabs } from '@/components/ui/Tabs';
 import { DatePicker } from '@/components/ui/DatePicker';
 import { ChartContainer, KpiCard } from '@/components/domain/StatusBadge';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import { Spinner } from '@/components/ui/Spinner';
 import { formatLKR } from '@/lib/utils';
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
@@ -100,10 +101,13 @@ export default function ReportsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">BI Dashboard</h1>
-        <Button variant="outline" size="sm" onClick={handleExportCSV}>Export CSV</Button>
-      </div>
+      <PageHeader
+        eyebrow="Reports"
+        title="BI Dashboard"
+        description="Explore sales, inventory, and buyer analytics across the platform."
+        actions={<Button variant="outline" size="sm" onClick={handleExportCSV}>Export CSV</Button>}
+        tone="emerald"
+      />
 
       <div className="flex gap-3">
         <DatePicker label="From" value={dateFrom} onChange={setDateFrom} />

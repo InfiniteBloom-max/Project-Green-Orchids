@@ -27,8 +27,8 @@ const repo = {
     );
     return { rows: r.rows, total };
   },
-  async ackAlert(id, actor, note) {
-    await query('UPDATE stock_alerts SET status=$1, acknowledged_by=$2, acknowledged_at=NOW(), notes=COALESCE($3, notes) WHERE id=$4', ['ACKNOWLEDGED', actor, note, id]);
+  async ackAlert(id, actor) {
+    await query('UPDATE stock_alerts SET status=$1, acknowledged_by=$2, acknowledged_at=NOW() WHERE id=$3', ['ACKNOWLEDGED', actor, id]);
   },
   async getSummary() {
     const r = await query(
@@ -36,7 +36,7 @@ const repo = {
               COUNT(CASE WHEN stock_qty <= 0 THEN 1 END) as out_of_stock,
               COUNT(CASE WHEN stock_qty <= reorder_level AND stock_qty > 0 THEN 1 END) as low_stock,
               SUM(stock_qty) as total_stock,
-              COUNT(CASE WHEN is_active = true THEN 1 END) as active_products
+              COUNT(CASE WHEN status = 'ACTIVE' THEN 1 END) as active_products
        FROM products`
     );
     return r.rows[0];

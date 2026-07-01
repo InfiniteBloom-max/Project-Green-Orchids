@@ -8,6 +8,7 @@ import { Table } from '@/components/ui/Table';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { Spinner, EmptyState, ErrorState } from '@/components/ui/Spinner';
 import { StockBand, StatusBadge } from '@/components/domain/StatusBadge';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import { formatLKR } from '@/lib/utils';
 import { Pagination } from '@/components/ui/Pagination';
 import toast from 'react-hot-toast';
@@ -107,10 +108,13 @@ export default function ProductsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Product Management</h1>
-        <Link href="/admin/products/new"><Button>Add Product</Button></Link>
-      </div>
+      <PageHeader
+        eyebrow="Catalogue"
+        title="Product Management"
+        description="Manage the product catalogue, stock levels, and listing visibility."
+        actions={<Link href="/admin/products/new"><Button>Add Product</Button></Link>}
+        tone="emerald"
+      />
 
       <div className="flex items-center gap-3">
         <Input placeholder="Search products..." onChange={(e) => handleSearch(e.target.value)} className="max-w-xs" />

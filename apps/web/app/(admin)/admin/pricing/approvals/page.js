@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/Card';
 import { Tabs } from '@/components/ui/Tabs';
 import { Table } from '@/components/ui/Table';
 import { StatusBadge } from '@/components/domain/StatusBadge';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import { Spinner, EmptyState } from '@/components/ui/Spinner';
 import { formatLKR, formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -55,7 +56,12 @@ export default function PricingApprovalsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Pricing Approvals</h1>
+      <PageHeader
+        eyebrow="Pricing"
+        title="Pricing Approvals"
+        description="Review pending price change requests and browse pricing history."
+        tone="emerald"
+      />
       <Tabs tabs={[{ key: 'pending', label: 'Pending', count: pending.length }, { key: 'history', label: 'History' }]} active={tab} onChange={setTab} />
 
       {tab === 'history' && (

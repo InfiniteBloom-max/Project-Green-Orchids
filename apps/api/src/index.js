@@ -83,8 +83,6 @@ api.use('/inventory', require('./modules/inventory/inventory.routes'));
 api.use('/reports', require('./modules/reports/reports.routes'));
 api.use('/notifications', require('./modules/notifications/notifications.routes'));
 api.use('/cms', require('./modules/cms/cms.routes'));
-api.use('/settings', require('./modules/settings/settings.routes'));
-api.use('/', require('./modules/bloom/bloom.routes')); // bloom uses /bloom-events prefix
 
 // Mount /api prefix
 app.use('/api', api);

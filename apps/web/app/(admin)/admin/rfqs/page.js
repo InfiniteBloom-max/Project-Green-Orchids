@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { Table } from '@/components/ui/Table';
 import { StatusBadge, TierBadge } from '@/components/domain/StatusBadge';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import { Spinner, EmptyState } from '@/components/ui/Spinner';
 import { formatDate, formatLKR } from '@/lib/utils';
 
@@ -25,7 +26,12 @@ export default function AdminRFQsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">RFQ Management</h1>
+      <PageHeader
+        eyebrow="RFQs"
+        title="RFQ Management"
+        description="Review and quote buyer requests for quotation."
+        tone="emerald"
+      />
       <div className="flex gap-2">
         {['', 'SUBMITTED', 'QUOTED', 'ACCEPTED', 'DECLINED', 'EXPIRED'].map((s) => (
           <button key={s} onClick={() => setFilter(s)} className={`px-3 py-1 text-sm rounded-full ${filter === s ? 'bg-green-700 text-white' : 'bg-gray-100'}`}>{s || 'All'}</button>

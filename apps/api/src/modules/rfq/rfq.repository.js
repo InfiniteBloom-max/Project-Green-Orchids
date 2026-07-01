@@ -7,14 +7,14 @@ const repo = {
     return `RFQ-${String(r.rows[0].num).padStart(6, '0')}`;
   },
   async create(client, data) {
-    const r = await (client || query)(
+    const r = await (client ? client.query.bind(client) : query)(
       `INSERT INTO rfqs (rfq_number, buyer_id, status, notes) VALUES ($1,$2,'PENDING',$3) RETURNING *`,
       [data.rfq_number, data.buyer_id, data.notes]
     );
     return r.rows[0];
   },
   async createItem(client, data) {
-    const r = await (client || query)(
+    const r = await (client ? client.query.bind(client) : query)(
       `INSERT INTO rfq_items (rfq_id, product_id, quantity, notes) VALUES ($1,$2,$3,$4) RETURNING *`,
       [data.rfq_id, data.product_id, data.quantity, data.notes]
     );
@@ -44,16 +44,16 @@ const repo = {
     return r.rows;
   },
   async updateStatus(client, id, status) {
-    await (client || query)(`UPDATE rfqs SET status = $1, updated_at = NOW() WHERE id = $2`, [status, id]);
+    await (client ? client.query.bind(client) : query)(`UPDATE rfqs SET status = $1, updated_at = NOW() WHERE id = $2`, [status, id]);
   },
   async updateItemQuote(client, { itemId, quotedPrice, notes }) {
-    await (client || query)('UPDATE rfq_items SET quoted_price = $1, notes = COALESCE($2, notes) WHERE id = $3', [quotedPrice, notes, itemId]);
+    await (client ? client.query.bind(client) : query)('UPDATE rfq_items SET quoted_price = $1, notes = COALESCE($2, notes) WHERE id = $3', [quotedPrice, notes, itemId]);
   },
   async setQuoteExpiry(client, rfqId, expiry) {
-    await (client || query)('UPDATE rfqs SET quote_expiry = $1, updated_at = NOW() WHERE id = $2', [expiry, rfqId]);
+    await (client ? client.query.bind(client) : query)('UPDATE rfqs SET quote_expiry = $1, updated_at = NOW() WHERE id = $2', [expiry, rfqId]);
   },
   async setDeclineReason(client, rfqId, reason) {
-    await (client || query)('UPDATE rfqs SET decline_reason = $1, updated_at = NOW() WHERE id = $2', [reason, rfqId]);
+    await (client ? client.query.bind(client) : query)('UPDATE rfqs SET decline_reason = $1, updated_at = NOW() WHERE id = $2', [reason, rfqId]);
   },
 };
 module.exports = repo;

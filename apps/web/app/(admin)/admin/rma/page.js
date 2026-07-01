@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { Table } from '@/components/ui/Table';
 import { StatusBadge } from '@/components/domain/StatusBadge';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import { Spinner, EmptyState } from '@/components/ui/Spinner';
 import { formatDate } from '@/lib/utils';
 
@@ -25,7 +26,12 @@ export default function AdminRMAPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">RMA Management</h1>
+      <PageHeader
+        eyebrow="Returns"
+        title="RMA Management"
+        description="Review and process buyer return merchandise requests."
+        tone="emerald"
+      />
       <div className="flex gap-2">
         {['', 'SUBMITTED', 'APPROVED', 'RECEIVED', 'RESOLVED', 'REJECTED'].map((s) => (
           <button key={s} onClick={() => setFilter(s)} className={`px-3 py-1 text-sm rounded-full ${filter === s ? 'bg-green-700 text-white' : 'bg-gray-100'}`}>{s || 'All'}</button>

@@ -5,6 +5,7 @@ import api from '@/lib/api';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Spinner, EmptyState } from '@/components/ui/Spinner';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import { formatLKR, formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
@@ -43,10 +44,12 @@ export default function StatementsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Statements</h1>
-        <Button variant="outline" onClick={handleDownload} disabled={!statement}>Download</Button>
-      </div>
+      <PageHeader
+        tone="violet"
+        title="Statements"
+        description="View and download your monthly account statements."
+        actions={<Button variant="outline" onClick={handleDownload} disabled={!statement}>Download</Button>}
+      />
 
       <div>
         <input type="month" value={month} onChange={(e) => setMonth(e.target.value)} className="px-3 py-2 border rounded-lg text-sm" />

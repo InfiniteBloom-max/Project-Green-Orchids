@@ -7,6 +7,7 @@ import { Button, Select, Textarea } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Modal } from '@/components/ui/Modal';
 import { StatusBadge, TimelineView } from '@/components/domain/StatusBadge';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import { Spinner, ErrorState } from '@/components/ui/Spinner';
 import { formatDate, formatLKR } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -60,11 +61,14 @@ export default function AdminRMADetailPage() {
 
   return (
     <div className="space-y-6">
-      <button onClick={() => router.back()} className="text-sm text-green-700 hover:underline">&larr; Back</button>
-      <div className="flex items-center justify-between">
-        <div><h1 className="text-2xl font-bold">RMA #{rma.rmaNo || rma.id}</h1><p className="text-sm text-gray-500">Order #{rma.orderNo} &middot; {rma.buyerName}</p></div>
-        <StatusBadge status={rma.status} />
-      </div>
+      <PageHeader
+        eyebrow="RMA"
+        title={`RMA #${rma.rmaNo || rma.id}`}
+        description={`Order #${rma.orderNo} · ${rma.buyerName}`}
+        back={{ href: '/admin/rma', label: 'Back to RMAs' }}
+        actions={<StatusBadge status={rma.status} />}
+        tone="emerald"
+      />
 
       <Card>
         <h3 className="text-sm font-medium mb-2">Details</h3>

@@ -7,6 +7,7 @@ import { Table } from '@/components/ui/Table';
 import { Modal } from '@/components/ui/Modal';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { StatusBadge } from '@/components/domain/StatusBadge';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import { Spinner, EmptyState } from '@/components/ui/Spinner';
 import { formatDate } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -73,10 +74,13 @@ export default function UsersPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Staff Management</h1>
-        <Button onClick={() => { setForm({ name: '', email: '', role: 'INVENTORY_MANAGER', password: '' }); setShowCreate(true); }}>Create Staff</Button>
-      </div>
+      <PageHeader
+        eyebrow="Staff"
+        title="Staff Management"
+        description="Manage internal staff accounts and access."
+        actions={<Button onClick={() => { setForm({ name: '', email: '', role: 'INVENTORY_MANAGER', password: '' }); setShowCreate(true); }}>Create Staff</Button>}
+        tone="emerald"
+      />
 
       {loading ? <Spinner className="py-20" /> : users.length === 0 ? <EmptyState title="No users" /> : (
         <Table

@@ -6,7 +6,7 @@ const repo = {
   },
   // Schema columns: payment_no, invoice_id, buyer_id, amount, method, reference, recorded_by, received_at
   async create(client, data) {
-    const r = await (client || query)(
+    const r = await (client ? client.query.bind(client) : query)(
       `INSERT INTO payments (payment_no, invoice_id, buyer_id, amount, method, reference, recorded_by, received_at)
        VALUES ($1,$2,$3,$4,$5,$6,$7,COALESCE($8, NOW())) RETURNING *`,
       [data.payment_no, data.invoice_id, data.buyer_id, data.amount, data.method,
@@ -20,7 +20,7 @@ const repo = {
   },
   // Reversal detected via reversed_at (no status column in schema) — Finding 6
   async markReversed(client, id, reason) {
-    await (client || query)(
+    await (client ? client.query.bind(client) : query)(
       'UPDATE payments SET reversed_at = NOW(), reversal_reason = $1 WHERE id = $2',
       [reason, id]
     );

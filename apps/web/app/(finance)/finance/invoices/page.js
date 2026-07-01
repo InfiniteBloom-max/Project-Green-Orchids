@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import { Button, Input } from '@/components/ui/Button';
 import { Table } from '@/components/ui/Table';
 import { StatusBadge } from '@/components/domain/StatusBadge';
@@ -26,7 +27,11 @@ export default function FinanceInvoicesPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Invoice Management</h1>
+      <PageHeader
+        tone="sky"
+        title="Invoice Management"
+        description="View and filter invoices by payment status."
+      />
       <div className="flex gap-2">
         {['', 'PAID', 'UNPAID', 'PARTIAL', 'OVERDUE'].map((s) => (
           <button key={s} onClick={() => setFilter(s)} className={`px-3 py-1 text-sm rounded-full ${filter === s ? 'bg-green-700 text-white' : 'bg-gray-100'}`}>{s || 'All'}</button>

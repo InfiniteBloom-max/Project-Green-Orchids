@@ -96,7 +96,7 @@ const repo = {
   },
 
   async updateStock(client, productId, newQty) {
-    await (client || query)(`UPDATE products SET stock_qty = $1, updated_at = NOW() WHERE id = $2`, [newQty, productId]);
+    await (client ? client.query.bind(client) : query)(`UPDATE products SET stock_qty = $1, updated_at = NOW() WHERE id = $2`, [newQty, productId]);
   },
 
   async getStockMovements(productId, { limit, offset }) {

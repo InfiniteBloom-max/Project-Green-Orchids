@@ -21,7 +21,7 @@ const repo = {
 
   async create(client, data) {
     // Schema columns: order_no, buyer_id, source, status, subtotal, tier_discount_amount, total
-    const r = await (client || query)(
+    const r = await (client ? client.query.bind(client) : query)(
       `INSERT INTO orders (order_no, buyer_id, source, status, subtotal, tier_discount_amount, total, rfq_id)
        VALUES ($1,$2,$3,'PENDING_APPROVAL',$4,$5,$6,$7) RETURNING *`,
       [data.order_no, data.buyer_id, data.source || 'CART', data.subtotal,
@@ -31,7 +31,7 @@ const repo = {
   },
   async createOrderItem(client, data) {
     // Schema columns: qty, unit_price_at_order, price_source, line_total
-    const r = await (client || query)(
+    const r = await (client ? client.query.bind(client) : query)(
       `INSERT INTO order_items (order_id, product_id, qty, unit_price_at_order, price_source, line_total)
        VALUES ($1,$2,$3,$4,$5,$6) RETURNING *`,
       [data.order_id, data.product_id, data.qty, data.unit_price, data.price_source || 'BASE', data.line_total]
@@ -78,16 +78,16 @@ const repo = {
     return r.rows;
   },
   async updateStatus(client, id, status) {
-    await (client || query)('UPDATE orders SET status = $1, updated_at = NOW() WHERE id = $2', [status, id]);
+    await (client ? client.query.bind(client) : query)('UPDATE orders SET status = $1, updated_at = NOW() WHERE id = $2', [status, id]);
   },
   async setRejected(client, id, reason) {
-    await (client || query)(
+    await (client ? client.query.bind(client) : query)(
       `UPDATE orders SET status='REJECTED', rejection_reason=$1, updated_at=NOW() WHERE id=$2`,
       [reason, id]
     );
   },
   async setCancelled(client, id, reason, actor) {
-    await (client || query)(
+    await (client ? client.query.bind(client) : query)(
       `UPDATE orders SET status='CANCELLED', cancel_reason=$1, cancelled_by=$2, cancelled_at=NOW(), updated_at=NOW() WHERE id=$3`,
       [reason, actor, id]
     );
@@ -127,7 +127,7 @@ const repo = {
   },
   // Cart items joined through carts (cart_items has cart_id, not buyer_id) and products.status (not is_active)
   async getCartItems(client, accountId) {
-    const r = await (client || query)(
+    const r = await (client ? client.query.bind(client) : query)(
       `SELECT ci.*, ci.qty AS quantity, p.id AS product_id, p.name, p.base_price,
               p.stock_qty, p.reserved_qty, p.moq, p.status
        FROM cart_items ci
@@ -139,7 +139,7 @@ const repo = {
     return r.rows;
   },
   async clearCart(client, accountId) {
-    await (client || query)(
+    await (client ? client.query.bind(client) : query)(
       'DELETE FROM cart_items WHERE cart_id IN (SELECT id FROM carts WHERE buyer_id = $1)',
       [accountId]
     );

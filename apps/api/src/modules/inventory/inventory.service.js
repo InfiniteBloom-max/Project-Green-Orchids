@@ -22,7 +22,7 @@ const service = {
     return { data: rows, pagination: { page: o.page, limit: o.limit, total, pages: Math.ceil(total / o.limit) } };
   },
   async ackAlert(id, data, actor) {
-    await repo.ackAlert(id, actor, data.note);
+    await repo.ackAlert(id, actor);
   },
   async getSummary() {
     return repo.getSummary();

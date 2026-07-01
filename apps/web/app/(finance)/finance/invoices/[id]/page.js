@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import api from '@/lib/api';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import { Button, Input } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Modal } from '@/components/ui/Modal';
@@ -43,7 +44,6 @@ export default function FinanceInvoiceDetailPage() {
   };
 
   const handleReversePayment = async () => {
-    if (!confirm('Reverse this payment? This requires two-person confirmation.')) return;
     setActionLoading(true);
     try {
       await api.post(`/finance/invoices/${id}/payments/${reverseId}/reverse`);
@@ -59,11 +59,13 @@ export default function FinanceInvoiceDetailPage() {
 
   return (
     <div className="space-y-6">
-      <button onClick={() => router.back()} className="text-sm text-green-700 hover:underline">&larr; Back</button>
-      <div className="flex items-center justify-between">
-        <div><h1 className="text-2xl font-bold">Invoice #{invoice.invoiceNo || invoice.id}</h1><p className="text-sm text-gray-500">{invoice.buyerName} &middot; {formatDate(invoice.createdAt)}</p></div>
-        <StatusBadge status={invoice.status} />
-      </div>
+      <PageHeader
+        tone="sky"
+        back={{ href: '/finance/invoices', label: 'Back' }}
+        title={`Invoice #${invoice.invoiceNo || invoice.id}`}
+        description={`${invoice.buyerName} · ${formatDate(invoice.createdAt)}`}
+        actions={<StatusBadge status={invoice.status} />}
+      />
 
       <Card>
         <div className="grid grid-cols-2 gap-4 text-sm">

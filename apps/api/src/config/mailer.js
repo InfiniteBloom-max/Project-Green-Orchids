@@ -38,7 +38,7 @@ let transporter = null;
 function getTransporter() {
   if (transporter) return transporter;
 
-  if (env.isProd) {
+  if (env.SMTP_USER && env.SMTP_PASS) {
     transporter = nodemailer.createTransport({
       host: env.SMTP_HOST,
       port: env.SMTP_PORT,

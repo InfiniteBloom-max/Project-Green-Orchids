@@ -7,6 +7,7 @@ import { Button, Input, Textarea, Select } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { FileUpload } from '@/components/ui/FileUpload';
 import { Spinner, ErrorState } from '@/components/ui/Spinner';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import toast from 'react-hot-toast';
 
 const REASONS = [
@@ -84,7 +85,7 @@ export default function NewReturnPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">New Return</h1>
+      <PageHeader tone="violet" title="New Return" description="Submit a return request for items from a delivered order." />
       <Card>
         <form onSubmit={handleSubmit} className="space-y-4">
           <Select

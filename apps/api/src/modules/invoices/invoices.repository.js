@@ -62,10 +62,10 @@ const repo = {
     return r.rows;
   },
   async updateStatus(client, id, status) {
-    await (client || query)('UPDATE invoices SET status = $1, updated_at = NOW() WHERE id = $2', [status, id]);
+    await (client ? client.query.bind(client) : query)('UPDATE invoices SET status = $1, updated_at = NOW() WHERE id = $2', [status, id]);
   },
   async updateBalanceDue(client, id, balanceDue) {
-    await (client || query)('UPDATE invoices SET balance_due = $1, updated_at = NOW() WHERE id = $2', [balanceDue, id]);
+    await (client ? client.query.bind(client) : query)('UPDATE invoices SET balance_due = $1, updated_at = NOW() WHERE id = $2', [balanceDue, id]);
   },
 };
 module.exports = repo;

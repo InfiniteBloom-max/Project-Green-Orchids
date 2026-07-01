@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
+import { PageHeader } from '@/components/domain/DashboardUI';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Table } from '@/components/ui/Table';
@@ -40,10 +41,12 @@ export default function AgingReportPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Aging Report {bucketParam ? `(${bucketParam} days)` : ''}</h1>
-        <Button variant="outline" onClick={handleExportCSV}>Export CSV</Button>
-      </div>
+      <PageHeader
+        tone="sky"
+        title={`Aging Report${bucketParam ? ` (${bucketParam} days)` : ''}`}
+        description="Track outstanding invoices by how many days they are overdue."
+        actions={<Button variant="outline" onClick={handleExportCSV}>Export CSV</Button>}
+      />
 
       {d.summary && (
         <div className="grid grid-cols-4 gap-4">
