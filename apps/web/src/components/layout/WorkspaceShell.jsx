@@ -17,7 +17,7 @@ export function WorkspaceShell({
 }) {
   const cfg = workspaceConfig[workspace] || workspaceConfig.admin;
   const active = (href) => pathname === href || pathname?.startsWith(`${href}/`);
-  const initials = (user?.businessName || user?.name || user?.email || 'K')
+  const initials = (user?.businessName || user?.name || user?.email || 'Orchids')
     .split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase();
   const displayName = user?.businessName || user?.name || user?.email || 'User';
 
@@ -30,7 +30,7 @@ export function WorkspaceShell({
       )}>
         {/* Logo */}
         <div className="flex items-center gap-3 border-b border-slate-700/60 px-5 py-5">
-          <div className={cn('flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-sm font-bold text-white', cfg.ring)}>K</div>
+          <div className={cn('flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-sm font-bold text-white', cfg.ring)}>O</div>
           <div>
             <p className="text-sm font-bold leading-none text-white tracking-tight">ORCHIDS</p>
             <p className={cn('mt-0.5 text-[11px] font-semibold uppercase tracking-wider', cfg.accent)}>{cfg.label}</p>
