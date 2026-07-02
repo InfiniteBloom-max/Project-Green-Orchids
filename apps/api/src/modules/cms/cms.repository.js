@@ -12,5 +12,24 @@ const repo = {
   async togglePublish(key, isPublished) {
     await query('UPDATE cms_blocks SET is_published=$1,updated_at=NOW() WHERE key=$2', [isPublished, key]);
   },
+
+  async findAllMedia() {
+    return (await query('SELECT * FROM cms_media ORDER BY created_at DESC')).rows;
+  },
+  async findMediaById(id) {
+    const r = await query('SELECT * FROM cms_media WHERE id = $1', [id]);
+    return r.rows[0] || null;
+  },
+  async createMedia(data) {
+    const r = await query(
+      `INSERT INTO cms_media (filename, url, mime_type, size_bytes, uploaded_by) VALUES ($1,$2,$3,$4,$5) RETURNING *`,
+      [data.filename, data.url, data.mime_type, data.size_bytes, data.uploaded_by]
+    );
+    return r.rows[0];
+  },
+  async removeMedia(id) {
+    const r = await query('DELETE FROM cms_media WHERE id = $1 RETURNING *', [id]);
+    return r.rows[0] || null;
+  },
 };
 module.exports = repo;
