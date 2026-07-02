@@ -78,6 +78,7 @@ api.use('/notifications', require('./modules/notifications/notifications.routes'
 api.use('/cms', require('./modules/cms/cms.routes'));
 api.use('/admin/tiers', require('./modules/tiers/tiers.routes'));
 api.use('/finance', require('./modules/finance/finance.routes'));
+api.use('/admin/security', require('./modules/security/security.routes'));
 
 // Mount /api prefix
 app.use('/api', api);
