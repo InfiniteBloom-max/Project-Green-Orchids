@@ -53,8 +53,8 @@ export default function SecurityPage() {
           break;
         }
         case 'windows': {
-          const res = await api.get('/admin/security/access-windows').catch(() => ({ data: {} }));
-          setSettings(res.data);
+          const res = await api.get('/admin/security/access-windows').catch(() => ({ data: { data: {} } }));
+          setSettings(res.data.data || res.data);
           break;
         }
       }

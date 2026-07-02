@@ -1,12 +1,15 @@
 const multer = require('multer');
+const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
 const UPLOADS_ROOT = path.resolve(__dirname, '..', '..', 'uploads');
 
 function makeUploader(subdir) {
+  const dest = path.join(UPLOADS_ROOT, subdir);
+  fs.mkdirSync(dest, { recursive: true });
   const storage = multer.diskStorage({
-    destination: (_req, _file, cb) => cb(null, path.join(UPLOADS_ROOT, subdir)),
+    destination: (_req, _file, cb) => cb(null, dest),
     filename: (_req, file, cb) => {
       const ext = path.extname(file.originalname) || '';
       cb(null, `${crypto.randomUUID()}${ext}`);

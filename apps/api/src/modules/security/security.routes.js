@@ -1,0 +1,15 @@
+const { Router } = require('express');
+const c = require('./security.controller');
+const { requireAuth } = require('../../middleware/auth');
+const { requirePermission } = require('../../middleware/rbac');
+const r = Router();
+r.use(requireAuth);
+r.get('/logins', requirePermission('audit.view'), c.logins);
+r.get('/sessions', requirePermission('audit.view'), c.sessions);
+r.post('/sessions/:id/force-logout', requirePermission('audit.view'), c.forceLogout);
+r.get('/locked-accounts', requirePermission('audit.view'), c.lockedAccounts);
+r.post('/locked-accounts/:id/unlock', requirePermission('audit.view'), c.unlock);
+r.get('/audit-logs', requirePermission('audit.view'), c.auditLogs);
+r.get('/access-windows', requirePermission('settings.view'), c.getAccessWindows);
+r.put('/access-windows', requirePermission('settings.edit'), c.saveAccessWindows);
+module.exports = r;

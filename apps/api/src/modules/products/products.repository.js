@@ -24,6 +24,11 @@ const repo = {
     return { rows: r.rows, total };
   },
 
+  async findCategories() {
+    const r = await query('SELECT id, name, parent_id, type FROM categories ORDER BY type, name');
+    return r.rows;
+  },
+
   async findById(id) {
     const r = await query(`SELECT p.*, s.name as supplier_name FROM products p LEFT JOIN suppliers s ON s.id = p.supplier_id WHERE p.id = $1`, [id]);
     return r.rows[0] || null;
@@ -49,8 +54,8 @@ const repo = {
     return r.rows;
   },
 
-  async create(data) {
-    const cols = ['name','display_name','description','product_type','category','genus','species','hybrid_name','color','supplier_id','base_price','unit','stock_qty','reorder_level','moq','is_active'];
+async create(data) {
+    const cols = ['sku', 'name', 'description', 'category_id', 'supplier_id', 'product_type', 'unit_size', 'base_price', 'moq', 'stock_qty', 'reorder_level', 'status', 'bloom_video_url'];
     const vals = cols.map(c => data[c] !== undefined ? data[c] : null);
     const placeholders = cols.map((_, i) => `$${i + 1}`);
     const r = await query(
@@ -58,6 +63,21 @@ const repo = {
       vals
     );
     return r.rows[0];
+  },
+
+  async findBySku(sku) {
+    const r = await query('SELECT id FROM products WHERE sku = $1', [sku]);
+    return r.rows[0] || null;
+  },
+
+  async replaceBulkTiers(productId, tiers) {
+    await query('DELETE FROM bulk_pricing_tiers WHERE product_id = $1', [productId]);
+    for (const t of tiers) {
+      await query(
+        `INSERT INTO bulk_pricing_tiers (product_id, min_quantity, unit_price) VALUES ($1,$2,$3)`,
+        [productId, t.min_quantity, t.unit_price]
+      );
+    }
   },
 
   async update(id, data) {
@@ -116,8 +136,8 @@ const repo = {
 
   async addImage(productId, data) {
     const r = await query(
-      `INSERT INTO product_images (product_id, url, alt_text, is_primary, sort_order) VALUES ($1,$2,$3,$4,$5) RETURNING *`,
-      [productId, data.url, data.alt_text, data.is_primary || false, data.sort_order || 0]
+      `INSERT INTO product_images (product_id, url, is_primary, sort_order) VALUES ($1,$2,$3,$4) RETURNING *`,
+      [productId, data.url, data.is_primary || false, data.sort_order || 0]
     );
     return r.rows[0];
   },

@@ -36,6 +36,10 @@ const service = {
   },
 
 
+  async listCategories() {
+    return repo.findCategories();
+  },
+
   async list(q) {
     const o = paginate(q);
     const filters = { type: q.type, category: q.category, supplier_id: q.supplier_id, status: q.status, search: q.search, min_price: q.min_price, max_price: q.max_price };
@@ -81,23 +85,46 @@ const service = {
   },
 
   async create(data, actor) {
+    const existing = await repo.findBySku(data.sku);
+    if (existing) throw new AppError('DUPLICATE_SKU', 'A product with this SKU already exists', 409);
     const p = await repo.create(data);
-    await writeAudit({ actor, action: 'PRODUCT_CREATED', entity: 'products', entityId: p.id, after: { name: p.name, base_price: p.base_price } });
+    await writeAudit({ actor, action: 'PRODUCT_CREATED', entity: 'products', entityId: p.id, after: { name: p.name, sku: p.sku, base_price: p.base_price } });
     return p;
   },
 
   async update(id, data, actor) {
     const before = await repo.findById(id);
     if (!before) throw new AppError('NOT_FOUND', 'Product not found', 404);
+    // DISCONTINUED is blocked while stock is still reserved against open orders (Part C spec).
+    if (data.status === 'DISCONTINUED' && Number(before.reserved_qty) > 0) {
+      throw new AppError('RESERVED_STOCK', 'Cannot discontinue a product with reserved stock', 409);
+    }
     const updated = await repo.update(id, data);
-    await writeAudit({ actor, action: 'PRODUCT_UPDATED', entity: 'products', entityId: id, before: { name: before.name, base_price: before.base_price }, after: data });
+    await writeAudit({ actor, action: 'PRODUCT_UPDATED', entity: 'products', entityId: id, before: { name: before.name, status: before.status }, after: data });
     return updated;
+  },
+
+  async setBulkTiers(productId, tiers, actor) {
+    const p = await repo.findById(productId);
+    if (!p) throw new AppError('NOT_FOUND', 'Product not found', 404);
+    const sorted = [...tiers].sort((a, b) => a.min_quantity - b.min_quantity);
+    for (let i = 1; i < sorted.length; i++) {
+      if (sorted[i].min_quantity <= sorted[i - 1].min_quantity) {
+        throw new AppError('INVALID_TIERS', 'Bulk tier quantities must be unique', 422);
+      }
+      if (Number(sorted[i].unit_price) >= Number(sorted[i - 1].unit_price)) {
+        throw new AppError('INVALID_TIERS', 'Unit price must strictly decrease as quantity increases', 422);
+      }
+    }
+    await repo.replaceBulkTiers(productId, sorted);
+    await writeAudit({ actor, action: 'PRODUCT_BULK_TIERS_UPDATED', entity: 'products', entityId: productId, after: { tiers } });
+    return repo.findBulkTiers(productId);
   },
 
   async uploadImage(productId, file, actor) {
     const p = await repo.findById(productId);
     if (!p) throw new AppError('NOT_FOUND', 'Product not found', 404);
-    const image = await repo.addImage(productId, { url: file.path || file.location || file.url, alt_text: file.originalname, is_primary: false, sort_order: 0 });
+    const image = await repo.addImage(productId, { url: file.url, alt_text: file.originalname, is_primary: false, sort_order: 0 });
     return image;
   },
 
