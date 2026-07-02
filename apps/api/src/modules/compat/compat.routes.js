@@ -1,3 +1,12 @@
+// NOT dead code / a legacy shim: this module is the aggregation layer for
+// endpoints the frontend needs that don't map 1:1 onto a single domain
+// module's repository — public catalogue (products.buyer/catalogue combine
+// pricing + tier discount + stock banding), the one-call buyer dashboard
+// summary, the server-authoritative cart mirror, and the inventory manager
+// dashboard roll-up. Kept separate on purpose so `products`, `orders`, etc.
+// stay single-responsibility; mounted at '/' before the domain routers in
+// index.js so these specific paths aren't swallowed by more generic ones
+// (e.g. '/products/catalogue' before '/products/:id').
 const express = require('express');
 const { query, tx } = require('../../config/db');
 const { requireAuth } = require('../../middleware/auth');

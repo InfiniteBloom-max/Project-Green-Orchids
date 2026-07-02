@@ -41,6 +41,11 @@ export default function AdminRFQDetailPage() {
   const handleSendQuote = async () => {
     setSending(true);
     try {
+      // State machine requires SUBMITTED -> UNDER_REVIEW -> QUOTED; a freshly
+      // submitted RFQ needs the review transition before it can be quoted.
+      if (rfq.status === 'SUBMITTED') {
+        await api.patch(`/rfqs/${id}/review`, {});
+      }
       const items = (rfq.lines || []).map((l, i) => ({
         rfq_item_id: l.id,
         quoted_price: parseFloat(quotePrices[i]) || l.targetPrice || 0,

@@ -24,7 +24,7 @@ export default function AccountPage() {
     if (newPw !== confirmPw) { toast.error('Passwords do not match'); return; }
     setChangingPw(true);
     try {
-      await api.post('/auth/change-password', { currentPassword: currentPw, newPassword: newPw });
+      await api.post('/auth/me/change-password', { currentPassword: currentPw, newPassword: newPw });
       toast.success('Password changed');
       setCurrentPw(''); setNewPw(''); setConfirmPw('');
     } catch (err) {

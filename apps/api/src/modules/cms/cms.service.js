@@ -7,5 +7,18 @@ const service = {
   async create(data) { const existing = await repo.findByKey(data.key); if (existing) throw new AppError('KEY_EXISTS', 'CMS block with this key already exists', 409); return repo.create(data); },
   async update(key, data) { await this.get(key); return repo.update(key, data); },
   async togglePublish(key) { const b = await this.get(key); await repo.togglePublish(key, !b.is_published); return repo.findByKey(key); },
+
+  async listMedia() { return repo.findAllMedia(); },
+  async createMedia(file, actor) {
+    return repo.createMedia({
+      filename: file.originalname, url: file.url,
+      mime_type: file.mimetype, size_bytes: file.size, uploaded_by: actor,
+    });
+  },
+  async removeMedia(id) {
+    const m = await repo.removeMedia(id);
+    if (!m) throw new AppError('NOT_FOUND', 'Media file not found', 404);
+    return m;
+  },
 };
 module.exports = service;

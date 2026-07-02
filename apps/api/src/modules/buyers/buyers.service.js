@@ -30,7 +30,9 @@ const buyersService = {
   async approve(userId, data, actor) {
     const buyer = await buyersRepository.findById(userId);
     if (!buyer) throw new AppError('NOT_FOUND', 'Buyer not found', 404);
-    if (buyer.account_status === 'APPROVED') throw new AppError('ALREADY_APPROVED', 'Buyer is already approved', 409);
+    // trade_accounts.account_status enum is PENDING_APPROVAL/ACTIVE/SUSPENDED/CLOSED
+    // (there is no 'APPROVED' value) — this guard never fired against a real row.
+    if (buyer.account_status === 'ACTIVE') throw new AppError('ALREADY_APPROVED', 'Buyer is already approved', 409);
 
     await tx(async (client) => {
       await buyersRepository.approve(client, {
@@ -41,7 +43,7 @@ const buyersService = {
 
     await writeAudit({
       actor, action: 'BUYER_APPROVED', entity: 'trade_accounts', entityId: buyer.trade_account_id,
-      before: { account_status: buyer.account_status }, after: { account_status: 'APPROVED', tier: data.tier },
+      before: { account_status: buyer.account_status }, after: { account_status: 'ACTIVE', tier: data.tier },
     });
 
     try {
