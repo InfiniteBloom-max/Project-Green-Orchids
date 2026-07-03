@@ -67,13 +67,13 @@ async function requireAuth(req, res, next) {
     // just refresh tokens/sessions (F4.1) — otherwise a stolen 15-minute
     // access token keeps working straight through a reset meant to revoke it.
     //
-    // payload.iat is JWT-standard whole seconds (truncated down); passwordChangedAt is a
-    // millisecond-precision timestamp. Comparing them raw meant a token issued in the very same
-    // wall-clock second as a password change could be spuriously flagged as "issued before the
-    // change" even when it was actually a fresh login using the new password issued afterwards
-    // — round iat up to the next full second before comparing so same-second tokens aren't
-    // penalized for something truncation caused, not something that actually happened.
-    const tokenIssuedAtMs = (payload.iat + 1) * 1000;
+    // Standard `iat` is whole seconds (JWT spec) — too coarse to safely compare against a
+    // millisecond-precision password_changed_at (a token issued in the same wall-clock second as
+    // a change is genuinely ambiguous at that resolution). Prefer the custom `iat_ms` claim
+    // (real millisecond precision, set at sign time) when present; fall back to `iat * 1000` for
+    // tokens issued before this claim existed, which still leans toward the safe (reject-if-
+    // ambiguous) direction rather than the unsafe one.
+    const tokenIssuedAtMs = payload.iat_ms ?? (payload.iat * 1000);
     if (payload.iat && cached.passwordChangedAt && tokenIssuedAtMs < new Date(cached.passwordChangedAt).getTime()) {
       return res.status(401).json({
         success: false,

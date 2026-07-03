@@ -92,6 +92,6 @@ individually. Product counts are from the live database at the time this was wri
 ---
 
 **Total: 70 image prompts across 14 real product types.** Once generated, these slot in
-alongside the asset-wiring task flagged in `docs/Final-Presentation-Strategy.md` section
+alongside the asset-wiring task flagged in `docs/presentations/Final-Presentation-Strategy.md` section
 4.1 — copy into `apps/web/public/images/`, then match to seeded products/categories by
 type so the catalogue page stops falling back to emoji/initial placeholders.
