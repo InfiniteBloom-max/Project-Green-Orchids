@@ -1,0 +1,159 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#071813"/><stop offset="0.52" stop-color="#090B0D"/><stop offset="1" stop-color="#1B0E19"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-30%" width="140%" height="160%">
+      <feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#000" flood-opacity=".35"/>
+    </filter>
+    <style>
+      text { font-family: Inter, "Segoe UI", Arial, sans-serif; }
+      .eyebrow { fill:#35D6A2; font-weight:800; font-size:16px; letter-spacing:6px; }
+      .title { fill:#F8FAF9; font-family:Georgia,serif; font-style:italic; font-size:52px; font-weight:700; }
+      .subtitle { fill:#9EB0A9; font-size:17px; }
+      .boundary { fill:#0D1112; fill-opacity:.83; stroke:#32403C; stroke-width:1.5; }
+      .boundary-title { fill:#DDE6E2; font-size:16px; font-weight:700; letter-spacing:2px; }
+      .connector { stroke:#72817C; stroke-width:1.35; opacity:.43; fill:none; }
+      .case { stroke-width:2; filter:url(#shadow); }
+      .case-label { fill:#F8FAF9; font-size:15.5px; font-weight:650; text-anchor:middle; }
+      .future { fill:#121617; stroke:#78817E; stroke-width:1.5; stroke-dasharray:7 6; }
+      .future-label { fill:#AAB4B0; font-size:14.5px; font-weight:600; text-anchor:middle; }
+      .actor { fill:none; stroke:#D7E1DD; stroke-width:2.4; stroke-linecap:round; }
+      .actor-label { fill:#F1F5F3; stroke:none; font-size:17px; font-weight:700; text-anchor:middle; }
+      .legend-name { fill:#E6ECE9; font-size:14px; font-weight:650; }
+      .legend-note { fill:#91A19B; font-size:13px; }
+      .small { fill:#80908A; font-size:13px; }
+    </style>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#bg)"/>
+  <text x="70" y="52" class="eyebrow">PROJECT GREEN · GROUP H</text>
+  <text x="70" y="112" class="title">Implementation Status — Use Cases</text>
+  <text x="72" y="145" class="subtitle">Colour identifies the member responsible for each implemented MVP capability.</text>
+
+  <g transform="translate(1290 55)">
+    <rect width="240" height="78" rx="18" fill="#10261D" stroke="#35D6A2" stroke-opacity=".55"/>
+    <text x="22" y="32" fill="#87A097" font-size="13" font-weight="700" letter-spacing="1.5">OVERALL DELIVERY</text>
+    <text x="22" y="62" fill="#35D6A2" font-size="30" font-weight="850">65%</text>
+    <rect x="91" y="47" width="125" height="8" rx="4" fill="#26352F"/>
+    <rect x="91" y="47" width="81" height="8" rx="4" fill="#35D6A2"/>
+  </g>
+
+  <rect x="260" y="180" width="1080" height="690" rx="26" class="boundary"/>
+  <rect x="292" y="164" width="325" height="32" rx="16" fill="#17211E" stroke="#32403C"/>
+  <text x="454" y="186" class="boundary-title" text-anchor="middle">K ORCHIDS B2B PLATFORM</text>
+  <line x1="292" y1="748" x2="1308" y2="748" stroke="#35413D" stroke-dasharray="3 7"/>
+  <text x="300" y="774" class="small" font-weight="700" letter-spacing="2">REMAINING / PHASE 4</text>
+
+<path d="M 157 326 C 250 326, 250 260, 344 260" class="connector"/>
+<path d="M 157 326 C 396 326, 396 260, 634 260" class="connector"/>
+<path d="M 157 326 C 540 326, 540 260, 924 260" class="connector"/>
+<path d="M 157 326 C 540 326, 540 365, 924 365" class="connector"/>
+<path d="M 157 326 C 540 326, 540 470, 924 470" class="connector"/>
+<path d="M 157 326 C 250 326, 250 575, 344 575" class="connector"/>
+<path d="M 157 326 C 396 326, 396 575, 634 575" class="connector"/>
+<path d="M 157 326 C 250 326, 250 680, 344 680" class="connector"/>
+<path d="M 157 631 C 250 631, 250 365, 344 365" class="connector"/>
+<path d="M 157 631 C 396 631, 396 365, 634 365" class="connector"/>
+<path d="M 157 631 C 250 631, 250 470, 344 470" class="connector"/>
+<path d="M 157 631 C 540 631, 540 365, 924 365" class="connector"/>
+<path d="M 157 631 C 540 631, 540 470, 924 470" class="connector"/>
+<path d="M 157 631 C 396 631, 396 575, 634 575" class="connector"/>
+<path d="M 157 631 C 396 631, 396 680, 634 680" class="connector"/>
+<path d="M 157 631 C 540 631, 540 680, 924 680" class="connector"/>
+<path d="M 1413 291 C 1150 291, 1150 365, 886 365" class="connector"/>
+<path d="M 1413 291 C 1150 291, 1150 470, 886 470" class="connector"/>
+<path d="M 1413 291 C 1294 291, 1294 470, 1176 470" class="connector"/>
+<path d="M 1413 501 C 1004 501, 1004 575, 596 575" class="connector"/>
+<path d="M 1413 501 C 1294 501, 1294 575, 1176 575" class="connector"/>
+<path d="M 1413 501 C 1150 501, 1150 680, 886 680" class="connector"/>
+<path d="M 1413 711 C 1004 711, 1004 680, 596 680" class="connector"/>
+<ellipse cx="470" cy="260" rx="126" ry="37" fill="#0E3B31" stroke="#58D6A3" class="case"/>
+<text x="470" y="257" class="case-label"><tspan x="470" dy="0">Register, Login &amp; Recover</tspan><tspan x="470" dy="22">Account</tspan></text>
+<ellipse cx="760" cy="260" rx="126" ry="37" fill="#142D61" stroke="#6F9CFF" class="case"/>
+<text x="760" y="266" class="case-label">Browse Wholesale Catalogue</text>
+<ellipse cx="1050" cy="260" rx="126" ry="37" fill="#55213E" stroke="#F09BC6" class="case"/>
+<text x="1050" y="266" class="case-label">Build &amp; Update Cart</text>
+<ellipse cx="470" cy="365" rx="126" ry="37" fill="#0E3B31" stroke="#58D6A3" class="case"/>
+<text x="470" y="371" class="case-label">Manage Trade Accounts &amp; Tiers</text>
+<ellipse cx="760" cy="365" rx="126" ry="37" fill="#142D61" stroke="#6F9CFF" class="case"/>
+<text x="760" y="371" class="case-label">Manage Products &amp; Suppliers</text>
+<ellipse cx="1050" cy="365" rx="126" ry="37" fill="#55213E" stroke="#F09BC6" class="case"/>
+<text x="1050" y="371" class="case-label">Request, Quote &amp; Accept RFQ</text>
+<ellipse cx="470" cy="470" rx="126" ry="37" fill="#0E3B31" stroke="#58D6A3" class="case"/>
+<text x="470" y="476" class="case-label">Control Roles, Sessions &amp; RBAC</text>
+<ellipse cx="760" cy="470" rx="126" ry="37" fill="#142D61" stroke="#6F9CFF" class="case"/>
+<text x="760" y="467" class="case-label"><tspan x="760" dy="0">Control Inventory &amp; Stock</tspan><tspan x="760" dy="22">Alerts</tspan></text>
+<ellipse cx="1050" cy="470" rx="126" ry="37" fill="#55213E" stroke="#F09BC6" class="case"/>
+<text x="1050" y="476" class="case-label">Place, Approve &amp; Cancel Orders</text>
+<ellipse cx="470" cy="575" rx="126" ry="37" fill="#4E3506" stroke="#FFBA2F" class="case"/>
+<text x="470" y="581" class="case-label">Record Invoices &amp; Payments</text>
+<ellipse cx="760" cy="575" rx="126" ry="37" fill="#4E3506" stroke="#FFBA2F" class="case"/>
+<text x="760" y="581" class="case-label">Submit &amp; Resolve Returns (RMA)</text>
+<ellipse cx="1050" cy="575" rx="126" ry="37" fill="#4E3506" stroke="#FFBA2F" class="case"/>
+<text x="1050" y="581" class="case-label">Statements, Credit &amp; Aging</text>
+<ellipse cx="470" cy="680" rx="126" ry="37" fill="#30205B" stroke="#9D7AF2" class="case"/>
+<text x="470" y="677" class="case-label"><tspan x="470" dy="0">Assign, Track &amp; Confirm</tspan><tspan x="470" dy="22">Delivery</tspan></text>
+<ellipse cx="760" cy="680" rx="126" ry="37" fill="#30205B" stroke="#9D7AF2" class="case"/>
+<text x="760" y="686" class="case-label">View Reports &amp; Audit Activity</text>
+<ellipse cx="1050" cy="680" rx="126" ry="37" fill="#30205B" stroke="#9D7AF2" class="case"/>
+<text x="1050" y="677" class="case-label"><tspan x="1050" dy="0">Send Notifications &amp; Manage</tspan><tspan x="1050" dy="22">CMS</tspan></text>
+<ellipse cx="470" cy="815" rx="126" ry="34" class="future"/>
+<text x="470" y="812" class="future-label"><tspan x="470" dy="0">Supplier Self-Service</tspan><tspan x="470" dy="22">Marketplace</tspan></text>
+<ellipse cx="760" cy="815" rx="126" ry="34" class="future"/>
+<text x="760" y="821" class="future-label">Split Payments &amp; External APIs</text>
+<ellipse cx="1050" cy="815" rx="126" ry="34" class="future"/>
+<text x="1050" y="812" class="future-label"><tspan x="1050" dy="0">Mobile App, AI &amp; Dynamic</tspan><tspan x="1050" dy="22">Pricing</tspan></text>
+<g class="actor">
+      <circle cx="115" cy="272" r="22"/>
+      <line x1="115" y1="294" x2="115" y2="350"/>
+      <line x1="77" y1="326" x2="153" y2="326"/>
+      <line x1="115" y1="350" x2="83" y2="402"/>
+      <line x1="115" y1="350" x2="147" y2="402"/>
+      <text x="115" y="435" class="actor-label">Trade Buyer</text>
+    </g>
+<g class="actor">
+      <circle cx="115" cy="577" r="22"/>
+      <line x1="115" y1="599" x2="115" y2="655"/>
+      <line x1="77" y1="631" x2="153" y2="631"/>
+      <line x1="115" y1="655" x2="83" y2="707"/>
+      <line x1="115" y1="655" x2="147" y2="707"/>
+      <text x="115" y="740" class="actor-label">Administrator</text>
+    </g>
+<g class="actor">
+      <circle cx="1455" cy="237" r="22"/>
+      <line x1="1455" y1="259" x2="1455" y2="315"/>
+      <line x1="1417" y1="291" x2="1493" y2="291"/>
+      <line x1="1455" y1="315" x2="1423" y2="367"/>
+      <line x1="1455" y1="315" x2="1487" y2="367"/>
+      <text x="1455" y="400" class="actor-label">Inventory Staff</text>
+    </g>
+<g class="actor">
+      <circle cx="1455" cy="447" r="22"/>
+      <line x1="1455" y1="469" x2="1455" y2="525"/>
+      <line x1="1417" y1="501" x2="1493" y2="501"/>
+      <line x1="1455" y1="525" x2="1423" y2="577"/>
+      <line x1="1455" y1="525" x2="1487" y2="577"/>
+      <text x="1455" y="610" class="actor-label">Finance Staff</text>
+    </g>
+<g class="actor">
+      <circle cx="1455" cy="657" r="22"/>
+      <line x1="1455" y1="679" x2="1455" y2="735"/>
+      <line x1="1417" y1="711" x2="1493" y2="711"/>
+      <line x1="1455" y1="735" x2="1423" y2="787"/>
+      <line x1="1455" y1="735" x2="1487" y2="787"/>
+      <text x="1455" y="820" class="actor-label">Delivery Staff</text>
+    </g>
+<g transform="translate(70 920)">
+<circle cx="8" cy="8" r="8" fill="#58D6A3"/><text x="24" y="13" class="legend-name">Sithum Nimhan</text>
+<circle cx="256" cy="8" r="8" fill="#6F9CFF"/><text x="272" y="13" class="legend-name">Nadeera Prabhash</text>
+<circle cx="504" cy="8" r="8" fill="#F09BC6"/><text x="520" y="13" class="legend-name">Yasali Sarajika</text>
+<circle cx="752" cy="8" r="8" fill="#FFBA2F"/><text x="768" y="13" class="legend-name">Rashandi Tharushika</text>
+<circle cx="1000" cy="8" r="8" fill="#9D7AF2"/><text x="1016" y="13" class="legend-name">Ronith Rashmikara</text>
+</g>
+<g transform="translate(1310 909)">
+  <rect x="0" y="0" width="220" height="35" rx="10" class="future"/>
+  <text x="110" y="22" class="future-label">Not yet implemented</text>
+</g>
+<text x="70" y="978" class="legend-note">Status @ 19 Jun 2026 · coloured use cases = implemented MVP · testing, handover and Phase 4 remain</text>
+<text x="1530" y="978" class="legend-note" text-anchor="end">Client · Kalsita</text>
+</svg>
