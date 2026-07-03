@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 const variants = {
@@ -27,8 +27,17 @@ const variants = {
   },
 };
 
-export function ConfirmDialog({ open, onClose, onConfirm, title, message, confirmLabel = 'Delete', variant = 'danger' }) {
+// requireTypedConfirmation: pass the exact string (e.g. a SKU, email, or name) the user must
+// retype before Confirm is enabled — for the handful of actions where a single misclick has a
+// real, hard-to-reverse cost (deleting/deactivating a specific product, user, or supplier).
+export function ConfirmDialog({
+  open, onClose, onConfirm, title, message, confirmLabel = 'Delete', variant = 'danger',
+  requireTypedConfirmation,
+}) {
   const v = variants[variant] || variants.danger;
+  const [typed, setTyped] = useState('');
+  const needsTyping = !!requireTypedConfirmation;
+  const canConfirm = !needsTyping || typed === requireTypedConfirmation;
 
   useEffect(() => {
     if (!open) return;
@@ -36,6 +45,10 @@ export function ConfirmDialog({ open, onClose, onConfirm, title, message, confir
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
   }, [open, onClose]);
+
+  useEffect(() => {
+    if (open) setTyped('');
+  }, [open, requireTypedConfirmation]);
 
   if (!open) return null;
 
@@ -64,6 +77,24 @@ export function ConfirmDialog({ open, onClose, onConfirm, title, message, confir
               {message && <p className="mt-2 text-sm leading-6 text-white/55">{message}</p>}
             </div>
           </div>
+
+          {needsTyping && (
+            <div className="mt-4">
+              <label className="mb-1.5 block text-xs font-medium text-white/50">
+                Type <span className="font-mono text-white/80">{requireTypedConfirmation}</span> to confirm
+              </label>
+              <input
+                type="text"
+                autoFocus
+                value={typed}
+                onChange={(e) => setTyped(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter' && canConfirm) { onConfirm(); onClose(); } }}
+                placeholder={requireTypedConfirmation}
+                className="w-full rounded-xl border border-white/10 bg-white/[0.05] px-3 py-2 text-sm text-white placeholder:text-white/20 outline-none transition focus:border-white/25"
+              />
+            </div>
+          )}
+
           <div className="mt-6 flex justify-end gap-3">
             <button
               onClick={onClose}
@@ -72,8 +103,12 @@ export function ConfirmDialog({ open, onClose, onConfirm, title, message, confir
               Cancel
             </button>
             <button
+              disabled={!canConfirm}
               onClick={() => { onConfirm(); onClose(); }}
-              className={cn('rounded-xl px-4 py-2 text-sm font-semibold shadow-lg transition hover:opacity-90 active:scale-95', v.confirm)}
+              className={cn(
+                'rounded-xl px-4 py-2 text-sm font-semibold shadow-lg transition hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:opacity-40',
+                v.confirm,
+              )}
             >
               {confirmLabel}
             </button>

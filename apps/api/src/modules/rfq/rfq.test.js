@@ -48,14 +48,13 @@ test('golden path: RFQ create -> admin review -> quote -> buyer accept -> conver
   assert.equal(afterConvert.data.data.status, 'CONVERTED');
 });
 
-test('regression (BUG-005): POST /rfqs/:id/convert must actually create an order and flip RFQ status, not silently no-op with a fake 200', async () => {
+test('regression (BUG-005): the old dead /rfqs/:id/convert stub is gone, not silently reintroduced', async () => {
+  // Was a scaffold that returned a fake 200 without creating an order or advancing status —
+  // deleted rather than fixed, since POST /orders/from-rfq is the one real implementation the
+  // buyer UI actually calls. This just guards against it quietly coming back.
   const rfqId = await acceptedRfq();
-
   const convert = await req(ctx.baseUrl, 'POST', `/rfqs/${rfqId}/convert`, { token: buyerToken, body: {} });
-  assert.equal(convert.status, 200);
-
-  const afterConvert = await req(ctx.baseUrl, 'GET', `/rfqs/${rfqId}`, { token: adminToken });
-  assert.equal(afterConvert.data.data.status, 'CONVERTED', 'RFQ status must actually flip to CONVERTED, not stay ACCEPTED');
+  assert.equal(convert.status, 404);
 });
 
 test('cannot skip straight from SUBMITTED to QUOTED without going through UNDER_REVIEW', async () => {

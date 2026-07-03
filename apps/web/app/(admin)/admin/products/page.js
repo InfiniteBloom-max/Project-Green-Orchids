@@ -167,6 +167,7 @@ export default function ProductsPage() {
         message={`Discontinue "${deleteTarget?.name}"? It will be marked DISCONTINUED and hidden from the buyer catalogue. Existing orders and stock history are preserved.`}
         confirmLabel="Discontinue"
         variant="danger"
+        requireTypedConfirmation={deleteTarget?.sku}
       />
 
       <Modal open={!!adjustTarget} onClose={() => setAdjustTarget(null)} title="Adjust Stock" size="sm">

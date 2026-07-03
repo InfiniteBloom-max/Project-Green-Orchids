@@ -136,6 +136,7 @@ export default function SuppliersPage() {
         message={`Deactivate "${deleteTarget?.name}"? They will be hidden from new-product supplier selection, but existing products keep their history.`}
         confirmLabel="Deactivate"
         variant="danger"
+        requireTypedConfirmation={deleteTarget?.name}
       />
     </div>
   );
