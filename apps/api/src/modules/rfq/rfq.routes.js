@@ -14,5 +14,10 @@ r.patch('/:id/quote', requirePermission('rfq.quote'), validate({ body: quoteSche
 r.patch('/:id/decline', requirePermission('rfq.quote'), validate({ body: declineSchema }), c.decline);
 r.patch('/:id/accept', requireApprovedBuyer, c.accept);
 r.patch('/:id/reject', requireApprovedBuyer, c.reject);
-r.post('/:id/convert', requireApprovedBuyer, c.convert);
+// Converting an accepted RFQ into a real order is handled by
+// POST /orders/from-rfq (orders.service.createFromRfq) — that's the only
+// path the buyer UI ever calls. A duplicate /rfqs/:id/convert route used to
+// live here as an unfinished scaffold that returned a fake 200 without
+// creating anything; removed rather than kept as a second, divergent
+// implementation of the same action.
 module.exports = r;

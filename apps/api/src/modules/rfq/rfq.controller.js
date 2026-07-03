@@ -9,5 +9,4 @@ module.exports = {
   decline: async (r, res, n) => { try { await s.decline(r.params.id, r.body, 'ADMIN'); res.json({ success: true, data: { message: 'Declined' } }); } catch (e) { n(e); } },
   accept: async (r, res, n) => { try { await s.accept(r.params.id, r.user.id, 'BUYER'); res.json({ success: true, data: { message: 'Accepted' } }); } catch (e) { n(e); } },
   reject: async (r, res, n) => { try { await s.reject(r.params.id, r.user.id, 'BUYER'); res.json({ success: true, data: { message: 'Rejected' } }); } catch (e) { n(e); } },
-  convert: async (r, res, n) => { try { const d = await s.convertToOrder(r.params.id, r.user.id); res.json({ success: true, data: d }); } catch (e) { n(e); } },
 };
