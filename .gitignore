@@ -20,16 +20,11 @@ logs/
 apps/api/uploads/*
 !apps/api/uploads/.gitkeep
 # QA / tooling artefacts (not product code)
-/screenshots/
-catalogue-products.csv
-scripts/onepage.js
-scripts/driver.js
-scripts/focus.js
-scripts/capture.js
-scripts/check_api.js
-scripts/check_mutations.js
-scripts/check_mutations2.js
-scripts/shot_footer.js
-scripts/build_frontend_pdf.js
-scripts/build_db_pdf.js
-scripts/build_history.js
+docs/media/qa-screenshots/
+docs/image-assets/catalogue-products.csv
+# One-off build/capture/debug scripts, not part of the app. capture_golden_path.js and
+# verify_fixes.js are already tracked in git — a tracked file being under a later ignore
+# pattern doesn't untrack it, this just stops *new* one-off scripts from being added here.
+scripts/dev-tools/
+# session scratch space (rendering sources, temp API/DB test artefacts)
+tmp/

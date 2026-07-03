@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Project Green — Engineering Session Snapshot</title>
+<style>
+  @font-face{ font-family:'Inter'; font-weight:400 800; font-style:normal; src:url('fonts/Inter.woff2') format('woff2'); }
+  @font-face{ font-family:'Playfair Display'; font-weight:500 700; font-style:normal; src:url('fonts/PlayfairNormal.woff2') format('woff2'); }
+  @font-face{ font-family:'Playfair Display'; font-weight:500 700; font-style:italic; src:url('fonts/PlayfairItalic.woff2') format('woff2'); }
+  @font-face{ font-family:'JetBrains Mono'; font-weight:400 500; font-style:normal; src:url('fonts/JetBrainsMono.woff2') format('woff2'); }
+  :root{
+    --plum:#3b0a45;
+    --plum-deep:#22062b;
+    --magenta:#a8306f;
+    --pink:#e691b8;
+    --pink-soft:#f7d9e6;
+    --sage:#6f8f6a;
+    --sage-soft:#e3ede1;
+    --cream:#fdf8f6;
+    --ink:#241226;
+    --gray:#6b5b6e;
+    --p0:#c0392b;
+    --p1:#d9762c;
+    --p2:#c99a1e;
+    --p3:#7a8a6b;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Inter',sans-serif;
+    color:var(--ink);
+    font-size:11.5px;
+    line-height:1.55;
+    background:var(--cream);
+  }
+  h1,h2,h3,h4{font-family:'Playfair Display',serif; margin:0 0 8px 0; color:var(--plum-deep);}
+  .page{
+    width:210mm; min-height:297mm;
+    padding:20mm 18mm;
+    position:relative;
+    page-break-after:always;
+    background:var(--cream);
+  }
+  .page:last-child{page-break-after:auto;}
+
+  /* ---------- COVER ---------- */
+  .cover{
+    background: radial-gradient(circle at 20% 10%, #5a1660 0%, var(--plum) 38%, var(--plum-deep) 100%);
+    color:#f6e9f1;
+    padding:0;
+    overflow:hidden;
+  }
+  .cover-inner{position:relative; z-index:5; height:297mm; padding:26mm 20mm; display:flex; flex-direction:column; justify-content:space-between;}
+
+  .cover-photo{
+    background-image:url('cover-page-snapshot.png');
+    background-size:cover;
+    background-position:center;
+  }
+  .cover-scrim{
+    position:absolute; inset:0; z-index:2;
+    background:linear-gradient(180deg, rgba(20,4,26,.15) 0%, rgba(20,4,26,.05) 40%, rgba(20,4,26,.55) 78%, rgba(15,3,20,.86) 100%);
+  }
+
+  .eyebrow{letter-spacing:.32em; text-transform:uppercase; font-size:10px; color:var(--pink); font-weight:600;}
+  .cover-title{font-family:'Playfair Display',serif; font-style:italic; font-weight:600; font-size:52px; line-height:1.08; margin:14px 0 10px; color:#fff;}
+  .cover-sub{font-size:15px; color:#e9cfdd; max-width:120mm; line-height:1.5;}
+  .cover-meta{display:flex; gap:14mm; align-items:flex-end;}
+  .cover-meta .item{border-top:1px solid rgba(255,255,255,.3); padding-top:6px;}
+  .cover-meta .label{font-size:9px; text-transform:uppercase; letter-spacing:.18em; color:var(--pink);}
+  .cover-meta .value{font-size:13px; color:#fff; font-weight:600; margin-top:3px;}
+  .cover-badge{
+    display:inline-block; padding:5px 14px; border:1px solid rgba(255,255,255,.4);
+    border-radius:999px; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:#f6e9f1;
+  }
+
+  /* ---------- TOC ---------- */
+  .toc h1{font-size:30px; border-bottom:3px solid var(--pink-soft); padding-bottom:10px; margin-bottom:22px;}
+  .toc-eyebrow{color:var(--magenta); text-transform:uppercase; letter-spacing:.2em; font-size:10px; font-weight:700; margin-bottom:6px;}
+  .toc-list{margin-top:10px;}
+  .toc-item{display:flex; align-items:baseline; gap:8px; padding:9px 0; border-bottom:1px dotted #dcc3cf;}
+  .toc-num{font-family:'Playfair Display',serif; font-style:italic; color:var(--magenta); font-size:15px; width:22px; flex-shrink:0;}
+  .toc-title{font-weight:600; font-size:13px; color:var(--plum-deep); flex-shrink:0;}
+  .toc-dots{flex:1; border-bottom:1px dotted transparent;}
+  .toc-page{color:var(--gray); font-size:11px; font-variant-numeric:tabular-nums;}
+
+  /* ---------- SECTION COMMON ---------- */
+  .kicker{color:var(--magenta); text-transform:uppercase; letter-spacing:.2em; font-size:9.5px; font-weight:700; margin-bottom:4px;}
+  .section-title{font-size:26px; border-bottom:3px solid var(--pink-soft); padding-bottom:10px; margin-bottom:16px;}
+  .lede{font-size:12.5px; color:var(--gray); margin-bottom:14px; max-width:165mm;}
+  .callout{
+    background:var(--sage-soft); border-left:4px solid var(--sage); border-radius:0 8px 8px 0;
+    padding:12px 16px; margin:14px 0; font-size:11px; color:#2d3b2a;
+  }
+  .callout.pink{background:var(--pink-soft); border-left-color:var(--magenta); color:#5a1a3c;}
+
+  .bug{
+    border:1px solid #ecd7e0; border-radius:10px; padding:12px 15px; margin-bottom:10px;
+    background:#fffdfd;
+    break-inside: avoid;
+  }
+  .bug-head{display:flex; align-items:center; gap:8px; margin-bottom:5px;}
+  .bug-id{font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--gray); font-weight:600;}
+  .bug-title{font-weight:700; font-size:12.5px; color:var(--plum-deep); flex:1;}
+  .sev{
+    font-size:9px; font-weight:800; letter-spacing:.06em; color:#fff; padding:2px 9px; border-radius:999px; flex-shrink:0;
+  }
+  .sev.p0{background:var(--p0);}
+  .sev.p1{background:var(--p1);}
+  .sev.p2{background:var(--p2);}
+  .sev.p3{background:var(--p3);}
+  .bug-body{font-size:11px; color:#463149;}
+  .bug-body b{color:var(--plum-deep);}
+
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+
+  table.score{width:100%; border-collapse:collapse; font-size:11px; margin-top:8px;}
+  table.score th{text-align:left; background:var(--plum); color:#fff; padding:8px 12px; font-family:'Playfair Display',serif; font-weight:600; font-size:11.5px;}
+  table.score td{padding:8px 12px; border-bottom:1px solid #f0dde6;}
+  table.score tr:nth-child(even){background:#fdf3f7;}
+  .status-pill{display:inline-block; padding:3px 10px; border-radius:999px; font-size:9.5px; font-weight:700; letter-spacing:.03em;}
+  .status-pill.done{background:#dcefd9; color:#2a6b2a;}
+  .status-pill.todo{background:#fbe3d6; color:#a2481a;}
+  .status-pill.planned{background:#e6def7; color:#4d3494;}
+
+  .roadmap{counter-reset:step;}
+  .step{
+    display:flex; gap:12px; margin-bottom:12px; break-inside:avoid;
+  }
+  .step-num{
+    counter-increment:step; content:counter(step);
+    width:26px; height:26px; border-radius:50%; background:var(--magenta); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-family:'Playfair Display',serif; font-weight:700; font-size:13px; flex-shrink:0;
+  }
+  .step-num::before{content:counter(step);}
+  .step-body b{color:var(--plum-deep); font-size:12px;}
+  .step-body p{margin:2px 0 0; font-size:11px; color:var(--gray);}
+  .step.priority .step-num{background:var(--p0);}
+
+  .divider-flourish{text-align:center; color:var(--pink); font-size:16px; letter-spacing:.4em; margin:18px 0;}
+  .footer-note{position:absolute; bottom:14mm; left:18mm; right:18mm; font-size:9px; color:#b599a8; border-top:1px solid #f0dde6; padding-top:6px; display:flex; justify-content:space-between;}
+  code{font-family:'JetBrains Mono',monospace; background:#f7ecf1; padding:1px 5px; border-radius:4px; font-size:10px; color:#7a2058;}
+  ul{margin:6px 0; padding-left:18px;}
+  li{margin-bottom:4px;}
+</style>
+</head>
+<body>
+
+<!-- ============ COVER ============ -->
+<div class="page cover cover-photo">
+  <div class="cover-scrim"></div>
+
+  <div class="cover-inner">
+    <div>
+      <span class="cover-badge">Internal Engineering Snapshot</span>
+      <div class="eyebrow" style="margin-top:22px;">ORCHIDS · Project Green</div>
+      <div class="cover-title">Engineering Session<br>Snapshot</div>
+      <div class="cover-sub">Two strict QA cycles, a real automated test suite built from scratch, GitHub Actions CI wired up end‑to‑end, and a security hygiene pass — a full account of what changed and what's still open.</div>
+    </div>
+    <div class="cover-meta">
+      <div class="item"><div class="label">Date</div><div class="value">03 July 2026</div></div>
+      <div class="item"><div class="label">Branches</div><div class="value">develop → main</div></div>
+      <div class="item"><div class="label">Bugs fixed</div><div class="value">24 total</div></div>
+      <div class="item"><div class="label">Completion</div><div class="value">~90 / 100</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TOC ============ -->
+<div class="page">
+  <div class="toc">
+    <div class="toc-eyebrow">Contents</div>
+    <h1>Table of Contents</h1>
+    <div class="toc-list">
+      <div class="toc-item"><span class="toc-num">01</span><span class="toc-title">Executive Summary</span><span class="toc-dots"></span><span class="toc-page">3</span></div>
+      <div class="toc-item"><span class="toc-num">02</span><span class="toc-title">QA Cycle 1 — 5 Bugs Found &amp; Fixed</span><span class="toc-dots"></span><span class="toc-page">4</span></div>
+      <div class="toc-item"><span class="toc-num">03</span><span class="toc-title">QA Cycle 2 — 10 Bugs Found &amp; Fixed</span><span class="toc-dots"></span><span class="toc-page">5</span></div>
+      <div class="toc-item"><span class="toc-num">04</span><span class="toc-title">Infrastructure &amp; Environment Fixes</span><span class="toc-dots"></span><span class="toc-page">7</span></div>
+      <div class="toc-item"><span class="toc-num">05</span><span class="toc-title">The Automated Test Suite</span><span class="toc-dots"></span><span class="toc-page">8</span></div>
+      <div class="toc-item"><span class="toc-num">06</span><span class="toc-title">8 More Bugs the Suite Caught</span><span class="toc-dots"></span><span class="toc-page">9</span></div>
+      <div class="toc-item"><span class="toc-num">07</span><span class="toc-title">CI/CD on GitHub Actions</span><span class="toc-dots"></span><span class="toc-page">11</span></div>
+      <div class="toc-item"><span class="toc-num">08</span><span class="toc-title">Security &amp; Repo Hygiene</span><span class="toc-dots"></span><span class="toc-page">12</span></div>
+      <div class="toc-item"><span class="toc-num">09</span><span class="toc-title">Git Workflow Note</span><span class="toc-dots"></span><span class="toc-page">12</span></div>
+      <div class="toc-item"><span class="toc-num">10</span><span class="toc-title">Completion Scorecard</span><span class="toc-dots"></span><span class="toc-page">13</span></div>
+      <div class="toc-item"><span class="toc-num">11</span><span class="toc-title">What's Left To Do</span><span class="toc-dots"></span><span class="toc-page">14</span></div>
+    </div>
+    <div class="callout pink" style="margin-top:30px;">
+      <b>Naming convention used for this document:</b> <code>PROJECT-GREEN-SESSION-SNAPSHOT-2026-07-03.pdf</code>, following the existing pattern in <code>docs/</code> (e.g. <code>QA_FULL_SYSTEM_TEST_REPORT_2026-07-04.md</code>, <code>QA_FIX_VERIFICATION_2026-07-03.md</code>, <code>SYSTEM-SNAPSHOT-2026-07-02-2200.md</code>) — <code>&lt;SCOPE&gt;-SNAPSHOT-&lt;YYYY-MM-DD&gt;</code>, uppercase, hyphen-separated, dated.
+    </div>
+  </div>
+</div>
+
+<!-- ============ 01 EXEC SUMMARY ============ -->
+<div class="page">
+  <div class="kicker">01 · Overview</div>
+  <h1 class="section-title">Executive Summary</h1>
+  <p class="lede">This session ran a strict, full-system QA pass on Project Green twice, then went further than QA alone: it built a real automated test suite from nothing, wired up continuous integration on GitHub, and closed a secrets-hygiene gap — each stage catching genuine bugs the previous stage hadn't.</p>
+
+  <div class="grid2">
+    <div class="callout">
+      <b>QA Cycle 1</b> — 5 bugs found and fixed the same day, centred on the buyer order-detail page and downstream notification/invoice effects.
+    </div>
+    <div class="callout">
+      <b>QA Cycle 2</b> — a fresh, independent strict pass found 10 more bugs, including the Delivery Coordinator role having no web portal at all (P0).
+    </div>
+    <div class="callout pink">
+      <b>Automated test suite</b> — every <code>*.test.js</code> file was previously an empty stub. Built 57 real tests across 20 modules; writing them surfaced <b>8 more genuine bugs</b>.
+    </div>
+    <div class="callout pink">
+      <b>CI on GitHub Actions</b> — first real run caught <b>one more bug</b> no local check had: a tsconfig/jsconfig mismatch that only failed on a clean checkout.
+    </div>
+  </div>
+
+  <div class="divider-flourish">⚜ ❁ ⚜</div>
+
+  <h3 style="font-size:15px;">Running total</h3>
+  <table class="score">
+    <tr><th>Stage</th><th>Bugs found &amp; fixed</th><th>Verification method</th></tr>
+    <tr><td>QA Cycle 1 (07-02/07-03)</td><td>5</td><td>Live API calls + direct PostgreSQL queries</td></tr>
+    <tr><td>QA Cycle 2 (07-03 afternoon)</td><td>10</td><td>Live API calls + direct PostgreSQL queries + browser session</td></tr>
+    <tr><td>Writing the automated test suite</td><td>8</td><td>Real node:test integration tests, re-run to green</td></tr>
+    <tr><td>First GitHub Actions CI run</td><td>1</td><td>Clean-checkout build failure, reproduced &amp; fixed locally</td></tr>
+    <tr><td><b>Total</b></td><td><b>24</b></td><td>—</td></tr>
+  </table>
+
+  <div class="callout" style="margin-top:18px;">
+    <b>Overall completion estimate: ~90 / 100.</b> Core commerce flow, all 6 role portals, backend test coverage, and CI are solid. The clearest remaining gaps are real product images (currently 0 of 523 working), a manual frontend QA pass, and automated frontend test coverage — see §11.
+  </div>
+
+  <div class="footer-note"><span>Project Green — Engineering Session Snapshot</span><span>03 July 2026</span></div>
+</div>
+
+<!-- ============ 02 QA CYCLE 1 ============ -->
+<div class="page">
+  <div class="kicker">02 · QA Cycle 1</div>
+  <h1 class="section-title">5 Bugs Found &amp; Fixed</h1>
+  <p class="lede">The first strict full-system QA pass centred on the buyer's own order-detail page and the money/notification effects downstream of it.</p>
+
+  <div class="bug">
+    <div class="bug-head"><span class="sev p0">P0</span><span class="bug-title">Buyer order-detail page — doubly (actually quadruply) broken</span></div>
+    <div class="bug-body">Response unwrapping used <code>res.data</code> instead of <code>res.data.data</code>, silently nulling every field. Cancel/Confirm-Receipt buttons called <code>api.post(...)</code> against routes registered as <code>PATCH</code>. Status comparisons used fictional enum values (<code>PENDING</code>, <code>CONFIRMED</code>, <code>SHIPPED</code>) instead of the real ones. Fields were read in camelCase (<code>orderNo</code>, <code>unitPrice</code>) when the API only ever returns snake_case (<code>order_no</code>, <code>unit_price_at_order</code>). All four fixed together; the linked-invoice card, which never had a data source at all, was wired up too.</div>
+  </div>
+  <div class="bug">
+    <div class="bug-head"><span class="sev p2">P2</span><span class="bug-title">POD upload faked buyer confirmation</span></div>
+    <div class="bug-body"><code>delivery.repository.js</code> set <code>buyer_confirmed_at</code> the instant a courier uploaded a proof-of-delivery photo — no buyer involved. Moved that write to the real, buyer-only <code>confirmReceipt()</code> action.</div>
+  </div>
+  <div class="bug">
+    <div class="bug-head"><span class="sev p1">P1</span><span class="bug-title">Cancelling an approved order left its invoice as a live receivable</span></div>
+    <div class="bug-body">Cancelling an <code>APPROVED</code> order now voids (or adjusts, if partially paid) its invoice in the same transaction, instead of permanently inflating the buyer's credit exposure.</div>
+  </div>
+  <div class="bug">
+    <div class="bug-head"><span class="sev p2">P2</span><span class="bug-title">Upload validation leaked a raw 500 + stack trace</span></div>
+    <div class="bug-body">A bad file type on any upload endpoint (products, CMS media, delivery POD) now returns a clean <code>400 INVALID_FILE_TYPE</code> instead of an unhandled exception.</div>
+  </div>
+  <div class="bug">
+    <div class="bug-head"><span class="sev p2">P2</span><span class="bug-title">Notifications had no recipient</span></div>
+    <div class="bug-body"><code>payment_received</code> referenced a non-existent <code>invoice.recipient_email</code> field; <code>price_approval_needed</code> hardcoded a null recipient. Both now resolve real emails (buyer via <code>trade_accounts → users</code>; every active admin, one outbox row each) and were confirmed reaching <code>SENT</code> status.</div>
+  </div>
+
+  <div class="footer-note"><span>Project Green — Engineering Session Snapshot</span><span>03 July 2026</span></div>
+</div>
+
+<!-- ============ 03 QA CYCLE 2 ============ -->
+<div class="page">
+  <div class="kicker">03 · QA Cycle 2</div>
+  <h1 class="section-title">10 Bugs Found &amp; Fixed</h1>
+  <p class="lede">A second, independent strict pass — this one caught the single biggest structural gap in the system, plus several money- and security-integrity issues.</p>
+
+  <div class="bug">
+    <div class="bug-head"><span class="sev p0">P0</span><span class="bug-title">BUG-006 — Delivery Coordinator had no web portal at all</span></div>
+    <div class="bug-body">Login redirected the role into a route that returned a real Next.js 404 — the entire <code>(delivery)</code> route group had never been built, despite the backend API being fully functional. Built <code>apps/web/app/(delivery)/</code> (dashboard + deliveries list with dispatch/in-transit/POD actions) and fixed the login redirect.</div>
+  </div>
+  <div class="bug">
+    <div class="bug-head"><span class="sev p1">P1</span><span class="bug-title">BUG-001 — RMA credit notes never updated the invoice</span></div>
+    <div class="bug-body">A resolved RMA correctly inserted an <code>invoice_adjustments</code> row, but never recalculated the invoice's own <code>balance_due</code>/<code>status</code> — a fully-paid invoice stayed marked <code>PAID</code> forever even after a credit was issued against it.</div>
+  </div>
+  <div class="bug">
+    <div class="bug-head"><span class="sev p1">P1</span><span class="bug-title">BUG-002 — Admin lockout panel disconnected from the real lockout</span></div>
+    <div class="bug-body">Real lockout is computed live from <code>login_history</code> (5 failures / 15 min); the admin panel read/wrote unrelated columns the login flow never touched. It was permanently blind, and Unlock was a no-op. Reconciled both to the same source of truth.</div>
+  </div>
+  <div class="bug">
+    <div class="bug-head"><span class="sev p1">P1</span><span class="bug-title">BUG-003 — Inventory Movements 500'd on every call</span></div>
+    <div class="bug-body">Wrong column name (<code>sm.created_at</code> vs. the real <code>occurred_at</code>) in 4 places — the entire Movements page was unusable.</div>
+  </div>
+  <div class="bug">
+    <div class="bug-head"><span class="sev p1">P1</span><span class="bug-title">BUG-004 — Two-person reversal rule accepted a fabricated approver</span></div>
+    <div class="bug-body">The &gt;50,000 reversal control only checked that <code>confirmed_by</code> was present and not equal to the actor — a completely made-up UUID satisfied it. A single officer could self-authorize any large reversal.</div>
+  </div>
+  <div class="bug">
+    <div class="bug-head"><span class="sev p2">P2</span><span class="bug-title">BUG-005 — Dead RFQ convert endpoint, fake 200 success</span></div>
+    <div class="bug-body"><code>PATCH/POST /rfqs/:id/convert</code> was a scaffold that returned success without creating an order or advancing status. The real UI correctly used <code>/orders/from-rfq</code>; the dead route was still live and misleading if hit directly.</div>
+  </div>
+  <div class="bug">
+    <div class="bug-head"><span class="sev p2">P2</span><span class="bug-title">BUG-007 — MOQ only enforced at order submission</span></div>
+    <div class="bug-body">A below-minimum quantity sat in the cart indefinitely and was only rejected at checkout, discarding the buyer's progress.</div>
+  </div>
+  <div class="bug">
+    <div class="bug-head"><span class="sev p2">P2</span><span class="bug-title">BUG-008 — Order approval never recorded who/when</span></div>
+    <div class="bug-body"><code>approved_by</code>/<code>approved_at</code> existed on the schema but were never set — a silent audit-trail gap.</div>
+  </div>
+  <div class="bug">
+    <div class="bug-head"><span class="sev p2">P2</span><span class="bug-title">BUG-009 — Delivery assignment accepted any user/role</span></div>
+    <div class="bug-body">No validation that <code>assignedTo</code> was an actual delivery coordinator; a non-existent id raised a raw 500 with a leaked stack trace.</div>
+  </div>
+  <div class="bug">
+    <div class="bug-head"><span class="sev p3">P3</span><span class="bug-title">BUG-010 — Security page swallowed API failures silently</span></div>
+    <div class="bug-body">Five data fetches on the admin Security page caught their own errors into an empty array — a failed request looked identical to "no data."</div>
+  </div>
+
+  <div class="footer-note"><span>Project Green — Engineering Session Snapshot</span><span>03 July 2026</span></div>
+</div>
+
+<!-- ============ 04 INFRA ============ -->
+<div class="page">
+  <div class="kicker">04 · Infrastructure</div>
+  <h1 class="section-title">Infrastructure &amp; Environment Fixes</h1>
+  <p class="lede">Alongside the QA bug fixes, the environment itself needed repair — a fresh clone couldn't stand the app up cleanly before this session.</p>
+
+  <ul style="font-size:12px;">
+    <li><b>scripts/migrate.js made idempotent</b> — now tracks applied migrations in a <code>schema_migrations</code> table. Re-running it against an already-migrated DB is a clean no-op instead of failing on the first non-idempotent statement.</li>
+    <li><b>scripts/seed.js FK-ordering bug fixed</b> — <code>rma_requests</code> was deleted before <code>invoice_adjustments</code>, which references it, so re-seeding any existing DB always failed with a foreign-key violation.</li>
+    <li><b>Missing <code>apps/api</code> "build" script added</b> — the root <code>build:api</code> script called a script that didn't exist; <code>npm run build:api</code> always failed.</li>
+    <li><b>3 leftover test/QA products cleaned</b> from the dev catalogue — marked <code>DISCONTINUED</code> rather than hard-deleted, since append-only <code>stock_movements</code>/<code>price_history</code> triggers correctly blocked outright deletion.</li>
+    <li><b>README rewritten</b> to reflect the real state of the system honestly — both QA cycles, known gaps, and setup steps that actually work.</li>
+  </ul>
+
+  <div class="callout" style="margin-top:20px;">
+    Verified end to end: seeded a completely fresh throwaway database from zero (<code>migrate</code> → <code>seed</code>), then re-ran <code>seed</code> a second time against it with no error — the exact scenario that used to fail.
+  </div>
+
+  <div class="footer-note"><span>Project Green — Engineering Session Snapshot</span><span>03 July 2026</span></div>
+</div>
+
+<!-- ============ 05 TEST SUITE ============ -->
+<div class="page">
+  <div class="kicker">05 · Automated Testing</div>
+  <h1 class="section-title">The Automated Test Suite</h1>
+  <p class="lede">Every <code>*.test.js</code> file in the codebase was previously an empty placeholder — <code>describe('X Module', () =&gt; {})</code>. There was no automated coverage at all; everything above was verified manually.</p>
+
+  <div class="callout pink">
+    Built a real <b>node:test</b> integration suite — Node's built-in test runner, <b>zero new dependencies</b> — that drives the actual Express app against an isolated <code>project_green_test</code> database.
+  </div>
+
+  <div class="grid2" style="margin-top:14px;">
+    <div class="callout">
+      <b>apps/api/src/test/helpers.js</b><br>Starts the real app on an ephemeral port against the isolated test DB, with the env override happening before <code>config/env.js</code> is ever required.
+    </div>
+    <div class="callout">
+      <b>scripts/run-tests.js</b><br>Migrates + seeds the test DB, then runs <code>node --test</code> sequentially (<code>--test-concurrency=1</code>) — files share seeded fixtures like buyer1's cart, so parallel files would be flaky.
+    </div>
+  </div>
+
+  <h3 style="margin-top:20px; font-size:14px;">57 tests across 20 modules</h3>
+  <p style="font-size:11.5px; color:var(--gray);">auth · cart · orders · payments · rfq · rma · inventory · delivery · invoices · notifications · reports · cms · products · finance · security · buyers · suppliers · users · pricing · tiers</p>
+
+  <p style="font-size:12px;">Covers the golden paths (cart→order→approve→invoice, RFQ→quote→convert, partial→final→PAID-at-zero, delivery lifecycle, RMA→credit) <b>and</b> explicitly re-asserts every regression from both QA cycles above, so none of the 15 bugs already fixed can silently come back.</p>
+
+  <div class="callout" style="margin-top:14px;">
+    Run locally with <code>npm test</code>. Never touches the real dev database — the test database name is always derived by suffixing <code>DATABASE_URL</code> with <code>_test</code>.
+  </div>
+
+  <div class="footer-note"><span>Project Green — Engineering Session Snapshot</span><span>03 July 2026</span></div>
+</div>
+
+<!-- ============ 06 8 MORE BUGS ============ -->
+<div class="page">
+  <div class="kicker">06 · What Writing Tests Found</div>
+  <h1 class="section-title">8 More Bugs the Suite Caught</h1>
+  <p class="lede">Writing real tests against real running code — not just reading it — surfaced genuine bugs no amount of manual spot-checking had caught yet.</p>
+
+  <div class="bug">
+    <div class="bug-head"><span class="sev p1">P1</span><span class="bug-title">Staff user creation was completely broken</span></div>
+    <div class="bug-body"><code>POST/PATCH /users</code> validated <code>role_id</code> as a UUID string — but the real <code>roles.id</code> column is a smallint. Every real role id (1–5) failed validation. Admin could not create a single new staff account.</div>
+  </div>
+  <div class="bug">
+    <div class="bug-head"><span class="sev p2">P2</span><span class="bug-title">Two wrong SQL column names, both 500ing</span></div>
+    <div class="bug-body"><code>users.repository.findLoginHistory</code> referenced <code>attempted_at</code> (real: <code>occurred_at</code>). <code>users.repository.findById</code> joined a non-existent <code>ta.tier</code> column (real: join through <code>tier_id</code> to <code>buyer_tiers</code>).</div>
+  </div>
+  <div class="bug">
+    <div class="bug-head"><span class="sev p2">P2</span><span class="bug-title">Supplier creation 500'd whenever lead_time_days was omitted</span></div>
+    <div class="bug-body">The column has a DB default of 7 — but binding JavaScript <code>undefined</code> sends SQL <code>NULL</code>, which overrides a column <code>DEFAULT</code> and violated the NOT NULL constraint.</div>
+  </div>
+  <div class="bug">
+    <div class="bug-head"><span class="sev p1">P1</span><span class="bug-title">The entire CMS content-block module was broken — plus a content leak</span></div>
+    <div class="bug-body">Create/update referenced columns (<code>title</code>, <code>block_type</code>, <code>image_url</code>, <code>link_url</code>, <code>start_date</code>, <code>end_date</code>, <code>meta</code>) that don't exist on the real <code>cms_blocks</code> table — real columns are just <code>key</code>/<code>type</code>/<code>content</code> (jsonb)/<code>is_published</code>. Every block create/update 500'd. Separately, <b>unpublished draft blocks were visible to unauthenticated public visitors</b> — a real content-leak, not just a broken feature.</div>
+  </div>
+  <div class="bug">
+    <div class="bug-head"><span class="sev p3">P3</span><span class="bug-title">Cart's stock check skipped brand-new lines entirely</span></div>
+    <div class="bug-body">The check only ever looked at an already-existing cart line — a fresh add of any quantity of an out-of-stock product went through unchecked.</div>
+  </div>
+  <div class="bug">
+    <div class="bug-head"><span class="sev p2">P2</span><span class="bug-title">seed.js couldn't reseed a DB with real CMS uploads</span></div>
+    <div class="bug-body">The clear-tables list never included <code>cms_media</code> at all — deleting <code>users</code> before <code>cms_media</code> hit the same class of FK-order bug already fixed for RMA, just for a table added later.</div>
+  </div>
+  <div class="bug">
+    <div class="bug-head"><span class="sev p3">P3</span><span class="bug-title">A JWT timing race in password-change invalidation</span></div>
+    <div class="bug-body">JWT <code>iat</code> is whole seconds; <code>password_changed_at</code> is millisecond-precision. A token issued in the same wall-clock second as a password change could be spuriously flagged "issued before the change" and rejected, even for a fresh login using the new password.</div>
+  </div>
+
+  <div class="footer-note"><span>Project Green — Engineering Session Snapshot</span><span>03 July 2026</span></div>
+</div>
+
+<!-- ============ 07 CI ============ -->
+<div class="page">
+  <div class="kicker">07 · Continuous Integration</div>
+  <h1 class="section-title">CI/CD on GitHub Actions</h1>
+  <p class="lede">A workflow now runs on every push and pull request to <code>main</code> and <code>develop</code>.</p>
+
+  <div class="callout">
+    <b>.github/workflows/ci.yml</b> — spins up a real Postgres 16 service container, runs <code>npm ci</code>, syntax-checks the API, builds the web app, then runs the full 57-test suite. Roughly 11–12 minutes end to end.
+  </div>
+
+  <div class="bug" style="margin-top:16px;">
+    <div class="bug-head"><span class="sev p1">P1</span><span class="bug-title">First real CI run caught a genuine, previously-invisible bug</span></div>
+    <div class="bug-body">The web app is 100% JavaScript — zero <code>.ts</code>/<code>.tsx</code> files anywhere — with <code>typescript</code> not even installed. But it shipped a <code>tsconfig.json</code> for its <code>@/*</code> import alias instead of the correct <code>jsconfig.json</code>. That ambiguous half-TypeScript setup resolved aliases by local-machine accident, but failed outright on a genuinely clean checkout: <code>Module not found: Can't resolve '@/lib/api'</code> across dozens of files. Fixed by switching to <code>jsconfig.json</code> and removing the stale <code>tsconfig.json</code>/<code>next-env.d.ts</code>. Verified with a from-scratch <code>rm -rf .next &amp;&amp; next build</code>.</div>
+  </div>
+
+  <div class="callout pink" style="margin-top:16px;">
+    This is exactly the class of bug CI exists to catch — it never surfaced in any manual "run it locally" check because local state had quietly drifted from what a clean clone actually needs.
+  </div>
+
+  <p style="font-size:11.5px; color:var(--gray); margin-top:14px;">Also added <code>apps/api/.env.example</code>, documenting every environment variable the API reads (required vs. optional) — there wasn't one before, so a fresh clone had no reference for what to put in <code>.env</code>.</p>
+
+  <div class="footer-note"><span>Project Green — Engineering Session Snapshot</span><span>03 July 2026</span></div>
+</div>
+
+<!-- ============ 08+09 SECURITY & GIT ============ -->
+<div class="page">
+  <div class="kicker">08 · Hygiene</div>
+  <h1 class="section-title">Security &amp; Repo Hygiene</h1>
+
+  <div class="bug">
+    <div class="bug-head"><span class="sev p1">P1</span><span class="bug-title">.gitignore didn't catch backup env files</span></div>
+    <div class="bug-body"><code>.gitignore</code> only matched <code>.env</code>, <code>.env.local</code>, and <code>*.env</code> (suffix-only) — a file like <code>apps/api/.env.qa.bak</code> (containing real DB/SMTP/JWT values) matched none of those patterns and sat untracked, one <code>git add -A</code> away from being committed. Fixed with a <code>.env.*</code> pattern, plus an explicit exception for <code>apps/api/.env.example</code> (the one <code>.env</code>-shaped file actually meant to be tracked). Confirmed it was never present anywhere in git history.</div>
+  </div>
+
+  <div class="divider-flourish">⚜ ❁ ⚜</div>
+
+  <div class="kicker">09 · Process</div>
+  <h2 style="font-size:20px; margin-bottom:10px;">Git Workflow Note</h2>
+  <p style="font-size:12px;">Every fix in this session followed the repository's existing branching convention: committed to <code>develop</code>, then merged into <code>main</code> with <code>--no-ff</code> to preserve a visible merge history, and pushed. No force-pushes, no history rewrites, no direct commits to <code>main</code>.</p>
+
+  <div class="footer-note"><span>Project Green — Engineering Session Snapshot</span><span>03 July 2026</span></div>
+</div>
+
+<!-- ============ 10 SCORECARD ============ -->
+<div class="page">
+  <div class="kicker">10 · Where Things Stand</div>
+  <h1 class="section-title">Completion Scorecard</h1>
+
+  <table class="score">
+    <tr><th>Area</th><th>Status</th></tr>
+    <tr><td>Core commerce flow (all 7 golden paths)</td><td><span class="status-pill done">DONE</span></td></tr>
+    <tr><td>All 6 role portals (incl. Delivery Coordinator)</td><td><span class="status-pill done">DONE</span></td></tr>
+    <tr><td>Backend automated test coverage (57 tests)</td><td><span class="status-pill done">DONE</span></td></tr>
+    <tr><td>CI on GitHub Actions</td><td><span class="status-pill done">DONE</span></td></tr>
+    <tr><td>Migration / seed reliability (idempotent)</td><td><span class="status-pill done">DONE</span></td></tr>
+    <tr><td>Secrets / gitignore hygiene</td><td><span class="status-pill done">DONE</span></td></tr>
+    <tr><td>Frontend automated test coverage</td><td><span class="status-pill todo">NOT DONE — zero coverage</span></td></tr>
+    <tr><td>Product images</td><td><span class="status-pill todo">NOT DONE — 0 of 523 working</span></td></tr>
+    <tr><td>Manual portal-by-portal frontend QA pass</td><td><span class="status-pill planned">PLANNED — next</span></td></tr>
+    <tr><td>Repo hygiene (untracked demo assets/scripts)</td><td><span class="status-pill todo">NOT RESOLVED</span></td></tr>
+    <tr><td>Glassy UI visual polish pass</td><td><span class="status-pill planned">PLANNED — later</span></td></tr>
+  </table>
+
+  <div class="callout pink" style="margin-top:22px;">
+    <b>Product images, specifically:</b> the seed script wires up 30 of 523 products with <code>product_images</code> rows, but every one points to <code>res.cloudinary.com/orchids/...</code> — a Cloudinary bucket that doesn't actually contain those files (confirmed 404 on request). Effectively <b>zero</b> products have a working image today, not "30 good, need 70 more."
+  </div>
+
+  <div class="callout" style="margin-top:16px; text-align:center;">
+    <div style="font-family:'Playfair Display',serif; font-style:italic; font-size:34px; color:var(--magenta);">~ 90 / 100 </div>
+    <div style="font-size:11px; color:var(--gray);">Overall completion estimate</div>
+  </div>
+
+  <div class="footer-note"><span>Project Green — Engineering Session Snapshot</span><span>03 July 2026</span></div>
+</div>
+
+<!-- ============ 11 ROADMAP ============ -->
+<div class="page">
+  <div class="kicker">11 · Roadmap</div>
+  <h1 class="section-title">What's Left To Do</h1>
+  <p class="lede">In priority order, based on visible impact for a demo audience versus long-term maintenance value.</p>
+
+  <div class="roadmap">
+    <div class="step priority">
+      <div class="step-num"></div>
+      <div class="step-body"><b>Source and wire up real product images</b><p>Highest visible-impact item — currently 0 of 523 products render an image anywhere in the app. Needs real photography sourced and either a working Cloudinary bucket or the already-built local upload endpoints.</p></div>
+    </div>
+    <div class="step priority">
+      <div class="step-num"></div>
+      <div class="step-body"><b>Manual portal-by-portal frontend QA pass</b><p>Planned as a collaborative, driven-browser session — catches visual/UX issues no automated assertion would catch.</p></div>
+    </div>
+    <div class="step">
+      <div class="step-num"></div>
+      <div class="step-body"><b>Frontend automated test coverage</b><p>Currently zero. Lower urgency than the two above for a near-term demo, higher urgency for long-term regression safety across the 5 portals.</p></div>
+    </div>
+    <div class="step">
+      <div class="step-num"></div>
+      <div class="step-body"><b>Repo hygiene cleanup</b><p>Decide what to do with the untracked demo videos, screenshots, and one-off build scripts still cluttering the repo root.</p></div>
+    </div>
+    <div class="step">
+      <div class="step-num"></div>
+      <div class="step-body"><b>Glassy UI visual polish pass</b><p>Planned for after the above — a polished theme over broken images or untested flows would be the wrong order of operations.</p></div>
+    </div>
+    <div class="step">
+      <div class="step-num"></div>
+      <div class="step-body"><b>Deeper edge-case testing</b><p>Reports/BI, notification retry, and credit monitor are currently smoke-tested rather than exhaustively covered — lowest priority of this list.</p></div>
+    </div>
+  </div>
+
+  <div class="divider-flourish" style="margin-top:26px;">⚜ ❁ ⚜</div>
+  <p style="text-align:center; color:var(--gray); font-size:11px;">End of snapshot — ORCHIDS · Project Green, 03 July 2026</p>
+
+  <div class="footer-note"><span>Project Green — Engineering Session Snapshot</span><span>03 July 2026</span></div>
+</div>
+
+</body>
+</html>

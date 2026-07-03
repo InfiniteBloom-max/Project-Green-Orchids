@@ -34,8 +34,8 @@ governance and CMS media.
 Two full strict QA passes have been run against this codebase; every bug
 either pass found — 15 total — has been fixed and re-verified live (not from
 code review alone):
-- [`docs/QA_FULL_SYSTEM_TEST_REPORT_2026-07-04.md`](docs/QA_FULL_SYSTEM_TEST_REPORT_2026-07-04.md) — the first strict pass (5 bugs, fixed same day)
-- [`docs/QA_FIX_VERIFICATION_2026-07-03.md`](docs/QA_FIX_VERIFICATION_2026-07-03.md) — the second strict pass (10 bugs, including the missing Delivery Coordinator portal, an RMA credit note that never updated its invoice, an admin lockout panel disconnected from the real lockout check, and a payment-reversal two-person rule that accepted a fabricated approver)
+- [`docs/qa-reports/QA_FULL_SYSTEM_TEST_REPORT_2026-07-04.md`](docs/qa-reports/QA_FULL_SYSTEM_TEST_REPORT_2026-07-04.md) — the first strict pass (5 bugs, fixed same day)
+- [`docs/qa-reports/QA_FIX_VERIFICATION_2026-07-03.md`](docs/qa-reports/QA_FIX_VERIFICATION_2026-07-03.md) — the second strict pass (10 bugs, including the missing Delivery Coordinator portal, an RMA credit note that never updated its invoice, an admin lockout panel disconnected from the real lockout check, and a payment-reversal two-person rule that accepted a fabricated approver)
 
 On top of that, a real automated test suite now backs the API: 57 `node:test`
 integration tests (`npm test`) driving the actual Express app against an
@@ -64,7 +64,7 @@ the correct `jsconfig.json`.
 
 ## Public Homepage
 
-![Homepage](docs/screenshots/homepage.png)
+![Homepage](docs/media/screenshots/homepage.png)
 
 ---
 
@@ -73,16 +73,16 @@ the correct `jsconfig.json`.
 Five distinct role-based portals, each with its own dark glassmorphism theme:
 
 ### Admin Suite — Operations Dashboard
-![Admin Dashboard](docs/screenshots/admin-dashboard.png)
+![Admin Dashboard](docs/media/screenshots/admin-dashboard.png)
 
 ### Trade Portal — Buyer Dashboard
-![Buyer Dashboard](docs/screenshots/buyer-dashboard.png)
+![Buyer Dashboard](docs/media/screenshots/buyer-dashboard.png)
 
 ### Finance Desk — Financial Overview
-![Finance Dashboard](docs/screenshots/finance-dashboard.png)
+![Finance Dashboard](docs/media/screenshots/finance-dashboard.png)
 
 ### Inventory Hub — Stock Overview
-![Inventory Dashboard](docs/screenshots/inventory-dashboard.png)
+![Inventory Dashboard](docs/media/screenshots/inventory-dashboard.png)
 
 ### Delivery Centre — Coordinator Dashboard
 Dispatch queue, in-transit tracking and proof-of-delivery upload for the Delivery Coordinator role — see `apps/web/app/(delivery)/`.
@@ -252,8 +252,17 @@ project-green/
 ├── scripts/
 │   ├── seed.js                # Database seeder (idempotent)
 │   ├── migrate.js             # Migration runner (idempotent, tracks applied files)
-│   └── run-tests.js           # Test-DB setup + node:test runner
-└── docs/                      # Documentation, snapshots & screenshots
+│   ├── run-tests.js           # Test-DB setup + node:test runner
+│   └── dev-tools/             # One-off build/capture/debug scripts (not part of the app)
+└── docs/
+    ├── qa-reports/            # Strict QA passes + bugfix verification
+    ├── snapshots/             # Dated system/session snapshots
+    ├── engineering/           # DATABASE.md, CONTRIBUTING.md, devlog, implementation report
+    ├── presentations/         # Gantt, use-case diagrams, defence/overview decks
+    ├── media/
+    │   ├── screenshots/       # README dashboard screenshots
+    │   └── videos/            # Demo recordings
+    └── image-assets/          # Generated/sourced catalogue image assets, legacy images
 ```
 
 Backend modules live under `apps/api/src/modules/` — each follows the same

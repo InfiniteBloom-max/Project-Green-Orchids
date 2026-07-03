@@ -1,0 +1,52 @@
+# Project Green — engineering devlog
+
+- 2026-04-30 · @ronith · docs: README with project one-liner and team table
+- 2026-05-05 · @rashandi · docs(db): first-draft ERD — users, buyers, products, orders
+- 2026-05-05 · @rashandi · docs(db): add suppliers, inventory, price_tiers to ERD
+- 2026-05-05 · @ronith · docs: /docs folder, CONTRIBUTING.md (branch + commit rules)
+- 2026-05-05 · @nadeera · docs(api): API surface plan v0 (41 endpoints)
+- 2026-05-07 · @rashandi · docs(db): ERD v0 frozen — 19 tables
+- 2026-05-11 · @rashandi · docs(ux): low-fi wireframes — login, catalogue, buyer dashboard
+- 2026-05-11 · @rashandi · docs(ux): admin + finance + delivery wireframes
+- 2026-05-11 · @ronith · docs: RBAC role × permission matrix (5 roles, 44 permissions)
+- 2026-05-12 · @nadeera · docs(api): endpoint contract doc served at /docs
+- 2026-05-12 · @sithum · test(api): healthz + error-envelope tests (3 green)
+- 2026-05-13 · @ronith · ci(deploy): Render (api) + Vercel (web) hello-world
+- 2026-05-13 · @ronith · ci: cache npm store, run tests on PR, block merge on red
+- 2026-05-15 · @rashandi · docs(db): regenerate ERD from migrations, commit /docs/diagrams
+- 2026-05-20 · @rashandi · docs(db): ERD v1 final + data-dictionary.md
+- 2026-05-21 · @ronith · docs: scope locked 22 May — must-have list, sacrifice order
+- 2026-05-22 · @rashandi · docs(ux): wireframes v2 signed off
+- 2026-05-23 · @ronith · docs: user stories US-01..US-58 grouped by role
+- 2026-05-24 · @rashandi · docs(ux): role-based navigation maps (5 dashboards)
+- 2026-05-25 · @nadeera · docs(arch): state machines — RFQ, order, invoice, payment, RMA, delivery
+- 2026-05-25 · @sithum · docs(arch): money handling — decimal.js, round-half-up, no floats
+- 2026-05-25 · @sithum · test(api): money.js 14 cases (rounding, negative) green
+- 2026-05-26 · @sithum · docs(security): threat model — IDOR, SQLi, brute-force, price tamper
+- 2026-05-26 · @sithum · chore(seed): roles + permissions matrix (seed 44 perms)
+- 2026-05-26 · @nadeera · chore(seed): roles + permissions + 5 demo users
+- 2026-05-27 · @nadeera · chore(seed): products, suppliers, categories, buyer tiers (faker 42)
+- 2026-05-28 · @nadeera · chore(seed): 12 trade buyers w/ tiers + credit limits
+- 2026-05-28 · @sithum · docs(arch): price-change governance — 2/24h, 3rd needs approval
+- 2026-05-29 · @ronith · chore: freeze develop for branch-out (lock pinned, CI green)
+- 2026-05-29 · @rashandi · chore: branch from develop (finance/rma)
+- 2026-05-29 · @ronith · chore: branch from develop (delivery/reports)
+- 2026-06-01 · @ronith · ci: per-branch preview deploys + healthz smoke test
+- 2026-06-04 · @rashandi · docs(ux): finance + RMA screen specs, every state drawn
+- 2026-06-05 · @ronith · ci: add jest coverage gate (>60% on changed modules)
+- 2026-06-09 · @rashandi · docs(ux): aging-report + statement layout finalised
+- 2026-06-11 · @sithum · feat(invoices): money math + invoice number sequence
+- 2026-06-11 · @rashandi · db: invoices + adjustments (folded into 0006)
+- 2026-06-12 · @sithum · feat(payments): payment.record txn (FOR UPDATE invoice, audit row)
+- 2026-06-12 · @ronith · feat(reports): sales + inventory + credit cards wired to real queries
+- 2026-06-14 · @rashandi · chore: rebase onto develop (post-RFQ), regenerate lock
+- 2026-06-15 · @yasali · feat(web): delivery coordinator board — assign, status, POD
+- 2026-06-15 · @ronith · feat(delivery): deliveries state machine + POD signed URL
+- 2026-06-16 · @sithum · feat(rma): approved return increments stock + invoice_adjustment
+- 2026-06-16 · @ronith · feat(jobs): payment-reminder + low-stock cron (fires in UTC) (I-12)
+- 2026-06-16 · @ronith · fix(jobs): pin cron + timestamps to Asia/Colombo, store UTC (I-12)
+- 2026-06-16 · @yasali · feat(web): Bloom Reaction spike — MediaPipe face landmarker
+- 2026-06-17 · @sithum · test(finance): invoice→partial→statement→aging (9 green)
+- 2026-06-17 · @ronith · chore: merge develop → branch — LARGE conflict (10 days behind) (I-14)
+- 2026-06-17 · @ronith · chore: resolve I-14 — seed split, api/types barrel, reports rebase
+- 2026-06-17 · @ronith · test(delivery): assign→dispatch→POD→buyer-confirm (5 green)

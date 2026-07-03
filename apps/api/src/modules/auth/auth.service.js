@@ -33,7 +33,12 @@ function verifyPassword(password, hash) {
 
 function generateAccessToken(user) {
   return jwt.sign(
-    { sub: user.id, email: user.email, role_id: user.roleId || user.role_id },
+    // iat_ms: standard `iat` is whole seconds (JWT spec), which is too coarse to safely compare
+    // against a millisecond-precision password_changed_at — a token issued in the same
+    // wall-clock second as a password change is genuinely ambiguous at that resolution. This
+    // custom claim carries real millisecond precision so requireAuth's staleness check has no
+    // ambiguous window at all, instead of having to pick a "safer" rounding direction.
+    { sub: user.id, email: user.email, role_id: user.roleId || user.role_id, iat_ms: Date.now() },
     env.JWT_ACCESS_SECRET,
     { expiresIn: env.JWT_ACCESS_EXPIRY }
   );
