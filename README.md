@@ -17,17 +17,29 @@ A full-stack B2B wholesale commerce platform for a Sri Lankan orchid exporter �
 
 ## Status
 
-All core B2B workflows are implemented and verified end-to-end: buyer onboarding
-(register → email OTP verify → admin approval), catalogue → cart → order →
-stock reservation, RFQ → quote → convert to order, invoicing with partial
-payments to exactly PAID, RMA returns with real stock movements, buyer tiers,
-inventory, business-intelligence reporting, CMS (including a media library),
-and a full security/audit panel (login history, session force-logout,
-locked-account unlock, audit log). See
-[`docs/SYSTEM-SNAPSHOT-2026-07-02-2200.md`](docs/SYSTEM-SNAPSHOT-2026-07-02-2200.md)
-for the latest detailed session report — what was fixed, what was verified live,
-and what's still open (frontend regex validation, type-to-confirm dialogs,
-catalogue image assets).
+All 6 roles (Admin, Trade Buyer, Finance Officer, Inventory Manager, Delivery
+Coordinator, and public visitor) have a working, populated portal, and all 7
+core golden paths pass end-to-end with UI + API + DB verification: buyer
+onboarding (register → email OTP verify → admin approval), catalogue → cart →
+order → admin approve → stock reservation → invoice, RFQ → quote → accept →
+convert to order, invoicing with partial/final payments to exactly PAID,
+delivery assign → dispatch → in-transit → POD → buyer confirmation, RMA
+return → approve → item received (real stock movement) → resolution with an
+invoice credit that actually updates the invoice's balance, and a security/
+audit panel (login history, session force-logout, a locked-account panel that
+reflects the real lockout mechanism, audit log) with admin-decided price
+governance and CMS media.
+
+Two full strict QA passes have been run against this codebase; every bug
+either pass found — 15 total — has been fixed and re-verified live (not from
+code review alone):
+- [`docs/QA_FULL_SYSTEM_TEST_REPORT_2026-07-04.md`](docs/QA_FULL_SYSTEM_TEST_REPORT_2026-07-04.md) — the first strict pass (5 bugs, fixed same day)
+- [`docs/QA_FIX_VERIFICATION_2026-07-03.md`](docs/QA_FIX_VERIFICATION_2026-07-03.md) — the second strict pass (10 bugs, including the missing Delivery Coordinator portal, an RMA credit note that never updated its invoice, an admin lockout panel disconnected from the real lockout check, and a payment-reversal two-person rule that accepted a fabricated approver)
+
+**Known gaps, honestly:**
+- No automated test suite backs this yet — every fix above was verified with live API calls + direct PostgreSQL queries, not CI.
+- Reports/BI, notification retry, credit monitor, and CMS content blocks (beyond media upload) have had lighter testing than the core commerce flow.
+- `scripts/seed.js`/`scripts/migrate.js` are now idempotent (see below) but the seeded demo dataset still accumulates whatever test data a session runs against it — reset with a fresh `npm run migrate && npm run seed` if you want a clean slate.
 
 ## Public Homepage
 
@@ -37,7 +49,7 @@ catalogue image assets).
 
 ## Dashboards
 
-Four distinct role-based portals, each with a clean slate-900 sidebar and white content area:
+Five distinct role-based portals, each with its own dark glassmorphism theme:
 
 ### Admin Suite — Operations Dashboard
 ![Admin Dashboard](docs/screenshots/admin-dashboard.png)
@@ -50,6 +62,9 @@ Four distinct role-based portals, each with a clean slate-900 sidebar and white 
 
 ### Inventory Hub — Stock Overview
 ![Inventory Dashboard](docs/screenshots/inventory-dashboard.png)
+
+### Delivery Centre — Coordinator Dashboard
+Dispatch queue, in-transit tracking and proof-of-delivery upload for the Delivery Coordinator role — see `apps/web/app/(delivery)/`.
 
 ---
 
@@ -99,22 +114,24 @@ npm install
 
 ### 2. Set up the database
 
-Create a database named `project_green` and run every migration in order (numbered, `apps/api/migrations/0001` through the latest — currently `0014`):
+`npm run migrate` creates the `project_green` database if it doesn't exist and runs every
+migration (`apps/api/migrations/0001` through the latest — currently `0014`) in order. It
+tracks what's already applied in a `schema_migrations` table, so running it again against an
+existing DB is a safe no-op instead of re-running non-idempotent DDL:
 
 ```bash
-psql -U postgres -c "CREATE DATABASE project_green;"
-for f in apps/api/migrations/*.sql; do
-  psql -U postgres -d project_green -f "$f"
-done
+DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/project_green npm run migrate
 ```
 
 ### 3. Seed demo data
 
 ```bash
-node scripts/seed.js
+DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/project_green npm run seed
 ```
 
-This creates staff accounts, buyer accounts, a full orchid catalogue and sample orders.
+This creates staff accounts, buyer accounts, a full orchid catalogue and sample orders. It's
+safe to re-run against an already-seeded DB — it clears its own tables first (in FK-safe
+order) and reseeds from scratch.
 
 ### 4. Configure environment
 

@@ -37,6 +37,18 @@ async function main() {
     await adminPool.end();
   }
 
+  // Track applied migrations so re-running this script against an existing DB is a no-op for
+  // files already applied, instead of re-executing non-idempotent DDL (e.g. CREATE TRIGGER)
+  // and failing halfway through.
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS schema_migrations (
+      filename TEXT PRIMARY KEY,
+      applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
+  const { rows: appliedRows } = await pool.query('SELECT filename FROM schema_migrations');
+  const applied = new Set(appliedRows.map(r => r.filename));
+
   const files = fs.readdirSync(MIGRATIONS_DIR)
     .filter(f => f.endsWith('.sql'))
     .sort();
@@ -47,14 +59,22 @@ async function main() {
     return;
   }
 
-  console.log(`📦 Running ${files.length} migration(s) against ${dbName}...\n`);
+  const pending = files.filter(f => !applied.has(f));
+  if (pending.length === 0) {
+    console.log(`✅ Nothing to do — all ${files.length} migration(s) already applied to ${dbName}.`);
+    await pool.end();
+    return;
+  }
 
-  for (const file of files) {
+  console.log(`📦 Running ${pending.length} pending migration(s) of ${files.length} total against ${dbName}...\n`);
+
+  for (const file of pending) {
     const filePath = path.join(MIGRATIONS_DIR, file);
     const sql = fs.readFileSync(filePath, 'utf8');
     console.log(`▶  ${file}`);
     try {
       await pool.query(sql);
+      await pool.query('INSERT INTO schema_migrations (filename) VALUES ($1)', [file]);
       console.log(`   ✅ OK`);
     } catch (err) {
       console.error(`   ❌ FAILED: ${err.message}`);
