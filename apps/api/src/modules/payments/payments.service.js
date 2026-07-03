@@ -55,8 +55,15 @@ const service = {
       await writeAudit({ actor: actor === 'SYSTEM' ? null : actor, action: 'PAYMENT_RECORDED',
         entityType: 'payments', entityId: String(payment.id),
         after: { invoice_id: data.invoice_id, amount: data.amount, newBalance } }, client);
+      // invoice.recipient_email was never a real column — invoices don't carry
+      // an email, the buyer's email lives on users via trade_accounts. Resolve
+      // it for real so this notification can actually be delivered.
+      const buyerEmail = await client.query(
+        `SELECT u.email FROM trade_accounts ta JOIN users u ON u.id = ta.user_id WHERE ta.id = $1`,
+        [invoice.buyer_id]
+      );
       await enqueueEmail(client, {
-        recipientUserId: null, recipientEmail: invoice.recipient_email || null, template: 'payment_received',
+        recipientUserId: null, recipientEmail: buyerEmail.rows[0]?.email || null, template: 'payment_received',
         payload: { amount: Number(data.amount).toFixed(2), invoiceNo: invoice.invoice_no, balanceDue: newBalance.toFixed(2) },
       });
     });

@@ -75,7 +75,9 @@ async function transition(id, status, { note, podUrl, actorId } = {}) {
     const vals = [status];
     if (status === 'DISPATCHED') { sets.push('dispatch_date = NOW()'); }
     if (podUrl) { vals.push(podUrl); sets.push(`pod_url = $${vals.length}`, 'pod_uploaded_at = NOW()'); }
-    if (status === 'DELIVERED') { sets.push('buyer_confirmed_at = NOW()'); }
+    // buyer_confirmed_at is NOT set here — POD upload means "delivered", not
+    // "the buyer confirmed it". That's a separate, buyer-initiated action
+    // (see orders.service.js confirmReceipt(), which sets this field for real).
     if (note && status === 'FAILED') { vals.push(note); sets.push(`failure_note = $${vals.length}`); }
     vals.push(id);
     const { rows } = await client.query(

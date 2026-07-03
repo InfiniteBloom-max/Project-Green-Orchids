@@ -222,6 +222,28 @@ const service = {
             ref_table: 'orders', ref_id: id, performed_by: actor, note: `Cancel ${order.order_no}`,
           });
         }
+
+        // An APPROVED order already has an invoice — cancelling the order
+        // must not leave a live receivable behind (it silently inflated the
+        // buyer's credit exposure forever, since checkCredit sums balance_due
+        // for PENDING/PARTIALLY_PAID/OVERDUE invoices). Void it in the same
+        // transaction. If money was already collected against it, leave the
+        // paid_amount as the historical record but flag it ADJUSTED for
+        // finance to review/refund rather than silently erasing that fact.
+        const inv = await client.query(
+          `SELECT id, paid_amount FROM invoices WHERE order_id = $1 AND status IN ('PENDING','PARTIALLY_PAID','OVERDUE')`,
+          [id]
+        );
+        if (inv.rows.length) {
+          const invoice = inv.rows[0];
+          const hasPayments = Number(invoice.paid_amount) > 0;
+          await client.query(
+            `UPDATE invoices SET status = $1, balance_due = 0, updated_at = NOW() WHERE id = $2`,
+            [hasPayments ? 'ADJUSTED' : 'CANCELLED', invoice.id]
+          );
+          await writeAudit({ actor, action: 'INVOICE_VOIDED_ON_ORDER_CANCEL', entityType: 'invoices', entityId: String(invoice.id),
+            before: { status: 'PENDING/PARTIALLY_PAID/OVERDUE' }, after: { status: hasPayments ? 'ADJUSTED' : 'CANCELLED', reason: `Order ${order.order_no} cancelled` } }, client);
+        }
       }
       await repo.setCancelled(client, id, data.reason, actor);
       await writeAudit({ actor, action: 'ORDER_CANCELLED', entityType: 'orders', entityId: String(id),
@@ -239,6 +261,12 @@ const service = {
     assertTransition('ORDER', order.status, 'CLOSED', 'BUYER');
     await tx(async (client) => {
       await repo.updateStatus(client, id, 'CLOSED');
+      // This is the real "buyer confirmed receipt" action — record it on the
+      // delivery record too, since that's what buyer_confirmed_at means.
+      await client.query(
+        `UPDATE deliveries SET buyer_confirmed_at = NOW() WHERE order_id = $1 AND buyer_confirmed_at IS NULL`,
+        [id]
+      );
       await writeAudit({ actor: userId, action: 'ORDER_CONFIRMED', entityType: 'orders', entityId: String(id),
         before: { status: order.status }, after: { status: 'CLOSED' } }, client);
     });
