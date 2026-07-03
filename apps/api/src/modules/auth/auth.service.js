@@ -121,8 +121,8 @@ const authService = {
       throw new AppError('INVALID_CREDENTIALS', 'Invalid email or password', 401);
     }
 
-    // Check lockout: 5 failures in 15 min
-    const recentFailures = await authRepository.countRecentFailures(user.id, 15);
+    // Check lockout: 5 failures in 15 min, ignoring anything before the last admin unlock
+    const recentFailures = await authRepository.countRecentFailures(user.id, 15, user.locked_until);
     if (recentFailures >= 5) {
       await authRepository.recordLoginHistory(null, {
         userId: user.id, ip, userAgent, success: false, failureReason: 'ACCOUNT_LOCKED',

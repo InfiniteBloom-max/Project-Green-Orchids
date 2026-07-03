@@ -14,7 +14,7 @@ const authRepository = {
   async findUserByEmail(email) {
     const result = await query(
       `SELECT u.id, u.email, u.password_hash, u.status, u.role_id, u.full_name AS name,
-              r.name AS role, ta.account_status AS trade_account_status
+              u.locked_until, r.name AS role, ta.account_status AS trade_account_status
        FROM users u
        LEFT JOIN roles r ON r.id = u.role_id
        LEFT JOIN trade_accounts ta ON ta.user_id = u.id
@@ -182,11 +182,16 @@ const authRepository = {
     );
   },
 
-  async countRecentFailures(userId, sinceMinutes = 15) {
+  // unlockedAfter: users.locked_until, repurposed as an admin "cleared as of" marker (Finding:
+  // this was the only lockout implementation the admin Security panel could see/write, but the
+  // real lockout below is login_history-based and never touched these columns — reconciled by
+  // having this count ignore any failure at or before the last admin unlock).
+  async countRecentFailures(userId, sinceMinutes = 15, unlockedAfter = null) {
     const result = await query(
       `SELECT COUNT(*) as count FROM login_history
-       WHERE user_id = $1 AND success = false AND occurred_at > NOW() - INTERVAL '1 minute' * $2`,
-      [userId, sinceMinutes]
+       WHERE user_id = $1 AND success = false
+         AND occurred_at > GREATEST(NOW() - INTERVAL '1 minute' * $2, COALESCE($3::timestamptz, '-infinity'))`,
+      [userId, sinceMinutes, unlockedAfter]
     );
     return parseInt(result.rows[0].count, 10);
   },

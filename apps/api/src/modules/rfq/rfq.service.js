@@ -128,16 +128,14 @@ const service = {
     await repo.updateStatus(null, id, 'REJECTED');
   },
 
+  // Was previously a dead stub that returned {rfq, items} with 200 success without creating an
+  // order or advancing RFQ status (the RFQ stayed ACCEPTED forever). The buyer UI never called
+  // this route — it calls POST /orders/from-rfq, which has the real implementation — but this
+  // route was still live and misleading if hit directly. Delegates to that real implementation
+  // now so both paths behave identically.
   async convertToOrder(id, userId) {
-    const acct = await repo.accountIdForUser(userId);
-    const rfq = await repo.findById(id);
-    if (!rfq) throw new AppError('NOT_FOUND', 'RFQ not found', 404);
-    if (!acct || rfq.buyer_id !== acct.id) throw new AppError('FORBIDDEN', 'Access denied', 403);
-    if (rfq.status !== 'ACCEPTED') throw new AppError('INVALID_STATE', 'RFQ must be accepted to convert', 409);
-
-    const items = await repo.findItems(id);
-    // This is handled by the orders service
-    return { rfq, items };
+    const ordersService = require('../orders/orders.service');
+    return ordersService.createFromRfq(userId, id);
   },
 };
 module.exports = service;

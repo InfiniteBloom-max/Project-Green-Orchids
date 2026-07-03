@@ -40,6 +40,16 @@ const service = {
       throw new AppError('INSUFFICIENT_STOCK', `Only ${existing.stock_qty} available`, 400);
     }
 
+    // Enforce MOQ at the point the buyer adds/increases quantity, not just at order submission
+    // (Finding: a below-MOQ item could sit in the cart indefinitely and only got caught at
+    // checkout, discarding the buyer's progress).
+    const product = await repo.findProductBasics(data.product_id);
+    if (!product) throw new AppError('NOT_FOUND', 'Product not found', 404);
+    const totalQty = (existing?.quantity || 0) + data.quantity;
+    if (totalQty < product.moq) {
+      throw new AppError('BELOW_MOQ', `${product.name} minimum order is ${product.moq}`, 400);
+    }
+
     const item = await repo.addOrUpdate(buyerId, data.product_id, data.quantity);
     return item;
   },
@@ -49,6 +59,10 @@ const service = {
     if (quantity === 0) {
       await repo.remove(buyerId, productId);
       return null;
+    }
+    const product = await repo.findProductBasics(productId);
+    if (product && quantity < product.moq) {
+      throw new AppError('BELOW_MOQ', `${product.name} minimum order is ${product.moq}`, 400);
     }
     const item = await repo.setQuantity(buyerId, productId, quantity);
     if (!item) throw new AppError('NOT_FOUND', 'Cart item not found', 404);

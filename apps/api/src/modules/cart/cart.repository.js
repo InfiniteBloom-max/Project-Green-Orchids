@@ -32,6 +32,13 @@ const repo = {
     );
     return r.rows;
   },
+  async findProductBasics(productId) {
+    const r = await query(
+      `SELECT id, name, moq, stock_qty, reserved_qty, status FROM products WHERE id = $1`,
+      [productId]
+    );
+    return r.rows[0] || null;
+  },
   async findCartItem(buyerId, productId) {
     const r = await query(
       `SELECT ci.* FROM cart_items ci INNER JOIN carts c ON c.id = ci.cart_id

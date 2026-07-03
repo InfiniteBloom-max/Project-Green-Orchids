@@ -118,14 +118,34 @@ const service = {
       await client.query(`UPDATE rma_requests SET resolution = $1 WHERE id = $2`, [data.resolution, id]);
 
       if (data.adjustment_amount > 0) {
-        const invoice = await client.query('SELECT id FROM invoices WHERE order_id = $1 LIMIT 1', [r.order_id]);
+        const invoice = await client.query('SELECT id, total_amount, paid_amount FROM invoices WHERE order_id = $1 LIMIT 1', [r.order_id]);
         if (invoice.rows.length) {
+          const inv = invoice.rows[0];
           await client.query(
             `INSERT INTO invoice_adjustments (invoice_id, amount, reason, rma_id, created_by)
              VALUES ($1, $2, $3, $4, $5)`,
-            [invoice.rows[0].id, data.adjustment_amount, data.notes || 'RMA Resolution', id, actor]
+            [inv.id, data.adjustment_amount, data.notes || 'RMA Resolution', id, actor]
           );
           await client.query(`UPDATE rma_requests SET invoice_adjustment_note = $1 WHERE id = $2`, [`Credit note ${data.adjustment_amount}`, id]);
+
+          // Re-fold this credit note into the invoice's own balance/status (Finding: RMA credit
+          // notes were only ever recorded in invoice_adjustments, never reflected on the invoice
+          // itself, so it stayed PAID/balance_due=0 forever). Adjustments are credits, so they
+          // reduce what's owed — same sign convention the Statement ledger already uses.
+          const creditTotalRes = await client.query(
+            'SELECT COALESCE(SUM(amount), 0) AS total FROM invoice_adjustments WHERE invoice_id = $1', [inv.id]
+          );
+          const creditTotal = Number(creditTotalRes.rows[0].total);
+          const paidAmount = Number(inv.paid_amount);
+          const totalAmount = Number(inv.total_amount);
+          const newBalance = Math.round((totalAmount - paidAmount - creditTotal) * 100) / 100;
+          const newStatus = newBalance <= 0
+            ? (paidAmount > 0 ? 'ADJUSTED' : 'CANCELLED')
+            : (paidAmount > 0 ? 'PARTIALLY_PAID' : 'PENDING');
+          await client.query(
+            'UPDATE invoices SET balance_due = $1, status = $2, updated_at = NOW() WHERE id = $3',
+            [newBalance, newStatus, inv.id]
+          );
         }
       }
       await writeAudit({ actor, action: 'RMA_RESOLVED', entity: 'rma_requests', entityId: String(id), after: { resolution: data.resolution } }, client);

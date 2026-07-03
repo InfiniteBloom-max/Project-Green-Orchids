@@ -76,10 +76,16 @@ const service = {
     // Reversal detected via reversed_at (Finding 6) — guard against double reversal
     if (payment.reversed_at) throw new AppError('ALREADY_REVERSED', 'Payment is already reversed', 409);
 
-    // Two-person rule for large reversals (Finding 11): require a distinct, present approver
+    // Two-person rule for large reversals (Finding 11): require a distinct, present approver who
+    // is a real, ACTIVE user actually entitled to countersign a reversal — a fabricated or
+    // wrong-role UUID must not satisfy this check.
     if (Number(payment.amount) > 50000) {
       if (!data.confirmed_by || data.confirmed_by === actor) {
         throw new AppError('TWO_PERSON_REQUIRED', 'Reversal over 50,000 requires confirmation by a different officer', 403);
+      }
+      const confirmer = await repo.findActiveUserWithPermission(data.confirmed_by, 'payment.reverse');
+      if (!confirmer) {
+        throw new AppError('TWO_PERSON_REQUIRED', 'Confirming officer must be a real, active user authorized to reverse payments', 403);
       }
     }
 

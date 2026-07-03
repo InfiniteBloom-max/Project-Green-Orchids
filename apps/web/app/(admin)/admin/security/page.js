@@ -7,7 +7,7 @@ import { Card } from '@/components/ui/Card';
 import { Tabs } from '@/components/ui/Tabs';
 import { Table } from '@/components/ui/Table';
 import { Pagination } from '@/components/ui/Pagination';
-import { Spinner, EmptyState } from '@/components/ui/Spinner';
+import { Spinner, EmptyState, ErrorState } from '@/components/ui/Spinner';
 import { StatusBadge, AuditDiffViewer } from '@/components/domain/StatusBadge';
 import { PageHeader } from '@/components/domain/DashboardUI';
 import { formatDate } from '@/lib/utils';
@@ -21,46 +21,56 @@ export default function SecurityPage() {
   const [auditLogs, setAuditLogs] = useState([]);
   const [settings, setSettings] = useState({ sessionCap: '5', lockoutThreshold: '5', lockoutDuration: '30' });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
   const [selectedAudit, setSelectedAudit] = useState(null);
   const [loginFilters, setLoginFilters] = useState({ user: '', outcome: '', ip: '', dateFrom: '', dateTo: '' });
 
-  useEffect(() => {
+  const loadTab = async () => {
     setLoading(true);
-    (async () => {
+    setError(null);
+    try {
       switch (tab) {
         case 'logins': {
           const params = new URLSearchParams({ page: String(page), limit: '20' });
           if (loginFilters.user) params.set('user', loginFilters.user);
           if (loginFilters.outcome) params.set('outcome', loginFilters.outcome);
-          const res = await api.get(`/admin/security/logins?${params}`).catch(() => ({ data: [] }));
+          const res = await api.get(`/admin/security/logins?${params}`);
           setLogins(res.data.logins || res.data.data || res.data);
           break;
         }
         case 'sessions': {
-          const res = await api.get('/admin/security/sessions').catch(() => ({ data: [] }));
+          const res = await api.get('/admin/security/sessions');
           setSessions(res.data.sessions || res.data.data || res.data);
           break;
         }
         case 'locked': {
-          const res = await api.get('/admin/security/locked-accounts').catch(() => ({ data: [] }));
+          const res = await api.get('/admin/security/locked-accounts');
           setLockedAccounts(res.data.accounts || res.data.data || res.data);
           break;
         }
         case 'audit': {
-          const res = await api.get(`/admin/security/audit-logs?page=${page}&limit=20`).catch(() => ({ data: [] }));
+          const res = await api.get(`/admin/security/audit-logs?page=${page}&limit=20`);
           setAuditLogs(res.data.logs || res.data.data || res.data);
           break;
         }
         case 'windows': {
-          const res = await api.get('/admin/security/access-windows').catch(() => ({ data: { data: {} } }));
+          const res = await api.get('/admin/security/access-windows');
           setSettings(res.data.data || res.data);
           break;
         }
       }
+    } catch (err) {
+      // Previously every one of these fetches swallowed its own failure into an empty array,
+      // which was indistinguishable from "genuinely no data" — a security page silently showing
+      // "no locked accounts" on a failed request is a real risk. Surface it instead.
+      setError(err.response?.data?.error?.message || err.message || 'Failed to load');
+    } finally {
       setLoading(false);
-    })();
-  }, [tab, page, loginFilters]);
+    }
+  };
+
+  useEffect(() => { loadTab(); }, [tab, page, loginFilters]);
 
   const handleForceLogout = async (sessionId) => {
     try {
@@ -103,7 +113,7 @@ export default function SecurityPage() {
       />
       <Tabs tabs={tabs} active={tab} onChange={setTab} />
 
-      {loading ? <Spinner className="py-20" /> : (
+      {loading ? <Spinner className="py-20" /> : error ? <ErrorState message={error} onRetry={loadTab} /> : (
         <>
           {tab === 'logins' && (
             <>

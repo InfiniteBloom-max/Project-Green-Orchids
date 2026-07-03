@@ -40,18 +40,28 @@ const repo = {
     );
   },
 
+  // Matches the real lockout check in auth.service.js login(): >=5 failures in the last 15
+  // minutes, ignoring anything at/before the user's last admin unlock (users.locked_until,
+  // repurposed as a "cleared as of" marker rather than an active-lock flag).
   async findLockedAccounts() {
     const r = await query(
-      `SELECT id, email, failed_login_count AS "failedAttempts", locked_until AS "lockedAt"
-       FROM users WHERE locked_until IS NOT NULL AND locked_until > NOW()
-       ORDER BY locked_until DESC`
+      `SELECT u.id, u.email, COUNT(*) AS "failedAttempts", MAX(lh.occurred_at) + INTERVAL '15 minutes' AS "lockedAt"
+       FROM login_history lh
+       JOIN users u ON u.id = lh.user_id
+       WHERE lh.success = false
+         AND lh.occurred_at > GREATEST(NOW() - INTERVAL '15 minutes', COALESCE(u.locked_until, '-infinity'))
+       GROUP BY u.id, u.email
+       HAVING COUNT(*) >= 5
+       ORDER BY MAX(lh.occurred_at) DESC`
     );
     return r.rows;
   },
 
   async unlockAccount(userId) {
+    // Marks "cleared as of now" — countRecentFailures ignores any failure at/before this
+    // timestamp, so the account can log in again immediately without losing login_history.
     await query(
-      `UPDATE users SET locked_until = NULL, failed_login_count = 0 WHERE id = $1`,
+      `UPDATE users SET locked_until = NOW() WHERE id = $1`,
       [userId]
     );
   },
