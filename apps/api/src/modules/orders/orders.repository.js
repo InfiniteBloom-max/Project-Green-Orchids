@@ -80,6 +80,12 @@ const repo = {
   async updateStatus(client, id, status) {
     await (client ? client.query.bind(client) : query)('UPDATE orders SET status = $1, updated_at = NOW() WHERE id = $2', [status, id]);
   },
+  async setApproved(client, id, actor) {
+    await (client ? client.query.bind(client) : query)(
+      `UPDATE orders SET status = 'APPROVED', approved_by = $1, approved_at = NOW(), updated_at = NOW() WHERE id = $2`,
+      [actor, id]
+    );
+  },
   async setRejected(client, id, reason) {
     await (client ? client.query.bind(client) : query)(
       `UPDATE orders SET status='REJECTED', rejection_reason=$1, updated_at=NOW() WHERE id=$2`,

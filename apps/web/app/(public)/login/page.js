@@ -29,7 +29,7 @@ export default function LoginPage() {
         case 'TRADE_BUYER': user.status !== 'APPROVED' ? router.push('/buyer/pending-approval') : router.push('/buyer/dashboard'); break;
         case 'INVENTORY_MANAGER': router.push('/inventory/dashboard'); break;
         case 'FINANCE_OFFICER': router.push('/finance/dashboard'); break;
-        case 'DELIVERY_COORDINATOR': router.push('/delivery'); break;
+        case 'DELIVERY_COORDINATOR': router.push('/delivery/dashboard'); break;
         default: router.push('/');
       }
     } catch (err) {

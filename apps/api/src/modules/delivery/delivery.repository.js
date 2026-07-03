@@ -47,6 +47,16 @@ async function create(orderId) {
   return rows[0];
 }
 
+async function findActiveCoordinator(userId) {
+  const { rows } = await pool.query(
+    `SELECT u.id FROM users u
+     JOIN roles r ON r.id = u.role_id
+     WHERE u.id = $1 AND u.status = 'ACTIVE' AND r.name = 'DELIVERY_COORDINATOR'`,
+    [userId],
+  );
+  return rows[0] || null;
+}
+
 async function assign(id, assignedTo, actorId) {
   const client = await pool.connect();
   try {
@@ -112,4 +122,4 @@ async function events(deliveryId) {
   return rows;
 }
 
-module.exports = { list, getById, getByOrderId, create, assign, transition, events };
+module.exports = { list, getById, getByOrderId, create, findActiveCoordinator, assign, transition, events };

@@ -177,7 +177,7 @@ const service = {
         total_amount: order.total, due_date: dueDate,
       });
 
-      await repo.updateStatus(client, id, 'APPROVED');
+      await repo.setApproved(client, id, actor);
       await client.query(
         `INSERT INTO deliveries (order_id) VALUES ($1) ON CONFLICT (order_id) DO NOTHING`,
         [id],

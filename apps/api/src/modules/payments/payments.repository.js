@@ -72,5 +72,17 @@ const repo = {
       [paidAmount, balanceDue, status, invoiceId]
     );
   },
+  // Two-person rule: confirmed_by must resolve to a real, ACTIVE, permissioned user (Finding: it
+  // previously only had to be present and != actor, so any fabricated UUID passed straight through)
+  async findActiveUserWithPermission(userId, permissionCode) {
+    const r = await query(
+      `SELECT u.id FROM users u
+       INNER JOIN role_permissions rp ON rp.role_id = u.role_id
+       INNER JOIN permissions p ON p.id = rp.permission_id
+       WHERE u.id = $1 AND u.status = 'ACTIVE' AND p.code = $2`,
+      [userId, permissionCode]
+    );
+    return r.rows[0] || null;
+  },
 };
 module.exports = repo;

@@ -4,13 +4,13 @@ const repo = {
     let where = 'WHERE 1=1'; const params = []; let p = 1;
     if (filters.product_id) { where += ` AND sm.product_id = $${p++}`; params.push(filters.product_id); }
     if (filters.movement_type) { where += ` AND sm.movement_type = $${p++}`; params.push(filters.movement_type); }
-    if (filters.from) { where += ` AND sm.created_at >= $${p++}`; params.push(filters.from); }
-    if (filters.to) { where += ` AND sm.created_at <= $${p++}`; params.push(filters.to); }
+    if (filters.from) { where += ` AND sm.occurred_at >= $${p++}`; params.push(filters.from); }
+    if (filters.to) { where += ` AND sm.occurred_at <= $${p++}`; params.push(filters.to); }
     const ct = await query(`SELECT COUNT(*) FROM stock_movements sm ${where}`, params);
     const total = parseInt(ct.rows[0].count, 10);
     const r = await query(
       `SELECT sm.*, p.name as product_name FROM stock_movements sm LEFT JOIN products p ON p.id = sm.product_id ${where}
-       ORDER BY sm.created_at DESC LIMIT $${p++} OFFSET $${p++}`,
+       ORDER BY sm.occurred_at DESC LIMIT $${p++} OFFSET $${p++}`,
       [...params, limit, offset]
     );
     return { rows: r.rows, total };
@@ -70,10 +70,10 @@ const repo = {
     let where = 'WHERE 1=1'; const params = []; let p = 1;
     if (filters.product_id) { where += ` AND product_id = $${p++}`; params.push(filters.product_id); }
     if (filters.movement_type) { where += ` AND movement_type = $${p++}`; params.push(filters.movement_type); }
-    if (filters.from) { where += ` AND created_at >= $${p++}`; params.push(filters.from); }
-    if (filters.to) { where += ` AND created_at <= $${p++}`; params.push(filters.to); }
+    if (filters.from) { where += ` AND occurred_at >= $${p++}`; params.push(filters.from); }
+    if (filters.to) { where += ` AND occurred_at <= $${p++}`; params.push(filters.to); }
     const r = await query(
-      `SELECT sm.*, p.name as product_name FROM stock_movements sm LEFT JOIN products p ON p.id = sm.product_id ${where} ORDER BY sm.created_at DESC LIMIT 10000`,
+      `SELECT sm.*, p.name as product_name FROM stock_movements sm LEFT JOIN products p ON p.id = sm.product_id ${where} ORDER BY sm.occurred_at DESC LIMIT 10000`,
       params
     );
     return r.rows;

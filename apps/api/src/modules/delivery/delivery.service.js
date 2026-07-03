@@ -24,6 +24,13 @@ async function assign(id, assignedTo, actorId) {
   const d = await repo.getById(id);
   if (!d) throw new AppError('Delivery not found', 404);
   if (!['PENDING','ASSIGNED'].includes(d.status)) throw new AppError('Cannot reassign at this stage', 400);
+  // assignedTo must be a real, ACTIVE user holding the DELIVERY_COORDINATOR role — previously
+  // any UUID was accepted (including other roles), and a non-existent one raised a raw 500 from
+  // the FK constraint instead of a clean error.
+  const coordinator = await repo.findActiveCoordinator(assignedTo);
+  if (!coordinator) {
+    throw new AppError('INVALID_ASSIGNEE', 'assignedTo must be an active delivery coordinator', 400);
+  }
   return repo.assign(id, assignedTo, actorId);
 }
 
