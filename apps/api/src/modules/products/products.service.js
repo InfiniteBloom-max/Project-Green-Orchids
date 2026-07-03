@@ -220,8 +220,17 @@ const service = {
            VALUES ($1,$2,$3,$4,$5,'PENDING')`,
           [productId, actor, p.base_price, newPrice, data.reason]
         );
-        await enqueueEmail(client, { recipientEmail: null, template: 'price_approval_needed',
-          payload: { productName: p.name, currentPrice: p.base_price, proposedPrice: newPrice, reason: data.reason } });
+        // price_approval_needed is an admin broadcast, not a single-recipient
+        // email — recipientEmail was hardcoded null, so this never had anyone
+        // to reach. Resolve every admin and enqueue one outbox row each
+        // (the outbox table has a single recipient_email column, not a list).
+        const admins = await client.query(
+          `SELECT u.email FROM users u JOIN roles r ON r.id = u.role_id WHERE r.name = 'ADMIN' AND u.status = 'ACTIVE'`
+        );
+        for (const admin of admins.rows) {
+          await enqueueEmail(client, { recipientEmail: admin.email, template: 'price_approval_needed',
+            payload: { productName: p.name, currentPrice: p.base_price, proposedPrice: newPrice, reason: data.reason } });
+        }
         result = { applied: false, needs_approval: true };
       }
     });

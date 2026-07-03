@@ -13,12 +13,16 @@ import { formatLKR, formatDate } from '@/lib/utils';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 
-const STEP_MAP = ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED'];
+// Real order.status enum (apps/api/migrations/0005 + the CLOSED addition from
+// a later migration): DRAFT, PENDING_APPROVAL, APPROVED, REJECTED, PROCESSING,
+// READY_TO_SHIP, DISPATCHED, DELIVERED, CLOSED, CANCELLED, RETURNED.
+const STEP_MAP = ['PENDING_APPROVAL', 'APPROVED', 'PROCESSING', 'READY_TO_SHIP', 'DISPATCHED', 'DELIVERED', 'CLOSED'];
 
 export default function OrderDetailPage() {
   const { id } = useParams();
   const router = useRouter();
   const [order, setOrder] = useState(null);
+  const [invoice, setInvoice] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
@@ -28,9 +32,17 @@ export default function OrderDetailPage() {
     (async () => {
       try {
         const res = await api.get(`/orders/${id}`);
-        setOrder(res.data);
+        setOrder(res.data.data);
+        // The order record itself carries no invoice reference — fetch it separately.
+        try {
+          const invRes = await api.get(`/invoices?order_id=${id}`);
+          const invoices = invRes.data.data || invRes.data.invoices || [];
+          if (invoices.length) setInvoice(invoices[0]);
+        } catch {
+          // No invoice yet (order not approved) — not an error.
+        }
       } catch (err) {
-        setError(err.message);
+        setError(err.response?.data?.error?.message || err.message);
       } finally {
         setLoading(false);
       }
@@ -40,11 +52,11 @@ export default function OrderDetailPage() {
   const handleCancel = async () => {
     setActionLoading(true);
     try {
-      await api.post(`/orders/${id}/cancel`);
+      await api.patch(`/orders/${id}/cancel`);
       setOrder((o) => ({ ...o, status: 'CANCELLED' }));
       toast.success('Order cancelled');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to cancel');
+      toast.error(err.response?.data?.error?.message || 'Failed to cancel');
     } finally {
       setActionLoading(false);
     }
@@ -53,11 +65,11 @@ export default function OrderDetailPage() {
   const handleConfirmReceipt = async () => {
     setActionLoading(true);
     try {
-      await api.post(`/orders/${id}/confirm-receipt`);
+      await api.patch(`/orders/${id}/confirm-receipt`);
       toast.success('Receipt confirmed');
-      setOrder((o) => ({ ...o, status: 'DELIVERED' }));
+      setOrder((o) => ({ ...o, status: 'CLOSED' }));
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed');
+      toast.error(err.response?.data?.error?.message || 'Failed');
     } finally {
       setActionLoading(false);
     }
@@ -67,21 +79,23 @@ export default function OrderDetailPage() {
   if (error) return <ErrorState message={error} />;
   if (!order) return <ErrorState message="Order not found" />;
 
-  const canCancel = order.status === 'PENDING';
+  const canCancel = order.status === 'PENDING_APPROVAL';
   const canConfirm = order.status === 'DELIVERED';
-  const canReturn = order.status === 'DELIVERED' && order.deliveredAt && (new Date() - new Date(order.deliveredAt)) < 7 * 24 * 3600 * 1000;
+  const canReturn = order.status === 'DELIVERED' || order.status === 'CLOSED';
 
   return (
     <div className="space-y-6">
       <PageHeader
         tone="violet"
         back={{ href: '/buyer/orders', label: 'Back' }}
-        title={`Order #${order.orderNo || order.id}`}
-        description={formatDate(order.createdAt)}
+        title={`Order #${order.order_no || order.id}`}
+        description={formatDate(order.created_at)}
         actions={<StatusBadge status={order.status} />}
       />
 
-      <StatusStepper steps={STEP_MAP} current={order.status} />
+      {order.status !== 'CANCELLED' && order.status !== 'REJECTED' && (
+        <StatusStepper steps={STEP_MAP} current={order.status} />
+      )}
 
       {/* Line Items */}
       <Card>
@@ -91,10 +105,10 @@ export default function OrderDetailPage() {
           <tbody>
             {order.items?.map((item, i) => (
               <tr key={i} className="border-b last:border-b-0">
-                <td className="py-2">{item.productName || item.productId}</td>
+                <td className="py-2">{item.product_name || item.product_id}</td>
                 <td className="text-right py-2">{item.quantity}</td>
-                <td className="text-right py-2">{formatLKR(item.unitPrice)}</td>
-                <td className="text-right py-2 font-medium">{formatLKR(item.unitPrice * item.quantity)}</td>
+                <td className="text-right py-2">{formatLKR(item.unit_price_at_order)}</td>
+                <td className="text-right py-2 font-medium">{formatLKR(item.line_total)}</td>
               </tr>
             ))}
           </tbody>
@@ -103,8 +117,11 @@ export default function OrderDetailPage() {
       </Card>
 
       {/* Linked Invoice */}
-      {order.invoice && (
-        <InvoiceCard invoice={order.invoice} onView={() => router.push(`/buyer/invoices/${order.invoice.id}`)} />
+      {invoice && (
+        <InvoiceCard
+          invoice={{ invoiceNo: invoice.invoice_no, status: invoice.status, dueDate: formatDate(invoice.due_date), total: Number(invoice.total_amount), balance: Number(invoice.balance_due) }}
+          onView={() => router.push(`/buyer/invoices/${invoice.id}`)}
+        />
       )}
 
       {/* Actions */}
