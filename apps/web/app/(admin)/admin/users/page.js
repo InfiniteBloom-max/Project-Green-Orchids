@@ -17,7 +17,7 @@ export default function UsersPage() {
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', role: 'INVENTORY_MANAGER', password: '' });
-  const [confirm, setConfirm] = useState({ open: false, action: null, title: '', message: '', variant: 'warning', label: '' });
+  const [confirm, setConfirm] = useState({ open: false, action: null, title: '', message: '', variant: 'warning', label: '', identifier: null });
 
   useEffect(() => {
     (async () => {
@@ -39,17 +39,18 @@ export default function UsersPage() {
     } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
   };
 
-  const handleDeactivate = (id) => {
+  const handleDeactivate = (user) => {
     setConfirm({
       open: true,
       title: 'Deactivate user',
       message: 'This user will lose access to the system immediately. You can reactivate them later.',
       variant: 'warning',
       label: 'Deactivate',
+      identifier: user.email,
       action: async () => {
         try {
-          await api.patch(`/users/${id}`, { status: 'INACTIVE' });
-          setUsers((u) => u.map((x) => x.id === id ? { ...x, status: 'INACTIVE' } : x));
+          await api.patch(`/users/${user.id}`, { status: 'INACTIVE' });
+          setUsers((u) => u.map((x) => x.id === user.id ? { ...x, status: 'INACTIVE' } : x));
           toast.success('Deactivated');
         } catch { toast.error('Failed'); }
       },
@@ -63,6 +64,7 @@ export default function UsersPage() {
       message: 'A password reset email will be sent to this user. Their current password will remain active until they reset it.',
       variant: 'info',
       label: 'Send Reset',
+      identifier: null,
       action: async () => {
         try {
           await api.post(`/auth/forgot-password`, { email: users.find((u) => u.id === id)?.email });
@@ -93,7 +95,7 @@ export default function UsersPage() {
             { key: 'actions', label: '', render: (_, r) => (
               <div className="flex gap-2">
                 <Button size="sm" variant="ghost" onClick={() => handleResetPassword(r.id)}>Reset PW</Button>
-                {r.status !== 'INACTIVE' && <Button size="sm" variant="ghost" onClick={() => handleDeactivate(r.id)}>Deactivate</Button>}
+                {r.status !== 'INACTIVE' && <Button size="sm" variant="ghost" onClick={() => handleDeactivate(r)}>Deactivate</Button>}
               </div>
             )},
           ]}
@@ -126,6 +128,7 @@ export default function UsersPage() {
         message={confirm.message}
         confirmLabel={confirm.label}
         variant={confirm.variant}
+        requireTypedConfirmation={confirm.identifier}
       />
     </div>
   );
