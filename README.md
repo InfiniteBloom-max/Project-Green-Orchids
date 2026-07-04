@@ -1,5 +1,7 @@
 <div align="center">
 
+![Project Green — Orchids](docs/media/branding/readme-banner.jpg)
+
 # 🌸 ORCHIDS — Project Green
 
 ### B2B Wholesale Orchid Trade Platform
