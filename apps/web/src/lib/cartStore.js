@@ -114,8 +114,10 @@ export function CartProvider({ children }) {
 
   const updateQuantity = useCallback((productId, quantity) => {
     setItems((prev) => {
+      // Match backend bounds (cart.schema.js): integer, min 1, max 100000.
+      const safeQty = Math.min(100000, Math.max(1, Math.round(Number(quantity) || 1)));
       const next = prev.map((i) =>
-        i.productId === productId ? { ...i, quantity: Math.max(1, quantity) } : i
+        i.productId === productId ? { ...i, quantity: safeQty } : i
       );
       saveMirror({ items: next });
       syncToServer(next);

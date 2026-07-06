@@ -126,7 +126,7 @@ export default function AdminRFQDetailPage() {
       {rfq.status === 'SUBMITTED' || rfq.status === 'UNDER_REVIEW' ? (
         <Card>
           <div className="space-y-4">
-            <DatePicker label="Quote Expiry Date" value={expiryDate} onChange={setExpiryDate} />
+            <DatePicker label="Quote Expiry Date" value={expiryDate} onChange={setExpiryDate} min={new Date().toISOString().slice(0, 10)} />
             <div className="flex justify-end gap-3">
               <Button variant="danger" onClick={() => setDeclineModal({ open: true, reason: '' })}>Decline</Button>
               <Button onClick={handleSendQuote} loading={sending}>Send Quote</Button>

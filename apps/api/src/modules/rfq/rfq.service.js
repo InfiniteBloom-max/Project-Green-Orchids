@@ -76,6 +76,12 @@ const service = {
     if (!rfq) throw new AppError('NOT_FOUND', 'RFQ not found', 404);
     assertTransition('RFQ', rfq.status, 'QUOTED', role);
 
+    // A quote that already expires in the past is meaningless — reject it here rather
+    // than in the Zod schema, since "not before today" is a business rule, not a format check.
+    if (data.quote_expiry && new Date(data.quote_expiry).getTime() < Date.now()) {
+      throw new AppError('INVALID_EXPIRY', 'Quote expiry date cannot be in the past', 422);
+    }
+
     await tx(async (client) => {
       for (const item of data.items) {
         await repo.updateItemQuote(client, { itemId: item.rfq_item_id, quotedPrice: item.quoted_price, notes: item.notes });

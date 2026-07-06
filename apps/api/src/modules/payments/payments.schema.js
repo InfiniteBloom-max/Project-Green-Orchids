@@ -7,7 +7,7 @@ const createSchema = z.object({
   payment_date: z.string().datetime().optional(),
 }).strict();
 const reverseSchema = z.object({
-  reason: z.string().min(10).max(500),
+  reason: z.string().trim().min(10).max(500),
   confirmed_by: z.string().uuid().optional(),
 }).strict();
 module.exports = { createSchema, reverseSchema };

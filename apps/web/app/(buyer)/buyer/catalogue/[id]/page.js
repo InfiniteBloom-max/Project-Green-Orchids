@@ -110,7 +110,7 @@ export default function ProductDetailPage() {
             <div className="flex items-center border rounded">
               <button onClick={() => setQty(Math.max(moq, qty - 1))} className="px-3 py-2 hover:bg-gray-100">−</button>
               <span className="px-4 py-2 min-w-[3rem] text-center">{qty}</span>
-              <button onClick={() => setQty(qty + 1)} className="px-3 py-2 hover:bg-gray-100">+</button>
+              <button onClick={() => setQty(Math.min(100000, qty + 1))} className="px-3 py-2 hover:bg-gray-100">+</button>
             </div>
           </div>
 
