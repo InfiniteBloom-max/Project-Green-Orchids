@@ -71,7 +71,10 @@ test('golden path: assign -> dispatch -> in-transit -> POD upload -> buyer confi
   assert.equal(inTransit.data.status, 'IN_TRANSIT');
 
   const form = new FormData();
-  form.append('photo', new Blob([Buffer.from('fake-jpeg-bytes')], { type: 'image/jpeg' }), 'pod.jpg');
+  // Real JPEG magic-byte signature (FF D8 FF) — the upload middleware now verifies file
+  // content against its signature (Finding 007), so arbitrary fake bytes no longer pass.
+  const jpegBytes = Buffer.concat([Buffer.from([0xff, 0xd8, 0xff]), Buffer.from('filler-image-data')]);
+  form.append('photo', new Blob([jpegBytes], { type: 'image/jpeg' }), 'pod.jpg');
   const pod = await req(ctx.baseUrl, 'PATCH', `/deliveries/${delivery.id}/pod`, { token: deliveryToken, form });
   assert.equal(pod.status, 200);
   assert.equal(pod.data.status, 'DELIVERED');

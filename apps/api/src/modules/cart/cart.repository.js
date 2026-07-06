@@ -1,4 +1,4 @@
-const { query } = require('../../config/db');
+const { query, tx } = require('../../config/db');
 const repo = {
   async accountIdForUser(userId) {
     const r = await query(`SELECT id FROM trade_accounts WHERE user_id = $1`, [userId]);
@@ -74,6 +74,32 @@ const repo = {
   },
   async clear(buyerId) {
     await query(`DELETE FROM cart_items WHERE cart_id = (SELECT id FROM carts WHERE buyer_id = $1)`, [buyerId]);
+  },
+  // Upserts the whole cart to match the given [{ productId, quantity }] list (Finding 001 —
+  // this backs the PUT /cart sync route the web cartStore already calls). Runs as one
+  // transaction: quantity 0 removes the line, everything else is set (not added) to the
+  // given quantity, and any existing line not present in `items` is left alone (this is a
+  // sync of the client's known lines, not a destructive full replace).
+  async upsertMany(buyerId, items) {
+    return tx(async (client) => {
+      const cartRes = await client.query('SELECT id FROM carts WHERE buyer_id = $1', [buyerId]);
+      let cartId = cartRes.rows[0]?.id;
+      if (!cartId) {
+        const created = await client.query('INSERT INTO carts (buyer_id) VALUES ($1) RETURNING id', [buyerId]);
+        cartId = created.rows[0].id;
+      }
+      for (const { productId, quantity } of items) {
+        if (quantity <= 0) {
+          await client.query('DELETE FROM cart_items WHERE cart_id = $1 AND product_id = $2', [cartId, productId]);
+        } else {
+          await client.query(
+            `INSERT INTO cart_items (cart_id, product_id, qty) VALUES ($1,$2,$3)
+             ON CONFLICT (cart_id, product_id) DO UPDATE SET qty = $3`,
+            [cartId, productId, quantity]
+          );
+        }
+      }
+    });
   },
 };
 module.exports = repo;

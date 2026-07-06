@@ -70,8 +70,9 @@ export function CartProvider({ children }) {
     debounceRef.current = setTimeout(async () => {
       try {
         await api.put('/cart', { items: cartItems.map((i) => ({ productId: i.productId, quantity: i.quantity })) });
-      } catch {
-        // Silently fail - mirror is source of truth
+      } catch (err) {
+        // Mirror stays source of truth on failure, but don't swallow the error silently.
+        console.error('Cart sync to server failed:', err);
       }
     }, 1500);
   }, [user]);

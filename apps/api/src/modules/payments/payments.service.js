@@ -40,10 +40,24 @@ const service = {
         throw new AppError('OVERPAYMENT', `Amount exceeds balance due. Maximum acceptable: ${currentBalance.toFixed(2)}`, 422, { maxAcceptable: currentBalance });
       }
 
+      // Idempotency backstop (Finding S03): the DB unique constraint is (invoice_id, method,
+      // reference). A blank reference bypasses it entirely (NULL <> NULL in SQL, so two
+      // reference-less submits never collide), which is the actual resubmit loophole — two
+      // *distinct* payments of the same amount (e.g. two equal installments) are legitimate
+      // and must not be blocked just for sharing an amount. So this fallback only fires when
+      // the client didn't supply a reference to dedupe on in the first place.
+      const normalizedReference = data.reference ? data.reference.trim() : null;
+      if (!normalizedReference) {
+        const duplicate = await repo.findRecentDuplicate(client, data.invoice_id, data.amount, 30);
+        if (duplicate) {
+          throw new AppError('DUPLICATE_PAYMENT', 'A matching payment with no reference was already recorded moments ago — add a reference to record a distinct payment', 409, { paymentId: duplicate.id });
+        }
+      }
+
       const paymentNo = await repo.nextPaymentNumber();
       payment = await repo.create(client, {
         payment_no: paymentNo, invoice_id: data.invoice_id, buyer_id: invoice.buyer_id,
-        amount: data.amount, method: data.method || 'BANK_TRANSFER', reference: data.reference,
+        amount: data.amount, method: data.method || 'BANK_TRANSFER', reference: normalizedReference,
         recorded_by: actor && actor !== 'SYSTEM' ? actor : invoice.buyer_id, payment_date: data.payment_date,
       });
 

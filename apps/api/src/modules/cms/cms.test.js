@@ -48,7 +48,12 @@ test('media upload rejects a bad file type cleanly and accepts a real image', as
   assert.equal(bad.data.error.code, 'INVALID_FILE_TYPE');
 
   const goodForm = new FormData();
-  goodForm.append('file', new Blob([Buffer.from('\x89PNG\r\n\x1a\n')], { type: 'image/png' }), 'good.png');
+  // Real PNG magic-byte signature (89 50 4E 47 0D 0A 1A 0A) followed by filler bytes — the
+  // upload middleware now verifies file content against its signature (Finding 007), so a
+  // string literal with escaped bytes > 0x7F (which UTF-8-encodes to the wrong byte sequence)
+  // no longer passes; build the real signature bytes directly instead.
+  const pngBytes = Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), Buffer.from('filler-image-data')]);
+  goodForm.append('file', new Blob([pngBytes], { type: 'image/png' }), 'good.png');
   const good = await req(ctx.baseUrl, 'POST', '/cms/media', { token: adminToken, form: goodForm });
   assert.equal(good.status, 201);
   assert.ok(good.data.url);
