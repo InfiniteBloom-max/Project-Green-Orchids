@@ -71,6 +71,27 @@ const service = {
     return item;
   },
 
+  // Backs PUT /cart (Finding 001) — the web cartStore syncs its local mirror here on every
+  // change. Validates each non-zero line against MOQ/stock the same way addItem/updateItem
+  // do, so a client-side sync can't smuggle in an invalid quantity.
+  async replaceCart(userId, items) {
+    const buyerId = await resolveAccountId(userId);
+    for (const { productId, quantity } of items) {
+      if (quantity <= 0) continue;
+      const product = await repo.findProductBasics(productId);
+      if (!product) throw new AppError('NOT_FOUND', `Product ${productId} not found`, 404);
+      if (quantity < product.moq) {
+        throw new AppError('BELOW_MOQ', `${product.name} minimum order is ${product.moq}`, 400);
+      }
+      const available = Number(product.stock_qty) - Number(product.reserved_qty || 0);
+      if (quantity > available) {
+        throw new AppError('INSUFFICIENT_STOCK', `Only ${available} available for ${product.name}`, 400);
+      }
+    }
+    await repo.upsertMany(buyerId, items);
+    return this.getCart(userId);
+  },
+
   async removeItem(userId, productId) {
     const buyerId = await resolveAccountId(userId);
     await repo.remove(buyerId, productId);

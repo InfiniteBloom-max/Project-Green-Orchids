@@ -49,6 +49,22 @@ const repo = {
     const r = await query('SELECT * FROM payments WHERE reference = $1', [ref]);
     return r.rows[0] || null;
   },
+  // Idempotency backstop for manual submits (Finding S03): the DB-level
+  // uq_payments_idempotent constraint is (invoice_id, method, reference), so a resubmit with a
+  // trivially different reference (or no reference at all) sails right past it. This catches
+  // that case by looking for an unreversed payment on the same invoice for the same amount
+  // recorded in the last N seconds, regardless of method/reference.
+  async findRecentDuplicate(client, invoiceId, amount, windowSeconds) {
+    const runner = client ? client.query.bind(client) : query;
+    const r = await runner(
+      `SELECT * FROM payments
+       WHERE invoice_id = $1 AND amount = $2 AND reversed_at IS NULL
+         AND received_at >= NOW() - ($3 || ' seconds')::interval
+       ORDER BY received_at DESC LIMIT 1`,
+      [invoiceId, amount, windowSeconds]
+    );
+    return r.rows[0] || null;
+  },
   async findInvoiceByOrderNo(orderNo) {
     const r = await query(
       `SELECT i.* FROM invoices i JOIN orders o ON o.id = i.order_id WHERE o.order_no = $1`,

@@ -26,14 +26,20 @@ const service = {
   async create(data, userId) {
     const buyerId = await resolveAccountId(userId);
     const rmaNo = await repo.nextRmaNumber();
-    const rma = await repo.create(null, {
-      rma_no: rmaNo,
-      order_id: data.order_id,
-      order_item_id: data.order_item_id,
-      quantity: data.quantity,
-      buyer_id: buyerId,
-      reason_category: data.return_type,
-      reason_detail: data.reason,
+    // Header + items insert must be atomic (Finding S02) — run both through the
+    // same tx client instead of passing null, which let each INSERT commit on
+    // its own connection with no rollback if the second one failed.
+    let rma;
+    await tx(async (client) => {
+      rma = await repo.create(client, {
+        rma_no: rmaNo,
+        order_id: data.order_id,
+        order_item_id: data.order_item_id,
+        quantity: data.quantity,
+        buyer_id: buyerId,
+        reason_category: data.return_type,
+        reason_detail: data.reason,
+      });
     });
     await notifyBuyer(buyerId, 'RMA Received', 'rma_received', { rmaNumber: rmaNo, reason: data.reason });
     return rma;

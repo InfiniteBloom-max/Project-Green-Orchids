@@ -6,4 +6,11 @@ const addItemSchema = z.object({
 const updateItemSchema = z.object({
   quantity: z.number().int().min(0),
 }).strict();
-module.exports = { addItemSchema, updateItemSchema };
+// Matches the shape the web cartStore actually sends: { items: [{ productId, quantity }] }
+const replaceCartSchema = z.object({
+  items: z.array(z.object({
+    productId: z.coerce.number().int().positive(),
+    quantity: z.number().int().min(0),
+  })),
+}).strict();
+module.exports = { addItemSchema, updateItemSchema, replaceCartSchema };
