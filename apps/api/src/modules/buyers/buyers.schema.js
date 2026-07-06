@@ -7,21 +7,21 @@ const approveSchema = z.object({
 }).strict();
 
 const rejectSchema = z.object({
-  reason: z.string().min(10).max(500),
+  reason: z.string().trim().min(10).max(500),
 }).strict();
 
 const suspendSchema = z.object({
-  reason: z.string().min(10).max(500),
+  reason: z.string().trim().min(10).max(500),
 }).strict();
 
 const creditUpdateSchema = z.object({
   credit_limit: z.number().min(0),
-  reason: z.string().min(5).max(500),
+  reason: z.string().trim().min(5).max(500),
 }).strict();
 
 const tierUpdateSchema = z.object({
   tier: z.enum(['SILVER', 'GOLD', 'PLATINUM']),
-  reason: z.string().min(5).max(500),
+  reason: z.string().trim().min(5).max(500),
 }).strict();
 
 module.exports = { approveSchema, rejectSchema, suspendSchema, creditUpdateSchema, tierUpdateSchema };

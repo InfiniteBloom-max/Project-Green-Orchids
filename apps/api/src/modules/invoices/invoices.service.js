@@ -45,7 +45,9 @@ const service = {
     const bold = await doc.embedFont(StandardFonts.HelveticaBold);
     const { height } = page.getSize();
     let y = height - 60;
-    const fmt = (n) => `LKR ${Number(n).toLocaleString('en-LK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    // Normalize -0 / tiny negative float-drift so a fully-credited invoice
+    // never prints "LKR -0.00" on the PDF.
+    const fmt = (n) => `LKR ${(Math.abs(Number(n)) < 0.005 ? 0 : Number(n)).toLocaleString('en-LK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
     page.drawText('ORCHIDS', { x: 50, y, size: 20, font: bold, color: rgb(0.17, 0.42, 0.31) });
     page.drawText('Invoice', { x: 450, y, size: 20, font: bold });
@@ -122,7 +124,9 @@ const service = {
     const bold = await doc.embedFont(StandardFonts.HelveticaBold);
     const { height } = page.getSize();
     let y = height - 60;
-    const fmt = (n) => `LKR ${Number(n).toLocaleString('en-LK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    // Normalize -0 / tiny negative float-drift so a fully-credited invoice
+    // never prints "LKR -0.00" on the PDF.
+    const fmt = (n) => `LKR ${(Math.abs(Number(n)) < 0.005 ? 0 : Number(n)).toLocaleString('en-LK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
     page.drawText('ORCHIDS', { x: 50, y, size: 20, font: bold, color: rgb(0.17, 0.42, 0.31) });
     page.drawText('Statement', { x: 420, y, size: 20, font: bold });

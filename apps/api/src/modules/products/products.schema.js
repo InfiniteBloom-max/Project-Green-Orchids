@@ -4,8 +4,8 @@ const { z } = require('zod');
 // sku, name, description, category_id, supplier_id, product_type, unit_size,
 // base_price, moq, stock_qty, reorder_level, status, bloom_video_url.
 const createSchema = z.object({
-  sku: z.string().min(2).max(50),
-  name: z.string().min(2).max(200),
+  sku: z.string().trim().min(2).max(50),
+  name: z.string().trim().min(2).max(200),
   description: z.string().max(5000).optional(),
   category_id: z.coerce.number().int().positive(),
   supplier_id: z.coerce.number().int().positive(),
@@ -21,7 +21,7 @@ const createSchema = z.object({
 
 const updateSchema = z.object({
   // sku is immutable after creation (Part C spec) — deliberately excluded here.
-  name: z.string().min(2).max(200).optional(),
+  name: z.string().trim().min(2).max(200).optional(),
   description: z.string().max(5000).optional(),
   category_id: z.coerce.number().int().positive().optional(),
   supplier_id: z.coerce.number().int().positive().optional(),
@@ -55,7 +55,7 @@ const stockAdjustmentSchema = z.object({
 
 const priceChangeSchema = z.object({
   new_price: z.number().min(0),
-  reason: z.string().min(5).max(500),
+  reason: z.string().trim().min(5).max(500),
 }).strict();
 
 const bulkActionSchema = z.object({

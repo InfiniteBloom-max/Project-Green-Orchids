@@ -9,7 +9,10 @@ export function cn(...classes) {
 
 export function formatLKR(amount) {
   if (amount == null) return 'LKR 0.00';
-  const num = typeof amount === 'string' ? parseFloat(amount) : amount;
+  let num = typeof amount === 'string' ? parseFloat(amount) : amount;
+  // Normalize -0 / tiny negative float-drift (e.g. -0.001) so a fully-credited
+  // or 100%-reversed invoice never displays as "LKR -0.00".
+  if (Math.abs(num) < 0.005) num = 0;
   return `LKR ${num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
 }
 

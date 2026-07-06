@@ -8,7 +8,7 @@ const { z } = require('zod');
 const BLOCK_TYPES = ['HERO', 'BANNER', 'TEXT', 'HTML', 'MARKDOWN', 'JSON'];
 
 const createSchema = z.object({
-  key: z.string().min(2).max(100).regex(/^[a-z0-9_]+$/),
+  key: z.string().trim().min(2).max(100).regex(/^[a-z0-9_]+$/),
   type: z.enum(BLOCK_TYPES).optional(),
   block_type: z.enum(BLOCK_TYPES).optional(),
   title: z.string().max(200).optional(),
