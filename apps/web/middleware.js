@@ -19,6 +19,7 @@ export function middleware(request) {
     pathname.startsWith('/help-centre') ||
     pathname.startsWith('/privacy') ||
     pathname.startsWith('/terms') ||
+    pathname.startsWith('/status') ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api')
   ) {

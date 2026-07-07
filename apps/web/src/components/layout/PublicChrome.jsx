@@ -58,7 +58,7 @@ export function PublicFooter() {
         {[
           { h: 'Shop', links: [['Catalogue', '/catalogue'], ['Pricing', '/pricing'], ['Request a quote', '/register']] },
           { h: 'Company', links: [['About', '/about'], ['Sign in', '/login'], ['Apply', '/register']] },
-          { h: 'Support', links: [['Contact', '/contact'], ['Trade terms', '/trade-terms'], ['Help centre', '/help-centre']] },
+          { h: 'Support', links: [['Contact', '/contact'], ['Trade terms', '/trade-terms'], ['Help centre', '/help-centre'], ['System status', '/status']] },
         ].map((col) => (
           <div key={col.h}>
             <p className="eyebrow text-emerald-300/80">{col.h}</p>

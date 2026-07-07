@@ -5,7 +5,7 @@ let accessToken = null;
 // Routes a guest is allowed to view — never bounce them to /login from here.
 const PUBLIC_PATHS = [
   '/', '/login', '/register', '/forgot-password', '/reset-password', '/verify-email', '/catalogue',
-  '/about', '/contact', '/pricing', '/trade-terms', '/help-centre', '/privacy', '/terms',
+  '/about', '/contact', '/pricing', '/trade-terms', '/help-centre', '/privacy', '/terms', '/status',
 ];
 function isPublicPath(pathname) {
   return PUBLIC_PATHS.some((p) => (p === '/' ? pathname === '/' : pathname.startsWith(p)));
