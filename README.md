@@ -14,7 +14,7 @@ A full-stack B2B wholesale commerce platform for a Sri Lankan orchid exporter �
 ![Tailwind CSS](https://img.shields.io/badge/UI-Tailwind_CSS-06B6D4?logo=tailwindcss)
 [![CI](https://github.com/InfiniteBloom-max/Project-Green-Orchids/actions/workflows/ci.yml/badge.svg)](https://github.com/InfiniteBloom-max/Project-Green-Orchids/actions/workflows/ci.yml)
 
-**[Status](#status) · [Homepage](#public-homepage) · [Catalogue](#catalogue) · [Dashboards](#dashboards) · [Features](#features) · [Getting Started](#getting-started) · [Testing](#testing) · [Demo Accounts](#demo-accounts)**
+**[Status](#status) · [Homepage](#public-homepage) · [Catalogue](#catalogue) · [Dashboards](#dashboards) · [System Status](#system-status) · [Features](#features) · [Getting Started](#getting-started) · [Testing](#testing) · [Demo Accounts](#demo-accounts)**
 
 </div>
 
@@ -134,6 +134,23 @@ Six distinct role-based portals, each with its own dark glassmorphism theme:
 
 ---
 
+## System Status
+
+A public `/status` page ([`apps/web/app/(public)/status/page.js`](apps/web/app/\(public\)/status/page.js)) polls a
+server-side route ([`apps/web/app/api/status/route.js`](apps/web/app/api/status/route.js)) every 30 seconds, which
+pings the API's real `/healthz` check (which itself runs `SELECT 1` against Postgres) and reports live status +
+latency for the web app, API and database — no fabricated uptime history, just what's actually reachable right now:
+
+| All systems operational | Live outage detection |
+|---|---|
+| ![Status — operational](https://raw.githubusercontent.com/InfiniteBloom-max/Project-Green-Orchids/main/docs/media/screenshots/status-operational.png) | ![Status — outage](https://raw.githubusercontent.com/InfiniteBloom-max/Project-Green-Orchids/main/docs/media/screenshots/status-outage.png) |
+
+The outage screenshot is a real capture taken with the API process killed — the page correctly flips the API to
+"Major outage" and the Database to "Unknown" (it can't be checked independently of the API), then recovers on its
+own once the API comes back on the next poll.
+
+---
+
 ## Features
 
 | Module | Capabilities |
@@ -150,6 +167,7 @@ Six distinct role-based portals, each with its own dark glassmorphism theme:
 | **CMS** | Admin-editable homepage content blocks + a media library (image upload/list/delete) |
 | **Security & Audit** | Login history, active-session listing with force-logout, locked-account unlock, audit log explorer, access-window settings |
 | **Public marketing pages** | About, Contact, Pricing, Trade Terms, Help Centre, Privacy, Terms of Service |
+| **System Status** | Public `/status` page, live-polls web/API/database health off the real `/healthz` check, no fake uptime history |
 | **RBAC** | 5 roles (Admin, Trade Buyer, Finance Officer, Inventory Manager, Delivery Coordinator) with granular, DB-driven permissions |
 
 ---
