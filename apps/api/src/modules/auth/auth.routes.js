@@ -3,6 +3,7 @@ const ctrl = require('./auth.controller');
 const { validate } = require('../../middleware/validate');
 const { requireAuth } = require('../../middleware/auth');
 const { authLimiter, forgotPasswordLimiter } = require('../../middleware/rateLimit');
+const { makeUploader } = require('../../middleware/upload');
 const {
   registerSchema, loginSchema, forgotPasswordSchema,
   resetPasswordSchema, changePasswordSchema, updateProfileSchema,
@@ -10,6 +11,7 @@ const {
 } = require('./auth.schema');
 
 const router = Router();
+const avatarUpload = makeUploader('avatars');
 
 function normalizeRegisterBody(req, _res, next) {
   const body = req.body || {};
@@ -49,5 +51,7 @@ router.delete('/me/sessions/:id', requireAuth, ctrl.revokeSession);
 router.post('/me/sessions/revoke-others', requireAuth, ctrl.signOutOtherSessions);
 router.patch('/me/profile', requireAuth, validate({ body: updateProfileSchema }), ctrl.updateProfile);
 router.post('/me/change-password', requireAuth, validate({ body: changePasswordSchema }), ctrl.changePassword);
+router.post('/me/avatar', requireAuth, avatarUpload.single('avatar'), ctrl.uploadAvatar);
+router.delete('/me/avatar', requireAuth, ctrl.removeAvatar);
 
 module.exports = router;

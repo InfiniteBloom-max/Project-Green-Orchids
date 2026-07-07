@@ -193,6 +193,7 @@ const authService = {
         status: user.trade_account_status ? uiAccountStatus(user.trade_account_status) : user.status,
         tier: user.tier,
         businessName: user.business_name,
+        avatarUrl: user.avatar_url,
         permissions,
       },
     };
@@ -243,6 +244,7 @@ const authService = {
         status: user.trade_account_status ? uiAccountStatus(user.trade_account_status) : user.status,
         tier: user.tier,
         businessName: user.business_name,
+        avatarUrl: user.avatar_url,
         permissions,
       },
     };
@@ -427,6 +429,11 @@ const authService = {
 
   async getSummary(userId) {
     return authRepository.getUserSummary(userId);
+  },
+
+  async updateAvatar(userId, avatarUrl) {
+    await authRepository.updateUserAvatar(userId, avatarUrl);
+    return authRepository.getUserWithProfile(userId);
   },
 };
 

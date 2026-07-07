@@ -65,9 +65,15 @@ export function AuthProvider({ children }) {
     setPermissions([]);
   }, []);
 
+  // Merges partial updates (e.g. a freshly-uploaded avatarUrl) into the current user object
+  // without requiring a full refreshSession() round-trip.
+  const updateUser = useCallback((updates) => {
+    setUser((prev) => (prev ? { ...prev, ...updates } : prev));
+  }, []);
+
   const value = useMemo(
-    () => ({ user, permissions, login, logout, refreshSession, isLoading }),
-    [user, permissions, login, logout, refreshSession, isLoading]
+    () => ({ user, permissions, login, logout, refreshSession, updateUser, isLoading }),
+    [user, permissions, login, logout, refreshSession, updateUser, isLoading]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

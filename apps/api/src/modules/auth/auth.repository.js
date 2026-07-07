@@ -14,7 +14,7 @@ const authRepository = {
   async findUserByEmail(email) {
     const result = await query(
       `SELECT u.id, u.email, u.password_hash, u.status, u.role_id, u.full_name AS name,
-              u.locked_until, r.name AS role, ta.account_status AS trade_account_status
+              u.locked_until, u.avatar_url, r.name AS role, ta.account_status AS trade_account_status
        FROM users u
        LEFT JOIN roles r ON r.id = u.role_id
        LEFT JOIN trade_accounts ta ON ta.user_id = u.id
@@ -28,7 +28,7 @@ const authRepository = {
     const result = await query(
       `SELECT u.id, u.email, u.status, u.role_id, u.full_name AS name, NULL::text AS phone,
               r.name AS role, ta.account_status AS trade_account_status,
-              bt.name AS tier, ta.business_name, u.created_at, u.updated_at
+              bt.name AS tier, ta.business_name, u.avatar_url, u.created_at, u.updated_at
        FROM users u
        LEFT JOIN roles r ON r.id = u.role_id
        LEFT JOIN trade_accounts ta ON ta.user_id = u.id
@@ -210,7 +210,7 @@ const authRepository = {
   async getUserWithProfile(userId) {
     const result = await query(
       `SELECT u.id, u.email, u.full_name AS name, NULL::text AS phone, u.status, u.role_id, u.email_verified_at, u.created_at,
-              r.name as role_name,
+              u.avatar_url, r.name as role_name,
               ta.id as trade_account_id, ta.business_name, ta.business_reg_no, ta.account_status as trade_account_status,
               ta.credit_limit, ta.payment_term AS payment_terms, bt.name AS tier,
               ta.address AS address_line1, NULL::text AS address_line2, NULL::text AS city, NULL::text AS district, NULL::text AS postal_code
@@ -243,6 +243,13 @@ const authRepository = {
     await query(
       `UPDATE users SET ${setClauses.join(', ')}, updated_at = NOW() WHERE id = $1`,
       [userId, ...values]
+    );
+  },
+
+  async updateUserAvatar(userId, avatarUrl) {
+    await query(
+      `UPDATE users SET avatar_url = $1, updated_at = NOW() WHERE id = $2`,
+      [avatarUrl, userId]
     );
   },
 

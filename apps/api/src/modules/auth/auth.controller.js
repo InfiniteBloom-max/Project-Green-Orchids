@@ -1,4 +1,6 @@
 const authService = require('./auth.service');
+const { publicUrl } = require('../../middleware/upload');
+const { AppError } = require('../../middleware/errors');
 
 const authController = {
   async register(req, res, next) {
@@ -169,6 +171,22 @@ const authController = {
   async getSummary(req, res, next) {
     try {
       const data = await authService.getSummary(req.user.id);
+      res.json({ success: true, data });
+    } catch (err) { next(err); }
+  },
+
+  async uploadAvatar(req, res, next) {
+    try {
+      if (!req.file) throw new AppError('FILE_REQUIRED', 'An image file is required', 400);
+      const url = publicUrl('avatars', req.file.filename);
+      const data = await authService.updateAvatar(req.user.id, url);
+      res.json({ success: true, data });
+    } catch (err) { next(err); }
+  },
+
+  async removeAvatar(req, res, next) {
+    try {
+      const data = await authService.updateAvatar(req.user.id, null);
       res.json({ success: true, data });
     } catch (err) { next(err); }
   },

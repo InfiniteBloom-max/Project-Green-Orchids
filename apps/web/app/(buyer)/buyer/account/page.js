@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useAuth } from '@/lib/auth';
 import { Button, Input } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -11,13 +11,54 @@ import api from '@/lib/api';
 import toast from 'react-hot-toast';
 
 export default function AccountPage() {
-  const { user, logout } = useAuth();
+  const { user, logout, updateUser } = useAuth();
   const [currentPw, setCurrentPw] = useState('');
   const [newPw, setNewPw] = useState('');
   const [confirmPw, setConfirmPw] = useState('');
   const [changingPw, setChangingPw] = useState(false);
   const [sessions, setSessions] = useState([]);
   const [showSessions, setShowSessions] = useState(false);
+  const [avatarBusy, setAvatarBusy] = useState(false);
+  const avatarInputRef = useRef(null);
+
+  const initials = (user?.businessName || user?.name || user?.email || 'U')
+    .split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase();
+  // avatarUrl from the API is a root-relative /uploads/... path, proxied straight through
+  // by the /uploads/:path* rewrite in next.config.js (same-origin, no CORS headaches).
+  const avatarSrc = user?.avatarUrl || null;
+
+  const handleAvatarSelect = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    setAvatarBusy(true);
+    try {
+      const formData = new FormData();
+      formData.append('avatar', file);
+      const res = await api.post('/auth/me/avatar', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      updateUser({ avatarUrl: res.data?.data?.avatar_url });
+      toast.success('Profile picture updated');
+    } catch (err) {
+      toast.error(err.response?.data?.error?.message || 'Failed to upload profile picture');
+    } finally {
+      setAvatarBusy(false);
+    }
+  };
+
+  const handleAvatarRemove = async () => {
+    setAvatarBusy(true);
+    try {
+      const res = await api.delete('/auth/me/avatar');
+      updateUser({ avatarUrl: res.data?.data?.avatar_url ?? null });
+      toast.success('Profile picture removed');
+    } catch (err) {
+      toast.error(err.response?.data?.error?.message || 'Failed to remove profile picture');
+    } finally {
+      setAvatarBusy(false);
+    }
+  };
 
   const handlePasswordChange = async (e) => {
     e.preventDefault();
@@ -55,6 +96,48 @@ export default function AccountPage() {
   return (
     <div className="space-y-6">
       <PageHeader tone="violet" title="Account Settings" description="Manage your business profile, tier benefits, password, and active sessions." />
+
+      {/* Profile Picture */}
+      <Card>
+        <h3 className="text-sm font-medium mb-3">Profile Picture</h3>
+        <div className="flex items-center gap-4">
+          <div className="h-20 w-20 shrink-0 overflow-hidden rounded-2xl">
+            {avatarSrc ? (
+              <img src={avatarSrc} alt={user?.name || 'Profile picture'} className="h-full w-full object-cover" />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center rounded-2xl bg-gradient-to-br from-green-500 to-orchid-500 text-xl font-bold text-white">
+                {initials}
+              </div>
+            )}
+          </div>
+          <div className="flex flex-col gap-2">
+            <input
+              ref={avatarInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleAvatarSelect}
+            />
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                loading={avatarBusy}
+                onClick={() => avatarInputRef.current?.click()}
+              >
+                Upload New Picture
+              </Button>
+              {avatarSrc && (
+                <Button type="button" size="sm" variant="ghost" disabled={avatarBusy} onClick={handleAvatarRemove}>
+                  Remove
+                </Button>
+              )}
+            </div>
+            <p className="text-xs text-gray-500">JPG, PNG, GIF or WEBP. Max 5MB.</p>
+          </div>
+        </div>
+      </Card>
 
       {/* Profile */}
       <Card>
