@@ -10,18 +10,19 @@ reviews:
   poem: false
   review_status: true
   path_filters:
-    - "apps/api/**"
+    - ".github/**"
+    - "scripts/**"
+    - "package.json"
+    - "start.bat"
   path_instructions:
-    - path: "apps/api/src/**"
+    - path: ".github/**"
       instructions: |
-        Perform a security-first backend audit. Check authentication and RBAC,
-        tenant/data isolation, input validation, SQL safety, transactionality,
-        race conditions, state transitions, error handling, sensitive logging,
-        and missing negative-path tests. Report only concrete, actionable issues.
-    - path: "apps/api/migrations/**"
+        Audit CI security, action pinning, permissions, secret handling, caching,
+        reproducibility, and whether required application checks are enforced.
+    - path: "scripts/**"
       instructions: |
-        Check migration ordering, reversibility, constraints, indexes, defaults,
-        data backfills, referential integrity, and compatibility with application code.
+        Audit destructive-operation safeguards, database and environment handling,
+        idempotency, error propagation, portability, and accidental secret exposure.
   auto_review:
     enabled: true
     drafts: true
