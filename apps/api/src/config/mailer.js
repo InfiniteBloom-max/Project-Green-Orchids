@@ -5,38 +5,38 @@ const path = require('path');
 const env = require('./env');
 
 const templatesDir = path.resolve(__dirname, '../templates');
-const TEMPLATE_FILES = Object.freeze({
-  account_locked: 'account_locked.hbs',
-  buyer_approved: 'buyer_approved.hbs',
-  buyer_rejected: 'buyer_rejected.hbs',
-  buyer_suspended: 'buyer_suspended.hbs',
-  delivery_confirmed: 'delivery_confirmed.hbs',
-  dispatch_notification: 'dispatch_notification.hbs',
-  invoice_overdue: 'invoice_overdue.hbs',
-  low_stock_digest: 'low_stock_digest.hbs',
-  new_device_login: 'new_device_login.hbs',
-  order_approved: 'order_approved.hbs',
-  order_cancelled: 'order_cancelled.hbs',
-  order_rejected: 'order_rejected.hbs',
-  order_submitted: 'order_submitted.hbs',
-  password_changed: 'password_changed.hbs',
-  payment_received: 'payment_received.hbs',
-  payment_reminder: 'payment_reminder.hbs',
-  price_approval_needed: 'price_approval_needed.hbs',
-  reset_password: 'reset_password.hbs',
-  rfq_declined: 'rfq_declined.hbs',
-  rfq_quoted: 'rfq_quoted.hbs',
-  rfq_received: 'rfq_received.hbs',
-  rma_decision: 'rma_decision.hbs',
-  rma_received: 'rma_received.hbs',
-  rma_resolved: 'rma_resolved.hbs',
-  verify_email: 'verify_email.hbs',
-});
+const TEMPLATE_FILES = new Map([
+  ['account_locked', 'account_locked.hbs'],
+  ['buyer_approved', 'buyer_approved.hbs'],
+  ['buyer_rejected', 'buyer_rejected.hbs'],
+  ['buyer_suspended', 'buyer_suspended.hbs'],
+  ['delivery_confirmed', 'delivery_confirmed.hbs'],
+  ['dispatch_notification', 'dispatch_notification.hbs'],
+  ['invoice_overdue', 'invoice_overdue.hbs'],
+  ['low_stock_digest', 'low_stock_digest.hbs'],
+  ['new_device_login', 'new_device_login.hbs'],
+  ['order_approved', 'order_approved.hbs'],
+  ['order_cancelled', 'order_cancelled.hbs'],
+  ['order_rejected', 'order_rejected.hbs'],
+  ['order_submitted', 'order_submitted.hbs'],
+  ['password_changed', 'password_changed.hbs'],
+  ['payment_received', 'payment_received.hbs'],
+  ['payment_reminder', 'payment_reminder.hbs'],
+  ['price_approval_needed', 'price_approval_needed.hbs'],
+  ['reset_password', 'reset_password.hbs'],
+  ['rfq_declined', 'rfq_declined.hbs'],
+  ['rfq_quoted', 'rfq_quoted.hbs'],
+  ['rfq_received', 'rfq_received.hbs'],
+  ['rma_decision', 'rma_decision.hbs'],
+  ['rma_received', 'rma_received.hbs'],
+  ['rma_resolved', 'rma_resolved.hbs'],
+  ['verify_email', 'verify_email.hbs'],
+]);
 
 const templateCache = new Map();
 
 function loadTemplate(name) {
-  const filename = TEMPLATE_FILES[name];
+  const filename = TEMPLATE_FILES.get(name);
   if (!filename) throw new Error(`Unsupported email template: ${String(name)}`);
   if (!templateCache.has(name)) {
     const source = fs.readFileSync(path.resolve(templatesDir, filename), 'utf8');
@@ -72,7 +72,8 @@ function getTransporter() {
 }
 
 function renderTemplate(name, data = {}) {
-  return loadTemplate(name)(data);
+  const renderer = loadTemplate(name);
+  return renderer(data);
 }
 
 function safeHeader(value, field) {
