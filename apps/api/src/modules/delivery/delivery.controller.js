@@ -3,26 +3,42 @@ const path = require('path');
 const { publicUrl, UPLOADS_ROOT } = require('../../middleware/upload');
 const { AppError } = require('../../middleware/errors');
 
+function assertDeliveryAccess(req, delivery) {
+  if (req.user.roleName === 'TRADE_BUYER' && delivery.buyer_user_id !== req.user.id) {
+    throw new AppError('FORBIDDEN', 'Access denied', 403);
+  }
+}
+
 const list = async (req, res, next) => {
   try {
     const { status, assignedTo } = req.query;
-    res.json(await svc.list({ assignedTo, status }));
+    const buyerUserId = req.user.roleName === 'TRADE_BUYER' ? req.user.id : undefined;
+    res.json(await svc.list({ assignedTo, status, buyerUserId }));
   } catch (e) { next(e); }
 };
 
 const get = async (req, res, next) => {
-  try { res.json(await svc.getById(Number(req.params.id))); }
+  try {
+    const delivery = await svc.getById(Number(req.params.id));
+    assertDeliveryAccess(req, delivery);
+    res.json(delivery);
+  }
   catch (e) { next(e); }
 };
 
 const getEvents = async (req, res, next) => {
-  try { res.json(await svc.events(Number(req.params.id))); }
+  try {
+    const delivery = await svc.getById(Number(req.params.id));
+    assertDeliveryAccess(req, delivery);
+    res.json(await svc.events(Number(req.params.id)));
+  }
   catch (e) { next(e); }
 };
 
 const getPodFile = async (req, res, next) => {
   try {
     const delivery = await svc.getById(Number(req.params.id));
+    assertDeliveryAccess(req, delivery);
     const expectedPrefix = '/uploads/pod/';
     if (!delivery.pod_url || !delivery.pod_url.startsWith(expectedPrefix)) {
       throw new AppError('POD_NOT_FOUND', 'Proof-of-delivery file not found', 404);

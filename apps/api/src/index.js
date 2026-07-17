@@ -27,7 +27,13 @@ app.set('trust proxy', 1);
 
 // ── Middleware Chain ──
 app.use(helmet());
-const corsOrigins = new Set(String(env.CORS_ORIGIN).split(',').map(value => new URL(value.trim()).origin));
+const corsOrigins = new Set(
+  String(env.CORS_ORIGIN)
+    .split(',')
+    .map(value => value.trim())
+    .filter(Boolean)
+    .map(value => new URL(value).origin)
+);
 app.use(cors({
   origin(origin, callback) {
     if (!origin || corsOrigins.has(origin)) return callback(null, true);

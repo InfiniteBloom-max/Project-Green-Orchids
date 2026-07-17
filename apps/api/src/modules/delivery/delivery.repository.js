@@ -1,14 +1,16 @@
 const { pool } = require('../../config/db');
 
-async function list({ assignedTo, status } = {}) {
+async function list({ assignedTo, status, buyerUserId } = {}) {
   const conds = [], vals = [];
   if (assignedTo) { conds.push(`d.assigned_to = $${vals.length+1}`); vals.push(assignedTo); }
   if (status)     { conds.push(`d.status = $${vals.length+1}`);      vals.push(status); }
+  if (buyerUserId) { conds.push(`ta.user_id = $${vals.length+1}`); vals.push(buyerUserId); }
   const where = conds.length ? 'WHERE ' + conds.join(' AND ') : '';
   const { rows } = await pool.query(`
     SELECT d.*, o.order_no AS reference_number, u.full_name AS assigned_name
     FROM deliveries d
     JOIN orders o ON o.id = d.order_id
+    JOIN trade_accounts ta ON ta.id = o.buyer_id
     LEFT JOIN users u ON u.id = d.assigned_to
     ${where}
     ORDER BY d.updated_at DESC
@@ -19,9 +21,11 @@ async function list({ assignedTo, status } = {}) {
 
 async function getById(id) {
   const { rows } = await pool.query(`
-    SELECT d.*, o.order_no AS reference_number, u.full_name AS assigned_name
+    SELECT d.*, o.order_no AS reference_number, u.full_name AS assigned_name,
+           ta.user_id AS buyer_user_id
     FROM deliveries d
     JOIN orders o ON o.id = d.order_id
+    JOIN trade_accounts ta ON ta.id = o.buyer_id
     LEFT JOIN users u ON u.id = d.assigned_to
     WHERE d.id = $1
   `, [id]);
