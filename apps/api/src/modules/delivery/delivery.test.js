@@ -5,6 +5,7 @@ const { startServer, req, login } = require('../../test/helpers');
 let ctx;
 let buyerToken;
 let otherBuyerToken;
+let financeToken;
 let adminToken;
 let deliveryToken;
 let deliveryUserId;
@@ -14,6 +15,7 @@ before(async () => {
   ctx = await startServer();
   buyerToken = await login(ctx.baseUrl, 'buyer1');
   otherBuyerToken = await login(ctx.baseUrl, 'buyer2');
+  financeToken = await login(ctx.baseUrl, 'finance');
   adminToken = await login(ctx.baseUrl, 'admin');
   deliveryToken = await login(ctx.baseUrl, 'delivery');
 
@@ -68,6 +70,9 @@ test('buyers can only list and open delivery records that belong to their own tr
 
   const otherPod = await req(ctx.baseUrl, 'GET', `/deliveries/${delivery.id}/pod-file`, { token: otherBuyerToken });
   assert.equal(otherPod.status, 403);
+
+  const unrelatedStaffPod = await req(ctx.baseUrl, 'GET', `/deliveries/${delivery.id}/pod-file`, { token: financeToken });
+  assert.equal(unrelatedStaffPod.status, 403);
 });
 
 test('golden path: assign -> dispatch -> in-transit -> POD upload -> buyer confirms receipt', async () => {

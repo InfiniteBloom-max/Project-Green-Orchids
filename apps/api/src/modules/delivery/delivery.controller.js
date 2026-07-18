@@ -9,6 +9,13 @@ function assertDeliveryAccess(req, delivery) {
   }
 }
 
+function assertPodAccess(req, delivery) {
+  assertDeliveryAccess(req, delivery);
+  if (req.user.roleName !== 'TRADE_BUYER' && !req.user.permissions.includes('pod.upload')) {
+    throw new AppError('FORBIDDEN', 'Access denied', 403);
+  }
+}
+
 const list = async (req, res, next) => {
   try {
     const { status, assignedTo } = req.query;
@@ -38,7 +45,7 @@ const getEvents = async (req, res, next) => {
 const getPodFile = async (req, res, next) => {
   try {
     const delivery = await svc.getById(Number(req.params.id));
-    assertDeliveryAccess(req, delivery);
+    assertPodAccess(req, delivery);
     const expectedPrefix = '/uploads/pod/';
     if (!delivery.pod_url || !delivery.pod_url.startsWith(expectedPrefix)) {
       throw new AppError('POD_NOT_FOUND', 'Proof-of-delivery file not found', 404);
