@@ -96,9 +96,12 @@ function makeUploader(subdir) {
       let head;
       try {
         const fd = fs.openSync(filePath, 'r');
-        head = Buffer.alloc(16);
-        fs.readSync(fd, head, 0, 16, 0);
-        fs.closeSync(fd);
+        try {
+          head = Buffer.alloc(16);
+          fs.readSync(fd, head, 0, 16, 0);
+        } finally {
+          fs.closeSync(fd);
+        }
       } catch (readErr) {
         return next(readErr);
       }

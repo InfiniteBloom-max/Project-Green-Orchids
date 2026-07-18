@@ -224,6 +224,20 @@ async function seed() {
     // inserts fixture data into the already-migrated disposable database.
     const { rows: rolesList } = await pool.query('SELECT id, name FROM roles');
     const roleMap = new Map(rolesList.map(r => [r.name, r.id]));
+    const expectedRoles = [
+      'ADMIN',
+      'TRADE_BUYER',
+      'INVENTORY_MANAGER',
+      'FINANCE_OFFICER',
+      'DELIVERY_COORDINATOR',
+      'SALES_MANAGER',
+    ];
+    const missingRoles = expectedRoles.filter(role => !roleMap.has(role));
+    if (missingRoles.length > 0) {
+      throw new Error(
+        `Missing required roles; run all database migrations before seeding: ${missingRoles.join(', ')}`,
+      );
+    }
     console.log(`   → ${[...roleMap.keys()].join(', ')}`);
 
     // ---- 3. Staff users ----

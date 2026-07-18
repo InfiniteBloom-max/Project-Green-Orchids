@@ -87,20 +87,28 @@ After the upgrades, `npm audit` reported no known vulnerabilities.
 - Reviewed CodeRabbit feedback and implemented the actionable findings.
 - Documented justified false positives where the scanner could not recognize application-specific validation controls.
 
+### Final CodeRabbit follow-up
+
+- Guaranteed closure of the upload signature-check file descriptor with `try`/`finally`, including when a read fails.
+- Added a seed preflight check that lists and rejects missing fixture roles, including `SALES_MANAGER`, before any role identifier is used.
+- Added a production-dependency audit to CI so future `npm audit` results are preserved in an independently accessible workflow log.
+
 ## Validation results
 
-| Security or quality check | Final result |
-|---|---:|
-| Code-scanning alerts | **0 open** |
-| Dependabot alerts | **0 open** |
-| Secret-scanning alerts | **0 open** |
-| `npm audit` vulnerabilities | **0** |
-| API integration tests | **63/63 passed** |
-| Production web build | **Passed** |
-| CodeQL — GitHub Actions | **Passed** |
-| CodeQL — JavaScript/TypeScript | **Passed** |
-| CodeRabbit review | **Passed** |
-| Main-branch CI | **Passed** |
+Validation baseline: commit [`70d2a54138421bd24b647fe13c06ecafad1b1a69`](https://github.com/ronithrashmikara/Project-Green-Orchids/commit/70d2a54138421bd24b647fe13c06ecafad1b1a69), checked on **18 July 2026 at 10:16 Asia/Colombo (04:46 UTC)**. The follow-up fixes in this report are validated by [PR #63 checks](https://github.com/ronithrashmikara/Project-Green-Orchids/pull/63/checks).
+
+| Security or quality check | Final result | Auditable evidence |
+|---|---:|---|
+| Code-scanning alerts | **0 open** | [Code scanning dashboard](https://github.com/ronithrashmikara/Project-Green-Orchids/security/code-scanning) |
+| Dependabot alerts | **0 open** | [Dependabot dashboard](https://github.com/ronithrashmikara/Project-Green-Orchids/security/dependabot) |
+| Secret-scanning alerts | **0 open** | [Secret-scanning dashboard](https://github.com/ronithrashmikara/Project-Green-Orchids/security/secret-scanning) |
+| `npm audit` vulnerabilities | **0** | [CI audit step and logs](https://github.com/ronithrashmikara/Project-Green-Orchids/actions/workflows/ci.yml) |
+| API integration tests | **63/63 passed** | [Main CI run](https://github.com/ronithrashmikara/Project-Green-Orchids/actions/runs/29631048286) |
+| Production web build | **Passed** | [Main CI run](https://github.com/ronithrashmikara/Project-Green-Orchids/actions/runs/29631048286) |
+| CodeQL — GitHub Actions | **Passed** | [Main CodeQL run](https://github.com/ronithrashmikara/Project-Green-Orchids/actions/runs/29631048135) |
+| CodeQL — JavaScript/TypeScript | **Passed** | [Main CodeQL run](https://github.com/ronithrashmikara/Project-Green-Orchids/actions/runs/29631048135) |
+| CodeRabbit review | **Passed after follow-up fixes** | [PR #63 review and checks](https://github.com/ronithrashmikara/Project-Green-Orchids/pull/63) |
+| Main-branch CI | **Passed** | [Main CI run](https://github.com/ronithrashmikara/Project-Green-Orchids/actions/runs/29631048286) |
 
 ## Pull-request record
 
