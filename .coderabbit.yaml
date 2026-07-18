@@ -1,0 +1,31 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: en-US
+early_access: false
+
+reviews:
+  profile: assertive
+  request_changes_workflow: true
+  high_level_summary: true
+  in_progress_fortune: false
+  poem: false
+  review_status: true
+  path_filters:
+    - "apps/api/**"
+  path_instructions:
+    - path: "apps/api/src/**"
+      instructions: |
+        Perform a security-first backend audit. Check authentication and RBAC,
+        tenant/data isolation, input validation, SQL safety, transactionality,
+        race conditions, state transitions, error handling, sensitive logging,
+        and missing negative-path tests. Report only concrete, actionable issues.
+    - path: "apps/api/migrations/**"
+      instructions: |
+        Check migration ordering, reversibility, constraints, indexes, defaults,
+        data backfills, referential integrity, and compatibility with application code.
+  auto_review:
+    enabled: true
+    drafts: true
+    auto_incremental_review: true
+
+chat:
+  art: false
