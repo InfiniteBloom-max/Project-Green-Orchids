@@ -25,9 +25,20 @@ export default function StatusPage() {
 
   const check = useCallback(async () => {
     try {
-      const res = await fetch('/api/status', { cache: 'no-store' });
-      if (!res.ok) throw new Error('bad response');
-      setData(await res.json());
+      const startedAt = Date.now();
+      const res = await fetch('/api/healthz', { cache: 'no-store' });
+      const health = await res.json();
+      if (!res.ok && res.status !== 503) throw new Error('bad response');
+      const latencyMs = Date.now() - startedAt;
+      const healthy = res.ok && health?.status === 'healthy';
+      setData({
+        overall: healthy ? 'operational' : 'major_outage',
+        checkedAt: health?.timestamp || new Date().toISOString(),
+        components: [
+          { key: 'web', name: 'Web application', status: 'operational', latencyMs: 0 },
+          { key: 'health', name: 'API & database health check', status: healthy ? 'operational' : 'major_outage', latencyMs },
+        ],
+      });
       setError(false);
     } catch {
       setError(true);
@@ -56,7 +67,7 @@ export default function StatusPage() {
             Orchids platform status
           </h1>
           <p className="mx-auto mt-6 max-w-xl text-base leading-7 text-white/70">
-            Live checks against the web application, API and database that power the trade portal.
+            Live checks against the web application and the aggregate API/database health endpoint.
           </p>
         </div>
 
@@ -89,7 +100,7 @@ export default function StatusPage() {
                 <div key={c.key} className="flex items-center justify-between gap-4 px-7 py-5">
                   <span className="text-sm font-medium text-white/90">{c.name}</span>
                   <div className="flex items-center gap-3">
-                    {!error && !loading && c.key !== 'web' && (
+                    {!error && !loading && c.key === 'health' && (
                       <span className="hidden text-xs text-white/40 sm:block">{c.latencyMs}ms</span>
                     )}
                     <span className={`flex items-center gap-2 text-xs font-semibold ${meta.text}`}>
@@ -115,6 +126,5 @@ export default function StatusPage() {
 
 const FALLBACK_COMPONENTS = [
   { key: 'web', name: 'Web application' },
-  { key: 'api', name: 'API server' },
-  { key: 'database', name: 'Database' },
+  { key: 'health', name: 'API & database health check' },
 ];

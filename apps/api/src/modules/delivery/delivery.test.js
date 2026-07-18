@@ -4,6 +4,8 @@ const { startServer, req, login } = require('../../test/helpers');
 
 let ctx;
 let buyerToken;
+let otherBuyerToken;
+let financeToken;
 let adminToken;
 let deliveryToken;
 let deliveryUserId;
@@ -12,6 +14,8 @@ let delivery;
 before(async () => {
   ctx = await startServer();
   buyerToken = await login(ctx.baseUrl, 'buyer1');
+  otherBuyerToken = await login(ctx.baseUrl, 'buyer2');
+  financeToken = await login(ctx.baseUrl, 'finance');
   adminToken = await login(ctx.baseUrl, 'admin');
   deliveryToken = await login(ctx.baseUrl, 'delivery');
 
@@ -52,6 +56,23 @@ test('regression (BUG-009): assigning to a non-coordinator or nonexistent user i
     token: adminToken, body: { assignedTo: 'not-a-uuid' },
   });
   assert.equal(malformed.status, 422);
+});
+
+test('buyers can only list and open delivery records that belong to their own trade account', async () => {
+  const ownList = await req(ctx.baseUrl, 'GET', '/deliveries', { token: buyerToken });
+  assert.ok(ownList.data.some((row) => row.id === delivery.id));
+
+  const otherList = await req(ctx.baseUrl, 'GET', '/deliveries', { token: otherBuyerToken });
+  assert.ok(!otherList.data.some((row) => row.id === delivery.id));
+
+  const otherGet = await req(ctx.baseUrl, 'GET', `/deliveries/${delivery.id}`, { token: otherBuyerToken });
+  assert.equal(otherGet.status, 403);
+
+  const otherPod = await req(ctx.baseUrl, 'GET', `/deliveries/${delivery.id}/pod-file`, { token: otherBuyerToken });
+  assert.equal(otherPod.status, 403);
+
+  const unrelatedStaffPod = await req(ctx.baseUrl, 'GET', `/deliveries/${delivery.id}/pod-file`, { token: financeToken });
+  assert.equal(unrelatedStaffPod.status, 403);
 });
 
 test('golden path: assign -> dispatch -> in-transit -> POD upload -> buyer confirms receipt', async () => {

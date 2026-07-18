@@ -1,21 +1,67 @@
 const svc = require('./delivery.service');
-const { publicUrl } = require('../../middleware/upload');
+const path = require('path');
+const { publicUrl, UPLOADS_ROOT } = require('../../middleware/upload');
+const { AppError } = require('../../middleware/errors');
+
+function assertDeliveryAccess(req, delivery) {
+  if (req.user.roleName === 'TRADE_BUYER' && delivery.buyer_user_id !== req.user.id) {
+    throw new AppError('FORBIDDEN', 'Access denied', 403);
+  }
+}
+
+function assertPodAccess(req, delivery) {
+  assertDeliveryAccess(req, delivery);
+  if (req.user.roleName !== 'TRADE_BUYER' && !req.user.permissions.includes('pod.upload')) {
+    throw new AppError('FORBIDDEN', 'Access denied', 403);
+  }
+}
 
 const list = async (req, res, next) => {
   try {
     const { status, assignedTo } = req.query;
-    res.json(await svc.list({ assignedTo, status }));
+    const buyerUserId = req.user.roleName === 'TRADE_BUYER' ? req.user.id : undefined;
+    res.json(await svc.list({ assignedTo, status, buyerUserId }));
   } catch (e) { next(e); }
 };
 
 const get = async (req, res, next) => {
-  try { res.json(await svc.getById(Number(req.params.id))); }
+  try {
+    const delivery = await svc.getById(Number(req.params.id));
+    assertDeliveryAccess(req, delivery);
+    res.json(delivery);
+  }
   catch (e) { next(e); }
 };
 
 const getEvents = async (req, res, next) => {
-  try { res.json(await svc.events(Number(req.params.id))); }
+  try {
+    const delivery = await svc.getById(Number(req.params.id));
+    assertDeliveryAccess(req, delivery);
+    res.json(await svc.events(Number(req.params.id)));
+  }
   catch (e) { next(e); }
+};
+
+const getPodFile = async (req, res, next) => {
+  try {
+    const delivery = await svc.getById(Number(req.params.id));
+    assertPodAccess(req, delivery);
+    const expectedPrefix = '/uploads/pod/';
+    if (!delivery.pod_url || !delivery.pod_url.startsWith(expectedPrefix)) {
+      throw new AppError('POD_NOT_FOUND', 'Proof-of-delivery file not found', 404);
+    }
+    const filename = path.basename(delivery.pod_url);
+    if (filename !== delivery.pod_url.slice(expectedPrefix.length)) {
+      throw new AppError('INVALID_POD_PATH', 'Invalid proof-of-delivery path', 400);
+    }
+    res.setHeader('Cache-Control', 'private, max-age=300');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.sendFile(filename, { root: path.join(UPLOADS_ROOT, 'pod'), dotfiles: 'deny' }, (err) => {
+      if (!err) return;
+      if (!res.headersSent) return next(new AppError('POD_NOT_FOUND', 'Proof-of-delivery file not found', 404));
+      return next(err);
+    });
+  } catch (e) { next(e); }
 };
 
 const assign = async (req, res, next) => {
@@ -37,7 +83,7 @@ const inTransit = async (req, res, next) => {
 
 const uploadPod = async (req, res, next) => {
   try {
-    const podUrl = req.file ? publicUrl('pod', req.file.filename) : (req.body.podUrl || null);
+    const podUrl = req.file ? publicUrl('pod', req.file.filename) : null;
     if (!podUrl) return res.status(400).json({ success: false, error: { code: 'POD_REQUIRED', message: 'A proof-of-delivery photo is required' } });
     res.json(await svc.transition(Number(req.params.id), 'DELIVERED', { podUrl, actorId: req.user.id }));
   } catch (e) { next(e); }
@@ -55,4 +101,4 @@ const cancel = async (req, res, next) => {
   catch (e) { next(e); }
 };
 
-module.exports = { list, get, getEvents, assign, dispatch, inTransit, uploadPod, fail, cancel };
+module.exports = { list, get, getEvents, getPodFile, assign, dispatch, inTransit, uploadPod, fail, cancel };
