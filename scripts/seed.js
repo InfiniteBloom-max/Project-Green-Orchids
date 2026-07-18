@@ -202,6 +202,24 @@ async function seed() {
   const pool = new Pool({ connectionString: DATABASE_URL });
 
   try {
+    // Validate migration-owned authorization data before destructive writes.
+    const { rows: rolesList } = await pool.query('SELECT id, name FROM roles');
+    const roleMap = new Map(rolesList.map(r => [r.name, r.id]));
+    const expectedRoles = [
+      'ADMIN',
+      'TRADE_BUYER',
+      'INVENTORY_MANAGER',
+      'FINANCE_OFFICER',
+      'DELIVERY_COORDINATOR',
+      'SALES_MANAGER',
+    ];
+    const missingRoles = expectedRoles.filter(role => !roleMap.has(role));
+    if (missingRoles.length > 0) {
+      throw new Error(
+        `Missing required roles; run all database migrations before seeding: ${missingRoles.join(', ')}`,
+      );
+    }
+
     console.log('🧹 Clearing existing data…');
     await clearData(pool);
     console.log('✅ Data cleared.\n');
@@ -222,8 +240,6 @@ async function seed() {
     console.log('🛡️  Seeding roles & permissions…');
     // The migration runner owns schema and authorization-matrix setup. Seed only
     // inserts fixture data into the already-migrated disposable database.
-    const { rows: rolesList } = await pool.query('SELECT id, name FROM roles');
-    const roleMap = new Map(rolesList.map(r => [r.name, r.id]));
     console.log(`   → ${[...roleMap.keys()].join(', ')}`);
 
     // ---- 3. Staff users ----
