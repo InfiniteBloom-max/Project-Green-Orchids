@@ -39,14 +39,17 @@ async function startServer() {
   };
 }
 
-async function req(baseUrl, method, urlPath, { token, body, form } = {}) {
-  const headers = {};
+async function req(baseUrl, method, urlPath, { token, body, form, rawBody, headers: extraHeaders } = {}) {
+  const headers = { ...(extraHeaders || {}) };
   if (token) headers.Authorization = `Bearer ${token}`;
   let fetchBody;
   if (form) {
     fetchBody = form;
+  } else if (rawBody !== undefined) {
+    if (!headers['Content-Type'] && !headers['content-type']) headers['Content-Type'] = 'application/json';
+    fetchBody = rawBody;
   } else if (body !== undefined) {
-    headers['Content-Type'] = 'application/json';
+    if (!headers['Content-Type'] && !headers['content-type']) headers['Content-Type'] = 'application/json';
     fetchBody = JSON.stringify(body);
   }
   const res = await fetch(`${baseUrl}${urlPath}`, { method, headers, body: fetchBody });
